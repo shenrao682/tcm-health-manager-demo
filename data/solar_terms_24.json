@@ -1,0 +1,863 @@
+{
+ "schema_version": "0.1",
+ "note": "24 节气定义与养生要点。index 按通行顺序(立春=1 … 大寒=24;霜降=18);solar_longitude 为太阳黄经(度)。wellness 为通用要点;constitution_season_tips 为九种体质在四季的调养侧重,与节气要点组合成「今日」页提示。来源字段为知识层溯源用,正式入库前需中医顾问逐条核对。",
+ "timezone_policy": "交节时刻以用户所在时区落到日历日;节气卡显示交节时刻,便于与按北京时间的中国日历对照。",
+ "terms": [
+  {
+   "index": 1,
+   "code": "lichun",
+   "zh": "立春",
+   "en": "Start of Spring",
+   "solar_longitude": 315,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "升发阳气,疏肝理气",
+    "principle_en": "Raise yang, soothe the liver",
+    "diet_focus": [
+     "韭菜",
+     "豆芽",
+     "葱",
+     "香菜"
+    ],
+    "avoid": [
+     "酸收之品过多",
+     "暴食"
+    ],
+    "body_focus": [
+     "颈肩",
+     "肝胆经"
+    ],
+    "tip_zh": "立春阳气初生。多吃辛甘发散的芽菜,少酸;早起伸展,舒展一冬蜷缩的筋骨。",
+    "tip_en": "Yang begins to rise at Start of Spring. Favor pungent, sweet sprouting vegetables over sour; stretch out a winter's worth of stiffness in the morning.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 2,
+   "code": "yushui",
+   "zh": "雨水",
+   "en": "Rain Water",
+   "solar_longitude": 330,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "健脾祛湿,防倒春寒",
+    "principle_en": "Strengthen the spleen, clear damp, guard against late cold snaps",
+    "diet_focus": [
+     "薏米",
+     "山药",
+     "红枣",
+     "小米"
+    ],
+    "avoid": [
+     "生冷",
+     "过甜"
+    ],
+    "body_focus": [
+     "脾胃",
+     "下肢"
+    ],
+    "tip_zh": "雨水湿气渐重、乍暖还寒。衣服别脱太快,饮食健脾为先,少吃寒凉和甜腻。",
+    "tip_en": "Dampness grows at Rain Water and warmth comes and goes. Don't shed layers too fast; eat to support the spleen and go easy on cold and sweet food.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 3,
+   "code": "jingzhe",
+   "zh": "惊蛰",
+   "en": "Awakening of Insects",
+   "solar_longitude": 345,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "顺阳而动,清淡养肝",
+    "principle_en": "Move with rising yang, light food for the liver",
+    "diet_focus": [
+     "梨",
+     "菠菜",
+     "春笋",
+     "百合"
+    ],
+    "avoid": [
+     "辛辣燥热",
+     "熬夜"
+    ],
+    "body_focus": [
+     "肝经",
+     "眼睛"
+    ],
+    "tip_zh": "惊蛰万物复苏,人也容易肝火上升、口干。多喝水、吃梨,早睡;户外快走让阳气顺畅升发。",
+    "tip_en": "Everything wakes at Awakening of Insects, and liver heat and dry mouth are common. Drink water, eat pear, sleep early, and walk briskly outdoors.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 4,
+   "code": "chunfen",
+   "zh": "春分",
+   "en": "Spring Equinox",
+   "solar_longitude": 0,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "阴阳平衡,寒热适中",
+    "principle_en": "Balance yin and yang; neither too cold nor too hot",
+    "diet_focus": [
+     "菠菜",
+     "豆腐",
+     "枸杞",
+     "蜂蜜"
+    ],
+    "avoid": [
+     "大寒大热之品",
+     "情绪大起大落"
+    ],
+    "body_focus": [
+     "情志",
+     "肝脾"
+    ],
+    "tip_zh": "春分昼夜平分,养生讲平衡。饮食寒热搭配,情绪也别大起大落;午后晒太阳,晚上按时睡。",
+    "tip_en": "Day and night are equal at Spring Equinox; the keyword is balance. Pair cooling with warming foods, keep moods even, catch afternoon sun and sleep on time.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 5,
+   "code": "qingming",
+   "zh": "清明",
+   "en": "Pure Brightness",
+   "solar_longitude": 15,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "柔肝养肺,防风防过敏",
+    "principle_en": "Soften the liver, nourish the lungs, guard against wind and allergies",
+    "diet_focus": [
+     "荠菜",
+     "银耳",
+     "枸杞",
+     "山药"
+    ],
+    "avoid": [
+     "发物:海鲜、笋过量",
+     "情绪郁结"
+    ],
+    "body_focus": [
+     "鼻",
+     "呼吸道"
+    ],
+    "tip_zh": "清明风大、花粉多,过敏体质注意防护。饮食清淡柔润,少吃发物;踏青疏解情绪,但别受风。",
+    "tip_en": "Pure Brightness brings wind and pollen; allergy-prone people take care. Eat light and moistening, limit trigger foods, and get outdoors without catching a chill.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 6,
+   "code": "guyu",
+   "zh": "谷雨",
+   "en": "Grain Rain",
+   "solar_longitude": 30,
+   "season": "spring",
+   "wellness": {
+    "principle_zh": "健脾化湿,护关节",
+    "principle_en": "Support the spleen, resolve damp, protect the joints",
+    "diet_focus": [
+     "香椿",
+     "薏米",
+     "冬瓜",
+     "鲫鱼"
+    ],
+    "avoid": [
+     "久坐潮湿处",
+     "甜腻"
+    ],
+    "body_focus": [
+     "脾胃",
+     "关节"
+    ],
+    "tip_zh": "谷雨雨水多、湿气重,关节不适者注意保暖防潮。多吃健脾利湿的食材,饭后散步。",
+    "tip_en": "Grain Rain is wet and damp; mind the joints and stay dry. Favor spleen-strengthening, damp-draining foods and walk after meals.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 7,
+   "code": "lixia",
+   "zh": "立夏",
+   "en": "Start of Summer",
+   "solar_longitude": 45,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "养心安神,清淡少油",
+    "principle_en": "Nourish the heart, calm the spirit, eat light",
+    "diet_focus": [
+     "莲子",
+     "苦瓜",
+     "番茄",
+     "绿豆"
+    ],
+    "avoid": [
+     "油腻",
+     "大汗后冲凉"
+    ],
+    "body_focus": [
+     "心",
+     "睡眠"
+    ],
+    "tip_zh": "立夏心火渐旺,容易心烦、睡不安。饮食清淡、略带苦味,午间小憩 20 分钟,运动别到大汗。",
+    "tip_en": "Heart fire rises at Start of Summer, bringing restlessness and lighter sleep. Eat light with a touch of bitter, nap 20 minutes at midday, and stop short of heavy sweating.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 8,
+   "code": "xiaoman",
+   "zh": "小满",
+   "en": "Grain Buds",
+   "solar_longitude": 60,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "清热祛湿,防皮肤病",
+    "principle_en": "Clear heat and damp, mind the skin",
+    "diet_focus": [
+     "赤小豆",
+     "薏米",
+     "黄瓜",
+     "苦菜"
+    ],
+    "avoid": [
+     "辛辣",
+     "甜腻",
+     "海鲜发物"
+    ],
+    "body_focus": [
+     "皮肤",
+     "脾胃"
+    ],
+    "tip_zh": "小满湿热渐起,皮肤问题多发。饮食清淡利湿,少辛辣甜腻;衣物透气,勤换洗。",
+    "tip_en": "Damp-heat builds at Grain Buds and skin complaints flare. Eat light and damp-draining, cut spice and sugar, and wear breathable clothes.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 9,
+   "code": "mangzhong",
+   "zh": "芒种",
+   "en": "Grain in Ear",
+   "solar_longitude": 75,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "清补养心,防暑湿",
+    "principle_en": "Light tonifying for the heart, guard against summer damp",
+    "diet_focus": [
+     "冬瓜",
+     "绿豆",
+     "鸭肉",
+     "莲藕"
+    ],
+    "avoid": [
+     "贪凉饮冷",
+     "熬夜"
+    ],
+    "body_focus": [
+     "心脾",
+     "午休"
+    ],
+    "tip_zh": "芒种闷热多雨,人易困倦。晚睡早起但务必午休;饮食清补,别贪冰饮,出汗后及时换衣。",
+    "tip_en": "Grain in Ear is muggy and tiring. Sleep a little later, rise early, and always nap; eat lightly nourishing food, skip iced drinks, change out of sweaty clothes.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 10,
+   "code": "xiazhi",
+   "zh": "夏至",
+   "en": "Summer Solstice",
+   "solar_longitude": 90,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "养阳护阴,防暑不贪凉",
+    "principle_en": "Protect yang and yin alike; beat the heat without overcooling",
+    "diet_focus": [
+     "西瓜适量",
+     "绿豆",
+     "丝瓜",
+     "酸梅汤"
+    ],
+    "avoid": [
+     "空调直吹",
+     "冰饮过量",
+     "烈日下运动"
+    ],
+    "body_focus": [
+     "腹部",
+     "后背"
+    ],
+    "tip_zh": "夏至阳气最盛、阴气初生。防暑但别贪凉,空调别对着吹,腹部盖好;运动放在清晨或傍晚。",
+    "tip_en": "Yang peaks and yin is born at Summer Solstice. Stay cool without overdoing it: no air-con blasting, keep the belly covered, exercise at dawn or dusk.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 11,
+   "code": "xiaoshu",
+   "zh": "小暑",
+   "en": "Minor Heat",
+   "solar_longitude": 105,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "清心消暑,健脾化湿",
+    "principle_en": "Cool the heart, relieve summer heat, resolve damp",
+    "diet_focus": [
+     "绿豆",
+     "荷叶",
+     "冬瓜",
+     "薏米"
+    ],
+    "avoid": [
+     "辛辣油腻",
+     "暴饮暴食"
+    ],
+    "body_focus": [
+     "心",
+     "脾胃"
+    ],
+    "tip_zh": "小暑湿热交蒸,胃口差、易乏力。少量多餐、清淡易消化;荷叶茶、绿豆汤解暑,心静自然凉。",
+    "tip_en": "Minor Heat steams with damp heat; appetite and energy dip. Eat smaller, lighter meals; lotus-leaf tea and mung-bean soup cool the body, a calm mind cools the rest.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 12,
+   "code": "dashu",
+   "zh": "大暑",
+   "en": "Major Heat",
+   "solar_longitude": 120,
+   "season": "summer",
+   "wellness": {
+    "principle_zh": "防暑补水,冬病夏治",
+    "principle_en": "Prevent heatstroke, hydrate, treat winter ailments in summer",
+    "diet_focus": [
+     "绿豆",
+     "西瓜",
+     "苦瓜",
+     "姜(少量)"
+    ],
+    "avoid": [
+     "长时间暴晒",
+     "过量冰饮"
+    ],
+    "body_focus": [
+     "补水",
+     "阳虚者温养"
+    ],
+    "tip_zh": "大暑最热,补水为先,少量多次。阳虚、怕冷的人反而是温养的好时机——这就是“冬病夏治”。",
+    "tip_en": "Major Heat is the hottest stretch: hydrate in small, frequent sips. For those who run cold, this is the season to build warmth — treating winter ailments in summer.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 13,
+   "code": "liqiu",
+   "zh": "立秋",
+   "en": "Start of Autumn",
+   "solar_longitude": 135,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "收敛养肺,防秋燥初起",
+    "principle_en": "Gather inward, nourish the lungs, head off early dryness",
+    "diet_focus": [
+     "梨",
+     "百合",
+     "莲藕",
+     "银耳"
+    ],
+    "avoid": [
+     "过早进补",
+     "辛辣"
+    ],
+    "body_focus": [
+     "肺",
+     "呼吸道"
+    ],
+    "tip_zh": "立秋暑热未退、燥气初起。饮食由清凉转向润燥,多吃梨和百合;别急着“贴秋膘”,等天真正凉下来。",
+    "tip_en": "Heat lingers at Start of Autumn while dryness begins. Shift from cooling toward moistening — pear, lily bulb — and don't rush into heavy autumn eating.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 14,
+   "code": "chushu",
+   "zh": "处暑",
+   "en": "End of Heat",
+   "solar_longitude": 150,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "滋阴润燥,早睡早起",
+    "principle_en": "Nourish yin, moisten dryness, early to bed and rise",
+    "diet_focus": [
+     "鸭肉",
+     "百合",
+     "蜂蜜",
+     "芝麻"
+    ],
+    "avoid": [
+     "辛辣",
+     "冷饮"
+    ],
+    "body_focus": [
+     "肺",
+     "皮肤"
+    ],
+    "tip_zh": "处暑暑气渐消,昼夜温差拉大。早睡早起,睡前温水;饮食滋阴润燥,皮肤开始干的人多喝水、少洗太热的澡。",
+    "tip_en": "Heat fades at End of Heat and day–night swings widen. Sleep and rise early; eat yin-nourishing, moistening food; if skin dries, drink more and skip very hot showers.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 15,
+   "code": "bailu",
+   "zh": "白露",
+   "en": "White Dew",
+   "solar_longitude": 165,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "润燥养肺,护好脚踝",
+    "principle_en": "Moisten the lungs, cover the ankles",
+    "diet_focus": [
+     "银耳",
+     "山药",
+     "莲子",
+     "枸杞"
+    ],
+    "avoid": [
+     "赤脚",
+     "生冷"
+    ],
+    "body_focus": [
+     "足踝",
+     "肺"
+    ],
+    "tip_zh": "“白露身不露”:夜凉露重,别再赤脚、露脚踝。饮食润燥,早晨一碗银耳或山药粥。",
+    "tip_en": "At White Dew the nights turn cool and damp — no more bare feet or ankles. Eat to moisten: white-fungus or yam congee in the morning.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 16,
+   "code": "qiufen",
+   "zh": "秋分",
+   "en": "Autumn Equinox",
+   "solar_longitude": 180,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "平调阴阳,润肺防凉",
+    "principle_en": "Balance yin and yang; moisten the lungs, avoid chills",
+    "diet_focus": [
+     "梨",
+     "百合",
+     "芝麻",
+     "核桃"
+    ],
+    "avoid": [
+     "辛辣",
+     "悲秋情绪"
+    ],
+    "body_focus": [
+     "情志",
+     "肺"
+    ],
+    "tip_zh": "秋分昼夜再度平分,之后夜长昼短。饮食平润,早晚添衣;秋日易生悲,多见朋友、多晒太阳。",
+    "tip_en": "Day and night balance again at Autumn Equinox, then nights lengthen. Eat mild and moistening, layer up morning and evening; autumn can lower mood — seek friends and sunlight.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 17,
+   "code": "hanlu",
+   "zh": "寒露",
+   "en": "Cold Dew",
+   "solar_longitude": 195,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "润燥收敛,早睡护足",
+    "principle_en": "Moisten, gather in, sleep early, keep the feet warm",
+    "diet_focus": [
+     "梨",
+     "百合",
+     "银耳",
+     "山药"
+    ],
+    "avoid": [
+     "辛辣",
+     "夜间受凉"
+    ],
+    "body_focus": [
+     "足",
+     "腰腹"
+    ],
+    "tip_zh": "寒露燥气当令、夜寒渐重。多吃梨、百合、银耳,少辛辣;睡前温水泡脚,护好脚和腰腹。",
+    "tip_en": "Dryness prevails at Cold Dew and nights grow cold. More pear, lily bulb and white fungus, less spice; soak the feet before bed and keep feet and lower back warm.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 18,
+   "code": "shuangjiang",
+   "zh": "霜降",
+   "en": "Frost's Descent",
+   "solar_longitude": 210,
+   "season": "autumn",
+   "wellness": {
+    "principle_zh": "平补、润燥、防寒",
+    "principle_en": "Gentle nourishment, moistening, warmth",
+    "diet_focus": [
+     "芝麻",
+     "山药",
+     "梨",
+     "银耳",
+     "栗子"
+    ],
+    "avoid": [
+     "辛辣",
+     "生冷"
+    ],
+    "body_focus": [
+     "脖颈",
+     "腰腹",
+     "足部"
+    ],
+    "tip_zh": "霜降是秋季最后一个节气,昼夜温差大。护住脖颈、腰腹和脚;饮食平补,多吃芝麻、山药、梨,少辛辣。民间说“补冬不如补霜降”。",
+    "tip_en": "Frost's Descent is autumn's last term, with big day–night swings. Keep neck, waist and feet warm; eat gently nourishing food — sesame, yam, pear — and go easy on spice.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 19,
+   "code": "lidong",
+   "zh": "立冬",
+   "en": "Start of Winter",
+   "solar_longitude": 225,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "藏精养肾,温补开始",
+    "principle_en": "Store essence, nourish the kidneys, begin warm tonifying",
+    "diet_focus": [
+     "羊肉",
+     "黑芝麻",
+     "核桃",
+     "栗子"
+    ],
+    "avoid": [
+     "生冷",
+     "熬夜"
+    ],
+    "body_focus": [
+     "肾",
+     "腰膝"
+    ],
+    "tip_zh": "立冬万物收藏,进补季节正式开始。温补为主但别过量;早睡晚起,等日出后再运动,护好腰膝。",
+    "tip_en": "Everything turns inward at Start of Winter and the tonifying season opens. Warm foods in moderation; sleep early, rise late, exercise after sunrise, guard the lower back and knees.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 20,
+   "code": "xiaoxue",
+   "zh": "小雪",
+   "en": "Minor Snow",
+   "solar_longitude": 240,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "温补防寒,疏解情志",
+    "principle_en": "Warm and protect; lift the spirits",
+    "diet_focus": [
+     "羊肉",
+     "萝卜",
+     "黑木耳",
+     "红枣"
+    ],
+    "avoid": [
+     "过度进补上火",
+     "久居室内"
+    ],
+    "body_focus": [
+     "情志",
+     "心脑血管"
+    ],
+    "tip_zh": "小雪天寒日短,容易情绪低落。温补的同时配点萝卜防上火;白天多出门见光,晚上早点休息。",
+    "tip_en": "Minor Snow brings cold and short days that dampen mood. Pair warming food with radish to avoid overheating; get daylight by day and rest early at night.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 21,
+   "code": "daxue",
+   "zh": "大雪",
+   "en": "Major Snow",
+   "solar_longitude": 255,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "温阳御寒,护头护脚",
+    "principle_en": "Warm yang against the cold; cover head and feet",
+    "diet_focus": [
+     "羊肉",
+     "牛肉",
+     "桂圆",
+     "生姜"
+    ],
+    "avoid": [
+     "受寒",
+     "冷饮"
+    ],
+    "body_focus": [
+     "头",
+     "足",
+     "心脑血管"
+    ],
+    "tip_zh": "大雪严寒,出门戴帽围巾,护好头和脚。晨起别急着起床,先在被窝里活动手脚;心脑血管不好的人尤其注意保暖。",
+    "tip_en": "Major Snow is bitter: hat and scarf outdoors, warm feet always. Move your limbs before getting out of bed; those with heart or vascular concerns take extra care against cold.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 22,
+   "code": "dongzhi",
+   "zh": "冬至",
+   "en": "Winter Solstice",
+   "solar_longitude": 270,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "一阳初生,静养护阳",
+    "principle_en": "Yang is reborn; rest quietly and protect it",
+    "diet_focus": [
+     "饺子/汤圆",
+     "羊肉",
+     "黑豆",
+     "桂圆"
+    ],
+    "avoid": [
+     "剧烈运动",
+     "大悲大喜"
+    ],
+    "body_focus": [
+     "阳气",
+     "后背"
+    ],
+    "tip_zh": "冬至阴极阳生,是养生的关键节点。静养为主,早睡,后背晒太阳;温补一餐,但别大吃大喝。",
+    "tip_en": "At Winter Solstice yang is reborn from deepest yin — a key moment. Rest, sleep early, warm your back in the sun; one warming meal, without overindulging.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 23,
+   "code": "xiaohan",
+   "zh": "小寒",
+   "en": "Minor Cold",
+   "solar_longitude": 285,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "温补藏阳,防寒护肾",
+    "principle_en": "Warm tonifying, store yang, guard the kidneys",
+    "diet_focus": [
+     "羊肉",
+     "核桃",
+     "黑豆",
+     "桂圆"
+    ],
+    "avoid": [
+     "生冷",
+     "寒凉水果"
+    ],
+    "body_focus": [
+     "腰",
+     "足",
+     "后颈"
+    ],
+    "tip_zh": "小寒是一年中最冷的节气之一。早晚护好腰和脚,晚饭可来一碗温补的汤;早睡晚起,等太阳出来再活动。",
+    "tip_en": "Minor Cold is among the coldest terms. Keep lower back and feet warm, have a warming soup at dinner, and rise after the sun does.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  },
+  {
+   "index": 24,
+   "code": "dahan",
+   "zh": "大寒",
+   "en": "Major Cold",
+   "solar_longitude": 300,
+   "season": "winter",
+   "wellness": {
+    "principle_zh": "固本培元,平稳过冬",
+    "principle_en": "Consolidate the root, pass winter steadily",
+    "diet_focus": [
+     "山药",
+     "红枣",
+     "糯米",
+     "姜"
+    ],
+    "avoid": [
+     "过度进补",
+     "油腻"
+    ],
+    "body_focus": [
+     "腰腹",
+     "膝"
+    ],
+    "tip_zh": "大寒已近立春,进补收尾、转向平和。少吃油腻,多喝温水,给脾胃减负,为春天做准备。",
+    "tip_en": "Major Cold sits just before spring. Wind down heavy tonics toward mild food, drink warm water and ease the digestion ahead of spring.",
+    "source": "《中医养生学》· 节气养生"
+   }
+  }
+ ],
+ "constitution_season_tips": {
+  "spring": {
+   "pinghe": {
+    "zh": "顺应春生,早起舒展,饮食清淡即可。",
+    "en": "Follow spring's rising energy: stretch in the morning, eat light."
+   },
+   "qixu": {
+    "zh": "春季多风易感冒,出门加件外套,别赶时间快跑。",
+    "en": "Spring wind brings colds easily — take a jacket and don't rush."
+   },
+   "yangxu": {
+    "zh": "倒春寒最伤阳虚,衣服晚点脱,早晨晒晒后背。",
+    "en": "Late cold snaps hit yang deficiency hardest: shed layers slowly and sun your back in the morning."
+   },
+   "yinxu": {
+    "zh": "春燥加上肝火,多喝水、少熬夜,晚上一碗百合粥。",
+    "en": "Spring dryness plus liver heat: drink more, sleep earlier, lily-bulb congee at night."
+   },
+   "tanshi": {
+    "zh": "春湿困脾,今天走够 6000 步,少吃甜腻。",
+    "en": "Spring damp weighs on the spleen — 6,000 steps today, skip the sweets."
+   },
+   "shire": {
+    "zh": "春天别贪辣,清淡一天,皮肤会感谢你。",
+    "en": "Hold the chili this spring; a light day is kind to your skin."
+   },
+   "xueyu": {
+    "zh": "春主生发,多活动肩背,每小时起来走 3 分钟。",
+    "en": "Spring favors movement — open the shoulders and back, stand up every hour."
+   },
+   "qiyu": {
+    "zh": "春应肝,最适合疏解情绪:午后出门,约个朋友。",
+    "en": "Spring belongs to the liver — the best season to unwind: get out this afternoon, call a friend."
+   },
+   "tebing": {
+    "zh": "花粉季来了,早晚戴口罩,回家洗脸换衣。",
+    "en": "Pollen season is here: mask up early and late, wash your face and change when home."
+   }
+  },
+  "summer": {
+   "pinghe": {
+    "zh": "夏养心,午休 20 分钟,运动放在清晨或傍晚。",
+    "en": "Summer nourishes the heart: a 20-minute nap, exercise at dawn or dusk."
+   },
+   "qixu": {
+    "zh": "暑热耗气,少量多次补水,别在烈日下久待。",
+    "en": "Summer heat drains qi — sip water often, stay out of the midday sun."
+   },
+   "yangxu": {
+    "zh": "冬病夏治正当时:少冰饮、不对着空调吹,腹部盖好。",
+    "en": "Treat winter ailments in summer: no iced drinks, no air-con blasting, keep the belly covered."
+   },
+   "yinxu": {
+    "zh": "夏季出汗伤阴,多喝温水,晚上吃点银耳或梨。",
+    "en": "Summer sweat taxes yin — warm water through the day, white fungus or pear at night."
+   },
+   "tanshi": {
+    "zh": "暑湿最重,管住甜饮和啤酒,出点微汗最好。",
+    "en": "Peak damp-heat: skip sugary drinks and beer; a light sweat is ideal."
+   },
+   "shire": {
+    "zh": "湿热体质的难熬季节:清淡、利湿,勤换衣,少熬夜。",
+    "en": "A hard season for damp-heat types: light, damp-draining food, fresh clothes, early nights."
+   },
+   "xueyu": {
+    "zh": "天热血行畅,正好多活动;别久坐空调房。",
+    "en": "Heat moves the blood — a good time to be active; don't sit all day in air-conditioning."
+   },
+   "qiyu": {
+    "zh": "心静自然凉,午后听听音乐,别把烦躁憋着。",
+    "en": "A calm mind cools the body: music in the afternoon, and let irritation out rather than in."
+   },
+   "tebing": {
+    "zh": "换季已过,但汗多易起疹,保持干爽,少吃海鲜发物。",
+    "en": "Pollen has eased, but sweat can trigger rashes — stay dry and limit seafood triggers."
+   }
+  },
+  "autumn": {
+   "pinghe": {
+    "zh": "顺应秋收,早睡早起,饮食清润。",
+    "en": "Follow autumn's gathering: early to bed, early to rise, light and moistening food."
+   },
+   "qixu": {
+    "zh": "气虚体质秋季易感冒,出门加件外套,别赶时间快跑。",
+    "en": "Qi deficiency catches autumn colds easily. Take a jacket; don't rush."
+   },
+   "yangxu": {
+    "zh": "秋凉阳气渐收,早晚护好腰腹和脚,今晚泡脚。",
+    "en": "Yang withdraws as autumn cools. Keep lower back, belly and feet warm; soak your feet tonight."
+   },
+   "yinxu": {
+    "zh": "秋燥伤阴,今天多喝温水,晚上来一碗银耳羹。",
+    "en": "Autumn dryness taxes yin — warm water through the day, white-fungus soup tonight."
+   },
+   "tanshi": {
+    "zh": "秋高气爽正适合活动,今天走够 6000 步。",
+    "en": "Crisp autumn air is made for moving — 6,000 steps today."
+   },
+   "shire": {
+    "zh": "天凉了也别贪辣,清淡一天。",
+    "en": "Cooler weather is no excuse for chili. Keep it light today."
+   },
+   "xueyu": {
+    "zh": "久坐伤血,每小时起来活动 3 分钟。",
+    "en": "Long sitting stagnates blood. Stand and move 3 minutes every hour."
+   },
+   "qiyu": {
+    "zh": "秋日易生悲,午后出门晒晒太阳,约个朋友。",
+    "en": "Autumn invites low spirits. Get afternoon sun and call a friend."
+   },
+   "tebing": {
+    "zh": "换季是过敏高发期,早晚戴口罩,回家洗脸。",
+    "en": "Season change means allergy season. Mask up early and late; wash your face when home."
+   }
+  },
+  "winter": {
+   "pinghe": {
+    "zh": "冬主藏,早睡晚起,温补一餐就好,别过量。",
+    "en": "Winter is for storing: sleep early, rise late, one warming meal is enough."
+   },
+   "qixu": {
+    "zh": "冬天别硬扛寒风,出门戴帽围巾,回家喝碗热汤。",
+    "en": "Don't brave the wind on empty: hat and scarf out, hot soup when home."
+   },
+   "yangxu": {
+    "zh": "阳虚最怕冬,腰腹和脚是重点,晚饭可来碗羊肉汤。",
+    "en": "Winter is hardest on yang deficiency: lower back, belly and feet first; lamb soup suits dinner."
+   },
+   "yinxu": {
+    "zh": "暖气房里更干,多喝水、少吃辛辣,温补要选平和的。",
+    "en": "Heated rooms dry you further — drink more, less spice, and choose mild tonics."
+   },
+   "tanshi": {
+    "zh": "冬天少动易生痰湿,室内也要活动,少吃肥甘。",
+    "en": "Less movement in winter breeds phlegm-damp: keep moving indoors, go easy on rich food."
+   },
+   "shire": {
+    "zh": "火锅季节到了,辛辣烟酒还是要节制。",
+    "en": "Hotpot season — spice, alcohol and tobacco still call for restraint."
+   },
+   "xueyu": {
+    "zh": "天冷血行迟缓,出门前先活动手脚,别久坐。",
+    "en": "Cold slows the blood: move your limbs before heading out, and don't sit too long."
+   },
+   "qiyu": {
+    "zh": "冬日短、情绪低,白天多见光,找人聊聊。",
+    "en": "Short days lower mood — get daylight, and talk to someone."
+   },
+   "tebing": {
+    "zh": "室内尘螨和干冷空气是冬天的过敏源,勤通风、戴口罩。",
+    "en": "Indoor dust mites and cold dry air are winter's triggers: ventilate often, wear a mask outside."
+   }
+  }
+ }
+}

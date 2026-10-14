@@ -50,8 +50,11 @@ python3 -m http.server 5173
 tcm-health-manager-demo/
 ├─ index.html                     演示本体(HTML + CSS + JS,单文件,无构建)
 ├─ data/
-│  └─ constitution_questionnaire_zyyxh_t157_2009.json
-│                                 60 题量表结构化数据:题目、子量表、评分、判定、渐进式评估与早停规则
+│  ├─ constitution_questionnaire_zyyxh_t157_2009.json
+│  │                              60 题量表结构化数据:题目、子量表、评分、判定、渐进式评估与早停规则
+│  ├─ solar_terms_24.json         24 节气定义:双语名称、黄经、季节、养生要点;九种体质 × 四季调养提示
+│  └─ solar_terms_instants_2024_2040.json
+│                                 2024–2040 每个节气的精确交节时刻(UTC + 北京时间),供日期→节气查表
 ├─ docs/
 │  ├─ proposal-client-mvp.html    客户端 MVP 开发方案(网页版)
 │  ├─ data-architecture.html      数据架构与存储策略:两层存储、表结构、同步协议、加密、合规
@@ -64,7 +67,9 @@ tcm-health-manager-demo/
 └─ README.md
 ```
 
-`index.html` 内嵌了与 `data/*.json` 等价的题目与量表定义(为了单文件可运行)。正式开发时应改为读取 JSON。
+`index.html` 内嵌了与 `data/*.json` 等价的题目、量表与节气数据(为了单文件可运行)。正式开发时应改为读取 JSON。
+
+**节气**按用户本地时间实时计算:`termAt(date)` 在交节时刻表中找最后一个 ≤ 当前时刻的节气,「今日」页显示当前节气、序号、交节时刻和距下一节气天数;方案、食疗标签、问答推荐问题随之变化。
 
 ---
 
