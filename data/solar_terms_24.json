@@ -1,6 +1,6 @@
 {
  "schema_version": "0.1",
- "note": "24 节气定义与养生要点。index 按通行顺序(立春=1 … 大寒=24;霜降=18);solar_longitude 为太阳黄经(度)。wellness 为通用要点;constitution_season_tips 为九种体质在四季的调养侧重,与节气要点组合成「今日」页提示。来源字段为知识层溯源用,正式入库前需中医顾问逐条核对。",
+ "note": "24 节气定义与养生要点。index 按通行顺序(立春=1 … 大寒=24;霜降=18);solar_longitude 为太阳黄经(度)。wellness 为通用要点;constitution_season_tips 为九种体质在四季的调养侧重,作为 constitution_term_tips.json(24 节气 × 9 体质)缺项时的回退。来源字段为知识层溯源用,正式入库前需中医顾问逐条核对。",
  "timezone_policy": "交节时刻以用户所在时区落到日历日;节气卡显示交节时刻,便于与按北京时间的中国日历对照。",
  "terms": [
   {

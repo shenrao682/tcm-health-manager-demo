@@ -52,7 +52,8 @@ tcm-health-manager-demo/
 ├─ data/
 │  ├─ constitution_questionnaire_zyyxh_t157_2009.json
 │  │                              60 题量表结构化数据:题目、子量表、评分、判定、渐进式评估与早停规则
-│  ├─ solar_terms_24.json         24 节气定义:双语名称、黄经、季节、养生要点;九种体质 × 四季调养提示
+│  ├─ solar_terms_24.json         24 节气定义:双语名称、黄经、季节、养生要点;九种体质 × 四季回退提示
+│  ├─ constitution_term_tips.json 24 节气 × 9 体质 = 216 条「今日」节气卡提示(中英)
 │  └─ solar_terms_instants_2024_2040.json
 │                                 2024–2040 每个节气的精确交节时刻(UTC + 北京时间),供日期→节气查表
 ├─ docs/
