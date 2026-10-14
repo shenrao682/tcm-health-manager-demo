@@ -315,6 +315,9 @@ const GOAL_RULES = {
   energy: {types:["sleep","diet_y","move"], acu:["ST36","CV6","CV4"]},
   weight: {types:["move","diet_n"], acu:["ST40","SP9"]},
 };
+// season fitness of acupoints / sections (knowledge-layer tags; reviewed with the 216 tips)
+const ACU_SEASON = {ST36:["spring","summer","autumn","winter"],CV6:["autumn","winter"],CV4:["autumn","winter"],KI1:["autumn","winter"],SP6:["spring","summer","autumn"],KI3:["autumn","winter"],ST40:["spring","summer"],SP9:["spring","summer"],LI11:["summer"],SP10:["spring","winter"],BL17:["winter"],LR3:["spring"],CV17:["spring","autumn"],LI20:["spring","autumn"]};
+const SECTION_SEASON = {sleep:["autumn","winter"], move:["spring","summer"]};
 function pickCandidates(code){
   const z=CONTENT_ZH[code]||CONTENT_ZH.pinghe; const out=[];
   z.diet.y.forEach((t,i)=>out.push({id:`diet_y:${i}`,type:"diet_y",zh:t}));
@@ -331,15 +334,22 @@ function dailyPicks(m){
   const dayKeys=Object.keys(m.checkins).concat(Object.keys(m.picksLog)).filter((v,i,a)=>a.indexOf(v)===i).sort();
   const prevDays=dayKeys.filter(d=>d<S.day).slice(-3);
   const recent=new Set(prevDays.flatMap(d=>m.picksLog[d]||[]));
-  const lastDiet=prevDays.length? (m.checkins[prevDays[prevDays.length-1]]||{}).diet : null;
+  const last=prevDays.length? (m.checkins[prevDays[prevDays.length-1]]||{}) : {};
+  const lastDiet=last.diet, lastAcu=typeof last.acu==="string"?last.acu:null, lastSleep=last.sleep, lastMove=last.move, lastMood=last.mood;
   const termFoods=T.def.diet||[];
   const scored=cands.map(c=>{
     let score=0; const why=[];
     if(c.type==="diet_y"||c.type==="diet_n"||c.type==="recipe"){ if(termFoods.some(f=>c.zh.includes(f.replace(/\(.*?\)/,"")))){ score+=2; why.push(tt(`${T.name}宜食`,`${T.name} food`)); } }
     for(const g of m.plan.goals||[]){ const r=GOAL_RULES[g]; if(!r) continue; if(r.types.includes(c.type)||(c.type==="acu"&&r.acu.includes(c.m))){ score+=2; why.push(tt(`${GL(g)}目标`,`${GL(g)} goal`)); } }
+    if(c.type==="acu" && (ACU_SEASON[c.m]||[]).includes(T.season)){ score+=1; why.push(tt(`${T.name}·穴位`,`${T.name} point`)); }
+    if(SECTION_SEASON[c.type] && SECTION_SEASON[c.type].includes(T.season)){ score+=1; why.push(tt(`${T.name}·${c.type==="sleep"?"作息":"运动"}`,`${T.name} ${c.type}`)); }
     if(c.type==="diet_n"||c.type==="acu"||c.type==="sleep") score+=1;
+    if(lastAcu && c.type==="acu"){ if(c.m===lastAcu) score-=2; else { score+=1; why.unshift(tt("昨天按过另一穴,今天换一个","rotate from yesterday's point")); } }
+    if(lastSleep!=null && lastSleep<6 && c.type==="sleep"){ score+=2; why.unshift(tt("昨晚睡不足 6 小时","under 6 h sleep last night")); }
+    if(lastMove==="0" && c.type==="move"){ score+=1; why.unshift(tt("昨天没动,今天动一动","no movement yesterday")); }
+    if(lastMood!=null && lastMood<=2 && (c.type==="recipe"||(c.type==="acu"&&["LR3","CV17"].includes(c.m)))){ score+=2; why.unshift(tt("昨日情绪偏低","low mood yesterday")); }
     if(recent.has(c.id)) { score-=1; }
-    if(lastDiet==="否"){ if(c.type==="diet_n"){ score+=1; why.push(tt("昨日饮食未遵循,先从少吃一样开始","yesterday's diet missed — start by cutting one thing")); } if(c.type==="diet_y") score-=1; }
+    if(lastDiet==="否"){ if(c.type==="diet_n"){ score+=1; why.unshift(tt("昨日饮食未遵循,先从少吃一样开始","yesterday's diet missed — start by cutting one thing")); } if(c.type==="diet_y") score-=1; }
     return {...c,score,why};
   }).sort((a,b)=>b.score-a.score||cands.indexOf(a)-cands.indexOf(b));
   // top 3 with 3 distinct types (diet_y/diet_n count as one family)
@@ -546,7 +556,7 @@ function tickTimer(){
   const C=2*Math.PI*34, ring=document.getElementById("tRing"), txt=document.getElementById("tText");
   if(ring) ring.setAttribute("stroke-dashoffset", C*(TIMER.left/TIMER.total));
   if(txt) txt.textContent=fmtT(TIMER.left);
-  if(TIMER.left===0){ stopTimer(); if(TIMER.side===1){ TIMER.side=2; TIMER.left=TIMER.total; toast(tt("第 1 侧完成,换另一侧","Side 1 done — switch sides")); } else { TIMER.side=1; TIMER.left=TIMER.total; toast(tt("两侧完成 ✓ 已记录到今日","Both sides done ✓ logged for today")); const c=M().checkins[S.day]||(M().checkins[S.day]={}); c.acu=true; save(); } render(); }
+  if(TIMER.left===0){ stopTimer(); if(TIMER.side===1){ TIMER.side=2; TIMER.left=TIMER.total; toast(tt("第 1 侧完成,换另一侧","Side 1 done — switch sides")); } else { TIMER.side=1; TIMER.left=TIMER.total; toast(tt("两侧完成 ✓ 已记录到今日","Both sides done ✓ logged for today")); const c=M().checkins[S.day]||(M().checkins[S.day]={}); c.acu=TIMER.point; save(); } render(); }
 }
 function S12(){ return `<h2 class="sec">${tt("家庭成员","Family members")}</h2>${S.members.map(m=>{const a=m.screenerDone?assess(m):null; return `<div class="card" data-act="switch" data-id="${m.id}" style="cursor:pointer;${m.id===S.cur?"border-color:var(--accent)":""}"><div class="check"><div style="display:flex;gap:10px;align-items:center"><span class="avatar">${esc(mi(m))}</span><div><b>${esc(mn(m))}</b>${m.minor?` <span class="pill gd">${tt("监护","Guardian")}</span>`:''}${m.id===S.cur?` <span class="pill ok">${tt("当前","Current")}</span>`:''}<div class="small muted">${a?esc(sn(a.primary))+(m.formal?tt(" · 正式"," · formal"):tt(" · 初步"," · preliminary")):tt("未评估","Not assessed")}</div></div></div>${m.id!=="m1"?`<span class="small muted">${tt("已授权","Authorized")}</span>`:''}</div></div>`}).join("")}<button class="btn sec full" data-act="addMember">＋ ${tt("添加成员","Add member")}</button><p class="small muted" style="margin-top:10px">${tt("成年成员需本人确认授权;未成年成员由监护人创建,数据不进入任何分析。","Adults confirm their own authorization; minors are created by a guardian and their data never enters analytics.")}</p>`; }
 function S13(p){ const sym=p&&p.symptom; const now=new Date(); return `${sym?`<div class="card warn"><div class="k">${tt("症状摘要(将带给医生)","Symptom note (for your doctor)")}</div><div>${esc(sym)}</div><div class="small muted" style="margin-top:4px">${tt("记录时间:今天","Recorded today")} ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}</div></div>`:""}<div class="card"><div class="k">${tt("合作诊所","Partner clinic")}</div><h3>${esc(pick(CLINIC.name))}</h3><div class="kv"><span class="muted">${tt("地址","Address")}</span><span style="text-align:right">${esc(CLINIC.addr)}</span></div><div class="kv"><span class="muted">${tt("电话","Phone")}</span><span>${esc(CLINIC.tel)}</span></div><div class="kv"><span class="muted">${tt("时间","Hours")}</span><span>${esc(pick(CLINIC.hours))}</span></div><div class="row" style="margin-top:10px"><button class="btn" data-act="call">${tt("拨打电话","Call")}</button><button class="btn sec" data-act="copy">${tt("复制号码","Copy number")}</button></div></div><p class="small muted">${tt("演示中拨打与复制仅作提示。","In this demo, call and copy only show a notice.")}</p>`; }
