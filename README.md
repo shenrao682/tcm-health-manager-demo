@@ -54,6 +54,7 @@ tcm-health-manager-demo/
 │                                 60 题量表结构化数据:题目、子量表、评分、判定、渐进式评估与早停规则
 ├─ docs/
 │  ├─ proposal-client-mvp.html    客户端 MVP 开发方案(网页版)
+│  ├─ data-architecture.html      数据架构与存储策略:两层存储、表结构、同步协议、加密、合规
 │  ├─ navigation-map.png          14 页导航组织图
 │  ├─ captions.js                 25 条字幕/旁白文本(中英)
 │  ├─ record-walkthrough.js       录屏脚本(Playwright):`node record-walkthrough.js zh ../index.html out_zh/`
@@ -114,7 +115,7 @@ tcm-health-manager-demo/
 - HealthKit / Health Connect 读取(打卡页的"已自动获取"为模拟)
 - 内嵌视频播放(八段锦链出到 YouTube)
 
-正式客户端的技术选型、接口依赖、排期与预算见 `docs/proposal-client-mvp.html`。
+正式客户端的技术选型、接口依赖、排期与预算见 `docs/proposal-client-mvp.html`;用户数据放哪里、怎么存、怎么删见 `docs/data-architecture.html`。
 
 ---
 

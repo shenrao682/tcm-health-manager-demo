@@ -1,0 +1,428 @@
+<title>中医AI健康管家 数据架构</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column with a sticky section nav on wide screens; schema tables and the data-flow diagram break out to the wider track. Same visual system as the client MVP proposal. */
+:root{
+  --bg:#f7f8f6; --surface:#ffffff; --fg:#1d2420; --muted:#5d6861; --line:#d9ded9;
+  --accent:#2f6f5e; --accent-soft:#e3efe9; --warn:#9a5b14; --warn-soft:#f6ebd9; --crit:#8e3b3b; --crit-soft:#f4e3e3;
+  --display:"Noto Serif SC","Songti SC","SimSun",serif;
+  --body:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --surface:#1c2320; --fg:#e6ebe7; --muted:#9aa69f; --line:#2f3a35;
+  --accent:#7fbfa8; --accent-soft:#1f3a32; --warn:#e0a85a; --warn-soft:#3a2d18; --crit:#e08a8a; --crit-soft:#3a2222; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --surface:#1c2320; --fg:#e6ebe7; --muted:#9aa69f; --line:#2f3a35;
+  --accent:#7fbfa8; --accent-soft:#1f3a32; --warn:#e0a85a; --warn-soft:#3a2d18; --crit:#e08a8a; --crit-soft:#3a2222; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.75;margin:0;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:0 48px}
+@media (min-width:960px){.wrap{grid-template-columns:200px minmax(0,1fr)}}
+nav.toc{display:none}
+@media (min-width:960px){nav.toc{display:block;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:96px;font-size:13px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 12px;border-left:2px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}}
+main{min-width:0}
+header.hero{padding-block:56px 24px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.2vw,40px);line-height:1.25;margin:10px 0 8px;text-wrap:balance}
+.sub{color:var(--muted);font-size:17px;margin:0 0 20px;max-width:65ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--muted);font-family:var(--mono)}
+h2{font-family:var(--display);font-weight:700;font-size:24px;margin:56px 0 16px;padding-top:8px;text-wrap:balance;scroll-margin-top:24px}
+h2 .n{color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;margin-right:10px;vertical-align:middle}
+h3{font-size:17px;font-weight:700;margin:28px 0 8px;text-wrap:balance}
+p,ul,ol{max-width:72ch}
+p{margin:0 0 14px}
+ul,ol{padding-left:1.3em;margin:0 0 14px}
+li{margin-bottom:4px}
+li::marker{color:var(--accent)}
+.thesis{background:var(--accent-soft);border-left:3px solid var(--accent);padding:16px 20px;margin:0 0 24px;max-width:none}
+.thesis p{margin:0;max-width:none;font-size:17px}
+.tablewrap{overflow-x:auto;margin:0 0 20px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:700;background:var(--surface);font-size:13px;letter-spacing:.02em}
+td:first-child{font-weight:500;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+table.wide td:first-child{white-space:normal}
+table.schema td:first-child{font-family:var(--mono);font-size:13px;font-weight:500}
+table.schema td:nth-child(2){font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.7;white-space:nowrap}
+.ok{color:var(--accent);background:var(--accent-soft)}
+.wn{color:var(--warn);background:var(--warn-soft)}
+.cr{color:var(--crit);background:var(--crit-soft)}
+.flow{font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface);border:1px solid var(--line);padding:16px 18px;overflow-x:auto;margin:0 0 20px;white-space:pre}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface);border:1px solid var(--line);padding:0 5px;border-radius:3px}
+.note{font-size:14px;color:var(--muted);border-top:1px solid var(--line);margin-top:48px;padding-top:16px;max-width:none}
+.diagram{background:var(--surface);border:1px solid var(--line);padding:12px;margin:0 0 8px;overflow-x:auto}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="章节">
+  <a href="#s1">1 原则</a>
+  <a href="#s2">2 数据分类与归属</a>
+  <a href="#s3">3 存储分层</a>
+  <a href="#s4">4 数据流</a>
+  <a href="#s5">5 表结构</a>
+  <a href="#s6">6 同步协议</a>
+  <a href="#s7">7 加密与密钥</a>
+  <a href="#s8">8 合规控制</a>
+  <a href="#s9">9 数据生命周期</a>
+  <a href="#s10">10 从 Demo 到正式</a>
+  <a href="#s11">11 待决策</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Data Architecture · MVP</div>
+  <h1>中医AI健康管家 · 数据架构与存储策略</h1>
+  <p class="sub">配套《客户端 MVP 开发方案》。回答一个问题:正式 App 的用户数据放在哪里、怎么存、谁能读、何时删。覆盖手机端与云端两层、表结构、同步协议、加密与合规控制。</p>
+  <div class="meta"><span>版本 0.1 · 草案</span><span>2026-10-14</span><span>适用:MVP 及 V2 诊所对接</span></div>
+</header>
+
+<h2 id="s1"><span class="n">01</span>原则</h2>
+<div class="thesis"><p><strong>两层存储:</strong>手机本地加密数据库是"工作副本",云端数据库是"真相来源"。本地保证 30 秒打卡和离线可读;云端保证换机不丢、家庭成员跨设备一致、未来对接诊所。</p></div>
+<ol>
+  <li><strong>从第一天按健康数据对待。</strong>体质答题包含排便、带下、情绪、过敏等内容,在 CPRA 和 WA My Health My Data Act 下属于敏感健康数据,无论 App 是否称为"医疗"。</li>
+  <li><strong>三套存储物理隔离。</strong>健康档案、行为分析、模型评估样本分别存放,权限互不相通。分析仓永远不含健康数值;评估集只收 opt-in 样本。</li>
+  <li><strong>原始健康数据不出手机。</strong>HealthKit / Health Connect 的原始记录只在设备上;云端只存派生值(睡眠小时数、步数)。</li>
+  <li><strong>按成员隔离。</strong>家庭账户下每位成员有独立数据密钥;撤销授权 = 销毁该成员密钥。</li>
+  <li><strong>按 HIPAA 标准建,虽然 MVP 尚非 Business Associate。</strong>V2 对接诊所后即成为 BA;现在多做 15%,省掉届时的重构。</li>
+  <li><strong>评分引擎是纯函数,客户端与服务端各跑一份。</strong>客户端用于即时反馈,服务端用于权威记录;两边结果必须一致,差异即 bug。</li>
+</ol>
+
+<h2 id="s2"><span class="n">02</span>数据分类与归属</h2>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>数据</th><th>敏感级</th><th>主存储</th><th>本地</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>账号、登录凭证、设备</td><td><span class="pill wn">身份</span></td><td>云端(Cognito)</td><td>令牌(SecureStore)</td><td>密码永不落自有库;OTP / Apple / Google 登录</td></tr>
+<tr><td>家庭成员关系、授权记录</td><td><span class="pill wn">身份</span></td><td>云端</td><td>缓存</td><td>跨设备一致;授权有时间戳与撤销记录</td></tr>
+<tr><td>基础信息(出生年、性别、所在地、过敏、孕哺期)</td><td><span class="pill cr">健康</span></td><td>云端</td><td>缓存</td><td>驱动禁忌过滤;孕哺期标记影响穴位与食材</td></tr>
+<tr><td>体质答题(60 题)</td><td><span class="pill cr">健康</span></td><td>云端</td><td>缓存 + 离线队列</td><td>最核心档案;每次作答带时间戳与来源(初探/每日/一次答完/对话映射)</td></tr>
+<tr><td>评估结果(分数、区间、判定、置信度)</td><td><span class="pill cr">健康</span></td><td>云端(服务端重算)</td><td>缓存(客户端计算)</td><td>服务端结果为准;客户端结果用于即时显示</td></tr>
+<tr><td>调养方案</td><td><span class="pill cr">健康</span></td><td>云端</td><td>缓存</td><td>含版本(初版/正式)、节气、目标、生成时间</td></tr>
+<tr><td>每日打卡、按压记录</td><td><span class="pill cr">健康</span></td><td>云端</td><td><strong>本地先写</strong>→ 后台同步</td><td>离线可写;幂等键 = 成员 + 日期 + 项目</td></tr>
+<tr><td>问答对话</td><td><span class="pill cr">健康</span></td><td>云端,短期</td><td>会话内</td><td>保留 90 天供分流追溯;分类结果与分流动作单独长期留存</td></tr>
+<tr><td>症状摘要(分流时生成)</td><td><span class="pill cr">健康</span></td><td>云端</td><td>缓存</td><td>V2 推送给诊所;用户可删除</td></tr>
+<tr><td>HealthKit / Health Connect 原始数据</td><td><span class="pill cr">健康</span></td><td><strong>仅手机</strong></td><td>只读,不落库</td><td>平台条款限制上传;仅派生值进入打卡记录</td></tr>
+<tr><td>设置(语言、字号、提醒时间、应用锁)</td><td><span class="pill ok">偏好</span></td><td>—</td><td>本地</td><td>不同步;换机重设</td></tr>
+<tr><td>行为埋点</td><td><span class="pill ok">去标识</span></td><td>分析仓(独立)</td><td>批量上报</td><td>不含健康数值;成员 ID 经不可逆哈希</td></tr>
+<tr><td>模型评估样本</td><td><span class="pill cr">健康</span></td><td>评估集(独立)</td><td>—</td><td>单独 opt-in;去标识;未成年人永不进入</td></tr>
+<tr><td>审计日志</td><td><span class="pill wn">安全</span></td><td>云端,只追加</td><td>—</td><td>谁、何时、读写了哪位成员的什么;不可篡改</td></tr>
+</tbody></table></div>
+
+<h2 id="s3"><span class="n">03</span>存储分层</h2>
+<h3>手机端</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>组件</th><th>选型</th><th>存什么</th></tr></thead>
+<tbody>
+<tr><td>加密数据库</td><td>SQLite + SQLCipher(expo-sqlite)</td><td>成员、答题、评估、方案、打卡、离线队列;与云端同构的表</td></tr>
+<tr><td>安全存储</td><td>iOS Keychain / Android Keystore(expo-secure-store)</td><td>访问令牌、刷新令牌、数据库密钥</td></tr>
+<tr><td>偏好</td><td>AsyncStorage / MMKV</td><td>语言、字号、提醒、上次打开的 Tab</td></tr>
+<tr><td>健康数据桥</td><td>react-native-health / Health Connect,只读</td><td>读取后立即派生,原始记录不保存</td></tr>
+</tbody></table></div>
+<h3>云端(AWS us-west-2,签 BAA)</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>组件</th><th>选型</th><th>存什么</th></tr></thead>
+<tbody>
+<tr><td>健康档案库</td><td>RDS PostgreSQL,静态加密(KMS)+ 敏感列字段级加密</td><td>第 5 节全部业务表</td></tr>
+<tr><td>认证</td><td>Cognito 用户池</td><td>账号、设备、MFA;家庭成员以"关联身份"建模</td></tr>
+<tr><td>对象存储</td><td>S3,服务端加密,预签名链接</td><td>数据导出包、分享图、方案 PDF</td></tr>
+<tr><td>密钥</td><td>KMS:根密钥 → 账户密钥 → 成员密钥(信封加密)</td><td>见第 7 节</td></tr>
+<tr><td>分析仓</td><td>独立账号下的 Redshift / Athena + S3</td><td>去标识化埋点;与健康档案库无网络连通</td></tr>
+<tr><td>评估集</td><td>独立 S3 桶 + 访问审批</td><td>opt-in 答题样本与中医师标注</td></tr>
+<tr><td>审计日志</td><td>CloudTrail + 应用级日志写入只追加表 / S3 Object Lock</td><td>所有对健康数据的读写</td></tr>
+<tr><td>知识层(非用户数据)</td><td>PostgreSQL + pgvector,可 CDN 缓存</td><td>体质规则、食疗、穴位、节气;每条带 <code>source</code></td></tr>
+</tbody></table></div>
+<h3>为什么不用 Firebase / Supabase 作正式架构</h3>
+<p>两者几天可上线,适合 Beta 前内测。但健康数据需要:签 BAA(Firebase 仅部分产品覆盖)、字段级加密、按成员密钥隔离、分析与档案物理分离。这些在 BaaS 上要绕着做,到 V2 诊所对接时大概率重构。直接用托管数据库 + 自有 API,成本在方案预算的"云基础设施 $8k–12k / 6 个月"之内。</p>
+
+<h2 id="s4"><span class="n">04</span>数据流</h2>
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  classDef dev fill:#e3efe9,stroke:#2f6f5e,color:#1d2420
+  classDef cloud fill:#ffffff,stroke:#2f6f5e,color:#1d2420
+  classDef iso fill:#f6ebd9,stroke:#9a5b14,color:#1d2420
+  classDef ext fill:#f4e3e3,stroke:#8e3b3b,color:#1d2420
+  subgraph P["手机"]
+    UI["App 界面"]:::dev
+    DB["SQLite + SQLCipher<br/>本地加密库"]:::dev
+    Q["离线队列"]:::dev
+    HK["HealthKit / Health Connect<br/>(只读,原始数据不出设备)"]:::ext
+    UI --> DB
+    DB --> Q
+    HK -- "派生值" --> DB
+  end
+  subgraph C["AWS us-west-2 · BAA"]
+    API["API 网关 + 服务"]:::cloud
+    PG["健康档案库<br/>PostgreSQL · 字段级加密"]:::cloud
+    KMS["KMS 密钥层级<br/>根 → 账户 → 成员"]:::cloud
+    S3["S3 · 导出 / 分享图"]:::cloud
+    AUD["审计日志(只追加)"]:::cloud
+    LLM["Claude(对话映射 / 问答)"]:::cloud
+    API --> PG
+    PG -.-> KMS
+    API --> S3
+    API --> AUD
+    API -- "去标识会话" --> LLM
+  end
+  subgraph I["隔离账号"]
+    AN["分析仓<br/>去标识埋点"]:::iso
+    EV["评估集<br/>opt-in 样本"]:::iso
+  end
+  Q -- "幂等批量同步" --> API
+  API -- "缓存回填" --> DB
+  UI -- "哈希成员 ID,无健康数值" --> AN
+  API -- "仅 opt-in,去标识" --> EV
+  CL["诊所(V2)"]:::ext
+  API -- "症状摘要 / 疗效回传,经授权" --> CL
+</pre>
+</div>
+<p style="font-size:13.5px;color:var(--muted)">绿色 = 设备;白色 = 云端健康档案域;橙色 = 物理隔离的分析与评估域;红色 = 外部边界。</p>
+
+<h2 id="s5"><span class="n">05</span>表结构</h2>
+<p>云端 PostgreSQL 与手机端 SQLite 同构;本地多两张同步表。所有业务表带 <code>created_at</code>、<code>updated_at</code>、<code>deleted_at</code>(软删,级联硬删见第 9 节)。标 🔒 的列在云端字段级加密,密钥为该行所属成员的成员密钥。</p>
+
+<h3>accounts · 账号</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>account_id</td><td>uuid pk</td><td>Cognito sub</td></tr>
+<tr><td>email_hash</td><td>bytea</td><td>仅用于去重;明文邮箱在 Cognito</td></tr>
+<tr><td>region</td><td>text</td><td>数据驻留区域,MVP 固定 <code>us</code></td></tr>
+<tr><td>locale</td><td>text</td><td>zh-CN / en-US</td></tr>
+<tr><td>status</td><td>text</td><td>active / deletion_requested / deleted</td></tr>
+</tbody></table></div>
+
+<h3>members · 家庭成员</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>member_id</td><td>uuid pk</td><td></td></tr>
+<tr><td>account_id</td><td>uuid fk</td><td>所属主账户</td></tr>
+<tr><td>display_name 🔒</td><td>text</td><td></td></tr>
+<tr><td>birth_year 🔒</td><td>int</td><td>只存年份</td></tr>
+<tr><td>sex</td><td>text</td><td>f / m / other / unknown;决定湿热质 Q41 / Q41M</td></tr>
+<tr><td>is_minor</td><td>bool</td><td>true 时:不进分析仓、不进评估集、由监护人管理</td></tr>
+<tr><td>pregnancy_status</td><td>text</td><td>none / pregnant / nursing;驱动禁忌过滤</td></tr>
+<tr><td>allergies 🔒</td><td>jsonb</td><td>食材 / 药材编码列表</td></tr>
+<tr><td>auth_status</td><td>text</td><td>self / invited / authorized / revoked</td></tr>
+<tr><td>authorized_at / revoked_at</td><td>timestamptz</td><td></td></tr>
+<tr><td>member_key_id</td><td>text</td><td>KMS 成员密钥引用;撤销 = 计划销毁</td></tr>
+</tbody></table></div>
+
+<h3>consents · 同意记录</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>consent_id</td><td>uuid pk</td><td></td></tr>
+<tr><td>account_id / member_id</td><td>uuid</td><td>成员级同意(如评估集 opt-in)带 member_id</td></tr>
+<tr><td>type</td><td>text</td><td>privacy_policy / health_data_use / not_medical_advice / eval_dataset_optin / clinic_share</td></tr>
+<tr><td>version</td><td>text</td><td>政策文本版本号</td></tr>
+<tr><td>granted</td><td>bool</td><td></td></tr>
+<tr><td>granted_at / withdrawn_at</td><td>timestamptz</td><td></td></tr>
+<tr><td>evidence</td><td>jsonb</td><td>设备、App 版本、IP 前缀</td></tr>
+</tbody></table></div>
+
+<h3>answers · 体质答题</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>answer_id</td><td>uuid pk</td><td>客户端生成,幂等</td></tr>
+<tr><td>member_id</td><td>uuid fk</td><td></td></tr>
+<tr><td>assessment_round</td><td>int</td><td>第几轮评估(重新评估 +1);同轮内同一题取最新</td></tr>
+<tr><td>item_id</td><td>text</td><td>Q01–Q60 / Q41M</td></tr>
+<tr><td>value 🔒</td><td>smallint</td><td>1–5</td></tr>
+<tr><td>source</td><td>text</td><td>screener / drip / one_shot / chat_mapped / chat_confirmed</td></tr>
+<tr><td>confidence</td><td>numeric</td><td>对话映射时模型给出的置信度;直接作答为 1.0</td></tr>
+<tr><td>evidence_quote 🔒</td><td>text</td><td>对话映射的用户原话片段;90 天后清空</td></tr>
+<tr><td>answered_at</td><td>timestamptz</td><td>客户端时间</td></tr>
+<tr><td>instrument_version</td><td>text</td><td>ZYYXH/T 157-2009 + 题库版本</td></tr>
+</tbody></table></div>
+
+<h3>assessments · 评估结果(服务端计算)</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>assessment_id</td><td>uuid pk</td><td></td></tr>
+<tr><td>member_id / assessment_round</td><td>uuid / int</td><td></td></tr>
+<tr><td>status</td><td>text</td><td>provisional / formal</td></tr>
+<tr><td>scales 🔒</td><td>jsonb</td><td>九个子量表:est、t_min、t_max、conclusion、confidence</td></tr>
+<tr><td>primary_code / secondary_codes</td><td>text / text[]</td><td>主体质与兼夹</td></tr>
+<tr><td>primary_confidence</td><td>text</td><td>confirmed / prelim / open</td></tr>
+<tr><td>items_answered / items_remaining</td><td>int</td><td>去重后的题数</td></tr>
+<tr><td>engine_version</td><td>text</td><td>评分引擎版本;客户端同版本必须得出相同结果</td></tr>
+<tr><td>computed_at</td><td>timestamptz</td><td></td></tr>
+</tbody></table></div>
+
+<h3>plans · 调养方案</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>plan_id</td><td>uuid pk</td><td></td></tr>
+<tr><td>member_id / assessment_id</td><td>uuid</td><td>基于哪次评估</td></tr>
+<tr><td>version</td><td>text</td><td>provisional / formal</td></tr>
+<tr><td>solar_term</td><td>text</td><td>生成时的节气</td></tr>
+<tr><td>goals</td><td>text[]</td><td>sleep / stress / digest / energy / weight</td></tr>
+<tr><td>content_refs</td><td>jsonb</td><td>引用知识层条目 ID(食疗方、穴位、宜忌),不复制内容</td></tr>
+<tr><td>contraindication_checks</td><td>jsonb</td><td>过滤掉了什么、为什么(孕期 / 过敏)</td></tr>
+<tr><td>generated_at / superseded_at</td><td>timestamptz</td><td>节气更新或升级时写 superseded_at</td></tr>
+</tbody></table></div>
+
+<h3>checkins · 每日打卡</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>member_id / local_date / item</td><td>复合 pk</td><td>item ∈ sleep / diet / move / mood / acupressure;幂等键</td></tr>
+<tr><td>value 🔒</td><td>jsonb</td><td>sleep:{hours,quality,prefilled} · diet:{followed} · move:{minutes,steps_prefilled} · mood:{score} · acupressure:{point,sides}</td></tr>
+<tr><td>recorded_at</td><td>timestamptz</td><td>客户端时间;冲突取最新</td></tr>
+<tr><td>synced_at</td><td>timestamptz</td><td></td></tr>
+</tbody></table></div>
+
+<h3>chat_sessions / chat_messages · 问答</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>session_id / member_id</td><td>uuid</td><td>purpose:assessment / qa</td></tr>
+<tr><td>message_id, role, content 🔒</td><td>uuid, text, text</td><td>content 90 天后清空,保留元数据</td></tr>
+<tr><td>classification</td><td>text</td><td>wellness / symptom / medical_advice / emergency / off_topic</td></tr>
+<tr><td>action</td><td>text</td><td>answered / referral_shown / referral_recorded / emergency_shown</td></tr>
+<tr><td>source_refs</td><td>text[]</td><td>回答引用的知识层条目</td></tr>
+<tr><td>flagged</td><td>bool</td><td>用户举报"回答不当"</td></tr>
+</tbody></table></div>
+
+<h3>referrals · 分流记录(V2 对接诊所)</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>referral_id / member_id</td><td>uuid</td><td></td></tr>
+<tr><td>symptom_summary 🔒</td><td>text</td><td>用户确认后的摘要</td></tr>
+<tr><td>clinic_id</td><td>uuid</td><td>绑定诊所</td></tr>
+<tr><td>shared_at / share_consent_id</td><td>timestamptz / uuid</td><td>推送给诊所须有 clinic_share 同意</td></tr>
+</tbody></table></div>
+
+<h3>audit_log · 审计(只追加)</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>列</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>log_id</td><td>bigserial</td><td></td></tr>
+<tr><td>actor</td><td>text</td><td>account_id / service 名 / 运维人员</td></tr>
+<tr><td>action</td><td>text</td><td>read / write / export / delete / key_destroy</td></tr>
+<tr><td>member_id, table_name, row_ids</td><td>uuid, text, uuid[]</td><td></td></tr>
+<tr><td>at, request_id, ip_prefix</td><td>timestamptz, text, inet</td><td></td></tr>
+</tbody></table></div>
+
+<h3>本地专用表</h3>
+<div class="tablewrap"><table class="schema">
+<thead><tr><th>表</th><th>关键列</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>sync_queue</td><td>op_id, table, row_id, payload, attempts, created_at</td><td>待上传的写操作;按创建顺序批量发送</td></tr>
+<tr><td>sync_state</td><td>table, last_pulled_at, cursor</td><td>增量拉取游标</td></tr>
+</tbody></table></div>
+
+<h2 id="s6"><span class="n">06</span>同步协议</h2>
+<h3>写路径(打卡、答题)</h3>
+<div class="flow">用户操作
+  → 写本地 SQLite(事务内同时写 sync_queue)
+  → 界面立即更新(客户端评分引擎重算)
+  → 后台:联网且队列非空时,按顺序批量 POST
+      POST /checkin            [ {member_id, local_date, item, value, recorded_at}, … ]
+      POST /assessment/answers [ {answer_id, member_id, round, item_id, value, source, answered_at}, … ]
+  → 服务端幂等写入(以 answer_id / 复合主键去重),重算评估,返回权威结果
+  → 客户端用返回结果覆盖本地缓存;若与本地计算不一致 → 上报 engine_mismatch 事件</div>
+<h3>读路径</h3>
+<div class="flow">打开 App
+  → 立即渲染本地缓存
+  → 后台 GET /sync?since=&lt;cursor&gt;  拉取各表增量(成员、答题、评估、方案、打卡)
+  → 合并到本地;游标前移</div>
+<h3>冲突规则</h3>
+<ul>
+  <li><strong>打卡</strong>:同成员、同日期、同项目,<code>recorded_at</code> 最新者胜。多设备同时打卡同一项极少见,接受。</li>
+  <li><strong>答题</strong>:同成员、同轮、同题,<code>answered_at</code> 最新者胜;评估结果永远由服务端按全部答题重算,不合并结果本身。</li>
+  <li><strong>成员与授权</strong>:服务端为准,客户端不离线修改。</li>
+  <li><strong>方案</strong>:只在服务端生成;客户端不写。</li>
+</ul>
+<h3>失败与重试</h3>
+<ul>
+  <li>队列项指数退避重试,最多 7 天;超期标记 <code>stale</code> 并在设置页提示"有 N 条记录未同步"。</li>
+  <li>令牌失效 → 刷新;刷新失败 → 保留队列,要求重新登录,登录后继续。</li>
+  <li>服务端 4xx(校验失败)→ 不重试,记录原因,界面显示该条打卡"未保存"。</li>
+</ul>
+
+<h2 id="s7"><span class="n">07</span>加密与密钥</h2>
+<div class="flow">KMS 根密钥(客户管理,年度轮换)
+  └─ 账户密钥(每个 account 一把,信封加密)
+       └─ 成员密钥(每个 member 一把)
+            └─ 加密该成员所有 🔒 列
+
+撤销成员授权 / 删除成员  → 计划销毁成员密钥(7 天宽限,可撤回)→ 密文不可解 = 数据失效
+删除账户                → 销毁账户密钥 → 所有成员数据同时失效;随后 72 小时内物理删除行与备份标记</div>
+<ul>
+  <li><strong>传输</strong>:TLS 1.2+;Beta 后期启用证书固定。</li>
+  <li><strong>手机端</strong>:SQLCipher 数据库密钥随机生成,存 Keychain / Keystore,受设备解锁保护;可选 Face ID / 指纹应用锁;切后台遮罩。</li>
+  <li><strong>服务端应用层</strong>:🔒 列在写入前用成员密钥加密(AES-256-GCM),数据库管理员看不到明文;非 🔒 列(编码、时间戳、状态)明文以便索引与统计。</li>
+  <li><strong>备份</strong>:RDS 自动快照同样受 KMS 保护;密钥销毁后快照中的对应数据同样不可解。</li>
+  <li><strong>LLM 调用</strong>:发送给模型的对话内容去掉姓名、邮箱、成员 ID;只带体质编码与会话内上下文。模型侧不保留训练用途(API 默认)。</li>
+</ul>
+
+<h2 id="s8"><span class="n">08</span>合规控制</h2>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>要求</th><th>来源</th><th>实现</th></tr></thead>
+<tbody>
+<tr><td>敏感健康数据需单独明示同意</td><td>CPRA、WA MHMDA</td><td><code>consents.health_data_use</code> 必须 granted 才能写任何 🔒 列;同意文本带版本</td></tr>
+<tr><td>不向第三方(含广告平台)共享健康数据</td><td>WA MHMDA、FTC Health Breach Rule</td><td>分析仓物理隔离且不含健康数值;SDK 白名单审查;无广告 SDK</td></tr>
+<tr><td>可访问、可删除、可携带</td><td>CPRA、GDPR 式权利</td><td><code>POST /data/export</code>(JSON,S3 预签名链接,24 小时有效)、<code>DELETE /account</code>(72 小时级联)</td></tr>
+<tr><td>未成年人数据</td><td>COPPA</td><td><code>is_minor</code> 行:禁止进入分析仓与评估集(数据库策略级强制);仅监护人账户可读写</td></tr>
+<tr><td>最小必要、访问审计</td><td>HIPAA 安全规则(V2 起适用)</td><td>服务角色按表授权;所有健康数据读写进 <code>audit_log</code>;运维访问需审批并记录</td></tr>
+<tr><td>BAA</td><td>HIPAA</td><td>AWS BAA 在 MVP 阶段即签;LLM 供应商 BAA 在 V2 对接诊所前签</td></tr>
+<tr><td>平台健康数据条款</td><td>Apple HealthKit、Google Health Connect</td><td>原始数据不上传、不用于广告或模型;只读权限;用途说明明确</td></tr>
+<tr><td>数据驻留</td><td>内部策略</td><td><code>accounts.region</code>;MVP 仅 <code>us</code>;其他区域另建独立部署,不共库</td></tr>
+<tr><td>泄露通知</td><td>FTC Health Breach Rule、州法</td><td>事件响应预案;审计日志支持 72 小时内确定影响范围</td></tr>
+</tbody></table></div>
+
+<h2 id="s9"><span class="n">09</span>数据生命周期</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>数据</th><th>保留</th><th>到期动作</th></tr></thead>
+<tbody>
+<tr><td>答题、评估、方案、打卡</td><td>账户存续期间</td><td>随账户删除</td></tr>
+<tr><td>对话正文、<code>evidence_quote</code></td><td>90 天</td><td>清空正文,保留分类与动作元数据</td></tr>
+<tr><td>症状摘要(分流)</td><td>1 年或用户删除</td><td>硬删</td></tr>
+<tr><td>导出包(S3)</td><td>24 小时</td><td>自动过期</td></tr>
+<tr><td>分析埋点</td><td>24 个月</td><td>聚合后删除明细</td></tr>
+<tr><td>评估集样本</td><td>opt-in 撤回即删;否则按研究协议</td><td>撤回后 30 天内删除,含衍生标注</td></tr>
+<tr><td>审计日志</td><td>6 年(HIPAA 要求)</td><td>归档至 Object Lock 桶</td></tr>
+<tr><td>已删除账户</td><td>—</td><td>72 小时内物理删除;备份中的数据因密钥销毁不可解,快照按 35 天滚动过期</td></tr>
+</tbody></table></div>
+
+<h2 id="s10"><span class="n">10</span>从 Demo 到正式</h2>
+<p>Demo 把全部状态放在一个 <code>S</code> 对象里存 localStorage。正式版的对应关系:</p>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>Demo</th><th>正式版</th></tr></thead>
+<tbody>
+<tr><td><code>S.members[]</code></td><td><code>members</code> 表(本地缓存 + 云端)</td></tr>
+<tr><td><code>member.answers {Q:value}</code></td><td><code>answers</code> 表,每题一行,带 round / source / answered_at</td></tr>
+<tr><td><code>assess(m)</code> 客户端计算</td><td>同一纯函数,客户端即时显示 + 服务端写 <code>assessments</code>;版本号一致</td></tr>
+<tr><td><code>member.plan {code, goals, provisional}</code></td><td><code>plans</code> 表;内容改为引用知识层条目 ID</td></tr>
+<tr><td><code>member.checkins[day]</code></td><td><code>checkins</code> 表;本地先写 + <code>sync_queue</code></td></tr>
+<tr><td><code>save()</code></td><td>本地事务 + 入队;<code>render()</code> 读本地</td></tr>
+<tr><td><code>mapText()</code> 关键词映射</td><td>服务端 <code>POST /assessment/chat</code>,由 Claude 输出 <code>{item_id, value, confidence, evidence_quote}</code>;低置信度回问确认</td></tr>
+<tr><td><code>classify()</code> 关键词分类</td><td>服务端 <code>POST /chat/classify</code>;客户端保留紧急关键词本地词典作兜底</td></tr>
+<tr><td><code>S.lang / S.elder</code></td><td>本地偏好,不同步</td></tr>
+<tr><td>localStorage</td><td>SQLite + SQLCipher;令牌进 Keychain / Keystore</td></tr>
+</tbody></table></div>
+
+<h2 id="s11"><span class="n">11</span>待决策</h2>
+<ol>
+  <li><strong>字段级加密的粒度</strong>:成员级密钥(本文方案)安全性最好,但每次读要解密、不能按 🔒 列索引。替代:账户级密钥,实现简单,撤销成员授权时需逐行重加密。建议成员级。</li>
+  <li><strong>对话正文保留期</strong>:90 天是折中;法务可能建议更短(30 天)或要求用户可随时清空。</li>
+  <li><strong>LLM 供应商 BAA 时点</strong>:MVP 阶段对话已含症状描述,严格说应尽早签;预算与流程允许的话建议 M3 联调前完成。</li>
+  <li><strong>评估集 opt-in 的激励</strong>:是否给 opt-in 用户正式报告加速等好处——涉及"用利益换健康数据"的伦理与合规审查,建议不做。</li>
+  <li><strong>多区域</strong>:若 V2 内即需服务中国大陆用户,需另起部署并评估《个人信息保护法》与数据出境规则;本文不覆盖。</li>
+</ol>
+
+<p class="note">本文为草案,配套《中医AI健康管家 · 客户端 MVP 开发方案》。法规描述以公开资料为据,正式立项前需隐私与监管顾问复核;表结构在服务端设计评审后冻结。</p>
+</main>
+</div>
