@@ -1,0 +1,65 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>compositor</title></head>
+<body style="margin:0;background:#000">
+<video id="v" muted playsinline style="display:none"></video>
+<canvas id="c" style="display:block"></canvas>
+<pre id="log" style="color:#0f0;font:12px monospace;position:fixed;top:0;right:0;margin:0"></pre>
+<script>
+// Replays the silent recording, finds the red calibration flash to get the video-time origin,
+// schedules narration clips at (origin + caption offset), and re-records canvas + audio via MediaRecorder.
+const log = (m) => { document.getElementById("log").textContent += m + "\n"; };
+async function run(cfg) {
+  const { video, timeline, clips, lang } = cfg; // clips: {id: url}
+  const v = document.getElementById("v"), c = document.getElementById("c"), g = c.getContext("2d");
+  v.src = video; await new Promise((r) => { v.onloadedmetadata = r; });
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  // --- find red flash: seek through first 6 s in 40 ms steps ---
+  const seek = (t) => new Promise((r) => { v.onseeked = r; v.currentTime = t; });
+  let origin = null;
+  for (let t = 0; t < 6; t += 0.04) {
+    await seek(t); g.drawImage(v, 0, 0);
+    const p = g.getImageData(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1).data;
+    if (p[0] > 200 && p[1] < 60 && p[2] < 60) { origin = t; break; }
+  }
+  if (origin == null) throw new Error("red flash not found");
+  log("origin " + origin.toFixed(2) + "s");
+  // --- audio ---
+  const ac = new AudioContext({ sampleRate: 48000 });
+  const dest = ac.createMediaStreamDestination();
+  const bufs = {};
+  for (const [id, url] of Object.entries(clips)) { const ab = await (await fetch(url)).arrayBuffer(); bufs[id] = await ac.decodeAudioData(ab); }
+  // --- recorder ---
+  const stream = c.captureStream(25);
+  dest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
+  const mime = ["video/webm;codecs=vp8,opus", "video/webm"].find((m) => MediaRecorder.isTypeSupported(m));
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 2500000, audioBitsPerSecond: 96000 });
+  const chunks = []; rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  const done = new Promise((r) => { rec.onstop = r; });
+  await seek(0);
+  await ac.resume();
+  rec.start(500);
+  const startCtx = ac.currentTime + 0.15;
+  // schedule clips: video time of caption = origin + at_ms/1000 ; audio starts when video reaches it
+  for (const cap of timeline) {
+    const src = ac.createBufferSource(); src.buffer = bufs[cap.id]; src.connect(dest);
+    src.start(startCtx + origin + cap.at_ms / 1000);
+  }
+  await new Promise((r) => setTimeout(r, 150));
+  await v.play();
+  let frames = 0;
+  await new Promise((resolve) => {
+    const draw = () => { if (v.ended) return resolve(); g.drawImage(v, 0, 0); frames++; requestAnimationFrame(draw); };
+    draw();
+  });
+  await new Promise((r) => setTimeout(r, 800));
+  rec.stop(); await done;
+  log("frames " + frames + " chunks " + chunks.length);
+  const blob = new Blob(chunks, { type: "video/webm" });
+  const ab = await blob.arrayBuffer(); const u8 = new Uint8Array(ab);
+  const CH = 1 << 20; let i = 0;
+  while (i < u8.length) { let s = ""; const sub = u8.subarray(i, i + CH); for (let j = 0; j < sub.length; j += 0x8000) s += String.fromCharCode.apply(null, sub.subarray(j, j + 0x8000)); await window.saveChunk(btoa(s)); i += CH; }
+  await window.saveDone(u8.length);
+  return { origin, frames, bytes: u8.length };
+}
+</script>
+</body></html>

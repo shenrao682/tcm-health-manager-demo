@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>中医AI健康管家 演示</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: a phone frame centered on a quiet page, with a small side panel explaining what the demo does. Everything inside the phone is the app. */
+:root{
+  --bg:#f1ece1; --fg:#1d2420; --muted:#5d6861; --line:#d9ded9;
+  --app-bg:#f7f8f6; --surface:#ffffff; --accent:#2f6f5e; --accent-soft:#e3efe9; --accent-ink:#ffffff;
+  --warn:#9a5b14; --warn-soft:#f6ebd9; --crit:#8e3b3b; --crit-soft:#f4e3e3; --gold:#b7893a;
+  --display:"Noto Serif SC","Songti SC",serif; --body:"Noto Sans SC","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  --fs:15px; color-scheme:light;
+  /* page backdrop: 宣纸底 + 祥云纹 + 淡墨晕(单一浅色主题) */
+  --bg-art:radial-gradient(ellipse 70% 55% at 15% 0%,rgba(47,111,94,.10),transparent 60%),radial-gradient(ellipse 60% 50% at 100% 100%,rgba(183,137,58,.12),transparent 60%),var(--cloud); --frame:#c9b98a; --frame-shadow:0 0 0 1px rgba(183,137,58,.25),0 20px 60px rgba(60,45,20,.22);
+  --cloud:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%238a7a4e' stroke-opacity='.16' stroke-width='1.2' stroke-linecap='round'><path d='M22 52c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11H34c-7 0-12-5-12-11z'/><path d='M38 50a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M46 49c3-4 9-4 12 0'/><path d='M94 118c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11h-13c-7 0-12-5-12-11z'/><path d='M110 116a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M118 115c3-4 9-4 12 0'/><path d='M104 30c6-8 18-8 24 0'/><path d='M110 36c3-4 9-4 12 0'/><path d='M24 124c6-8 18-8 24 0'/><path d='M30 130c3-4 9-4 12 0'/></g></svg>");
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);background-image:var(--bg-art);background-attachment:fixed;color:var(--fg);font-family:var(--body);padding-inline:16px;padding-block:24px 40px;min-height:100vh}
+/* 印章式角标 */
+.seal{position:fixed;right:28px;bottom:28px;width:64px;height:64px;border:2px solid rgba(178,52,45,.55);border-radius:6px;display:grid;place-items:center;font-family:var(--display);font-weight:700;color:rgba(178,52,45,.75);font-size:15px;line-height:1.1;text-align:center;letter-spacing:.05em;writing-mode:vertical-rl;pointer-events:none;transform:rotate(-4deg)}
+@media (max-width:860px){.seal{display:none!important}}
+.stage{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:24px;align-items:start;justify-items:center}
+@media (min-width:860px){.stage{grid-template-columns:minmax(0,1fr) 400px}}
+.side{max-width:440px;font-size:14px;line-height:1.7;order:2}
+@media (min-width:860px){.side{order:0;justify-self:end;padding-top:12px}}
+.side h1{font-family:var(--display);font-size:24px;margin:0 0 6px}
+.side p{margin:0 0 10px;color:var(--muted)}
+.side ol{padding-left:1.2em;margin:0 0 12px}
+.side li{margin-bottom:4px}
+.side .tag{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted);margin-right:6px}
+.side button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:8px;cursor:pointer;margin-right:6px}
+.side button.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+
+/* phone */
+.phone{width:min(390px,100%);height:min(800px,calc(100vh - 80px));min-height:600px;background:var(--app-bg);border:1px solid var(--frame);border-radius:40px;box-shadow:var(--frame-shadow);overflow:hidden;position:relative;display:flex;flex-direction:column;font-size:var(--fs)}
+.phone[data-elder="1"]{--fs:18.5px}
+.phone[data-lang="en"]{--display:"Georgia","Times New Roman",serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.statusbar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:12px;color:var(--muted);flex:none}
+.topbar{display:flex;align-items:center;gap:10px;padding:4px 16px 10px;flex:none;border-bottom:1px solid var(--line);background:var(--app-bg)}
+.member{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;font-size:.9em}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px}
+.topbar .title{flex:1;font-weight:700;font-size:1.05em}
+.back{background:none;border:none;color:var(--accent);font:inherit;font-size:1em;cursor:pointer;padding:4px 6px}
+.lang{font:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:2px 8px;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:14px 16px 24px;min-height:0;scrollbar-width:thin}
+.tabbar{flex:none;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface);padding:6px 0 14px}
+.tabbar button{background:none;border:none;font:inherit;font-size:.75em;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px}
+.tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.on{color:var(--accent);font-weight:700}
+
+/* components */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 6px;font-size:1em}
+.card .k{font-size:.72em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.card.soft{background:var(--accent-soft);border-color:transparent}
+.card.warn{background:var(--warn-soft);border-color:transparent}
+.card.crit{background:var(--crit-soft);border-color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:.95em;padding:10px 16px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600}
+.btn.sec{background:var(--surface);color:var(--accent)}
+.btn.ghost{background:none;border-color:var(--line);color:var(--fg)}
+.btn.sm{padding:6px 12px;font-size:.85em;border-radius:10px}
+.btn.full{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.small{font-size:.85em}
+.pill{display:inline-block;font-size:.72em;padding:1px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.7;white-space:nowrap}
+.pill.ok{color:var(--accent);background:var(--accent-soft)}
+.pill.wn{color:var(--warn);background:var(--warn-soft)}
+.pill.cr{color:var(--crit);background:var(--crit-soft)}
+.pill.gd{color:var(--gold)}
+.src{display:inline-block;font-size:.72em;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:0 6px;cursor:pointer}
+h2.sec{font-family:var(--display);font-size:1.15em;margin:6px 0 10px}
+.list{margin:0;padding-left:1.2em}
+.list li{margin-bottom:4px}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.opt{font:inherit;font-size:.9em;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.opt.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px}
+.likert button{font:inherit;font-size:.72em;padding:8px 2px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.likert button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.bubble{max-width:85%;padding:10px 12px;border-radius:14px;margin-bottom:8px;line-height:1.5;font-size:.95em}
+.bubble.ai{background:var(--surface);border:1px solid var(--line);border-top-left-radius:4px}
+.bubble.me{background:var(--accent);color:var(--accent-ink);margin-left:auto;border-top-right-radius:4px}
+.inputrow{display:flex;gap:6px;margin-top:8px;position:sticky;bottom:0;background:var(--app-bg);padding-top:6px}
+.inputrow input{flex:1;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);min-width:0}
+.tabs2{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.tabs2 button{font:inherit;font-size:.85em;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;white-space:nowrap}
+.tabs2 button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.95em}
+.kv:last-child{border-bottom:none}
+.toggle{width:44px;height:26px;border-radius:13px;background:var(--line);position:relative;border:none;cursor:pointer;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{left:21px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.85em;padding:4px 12px;border:none;background:var(--surface);color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.bar{display:flex;align-items:center;gap:8px;font-size:.85em;margin-bottom:6px}
+.bar i{display:block;height:10px;background:var(--accent);border-radius:5px}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;z-index:5}
+.sheet>div{background:var(--app-bg);width:100%;max-height:92%;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet>div{animation:none}}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;flex:none}
+.sheet .hd b{font-size:1.05em}
+.sheet .bd{overflow-y:auto;padding:4px 16px 24px;min-height:0;flex:1}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:90px;background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.85em;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none;max-width:85%;text-align:center}
+.toast.show{opacity:1}
+.emerg{position:absolute;inset:0;background:var(--crit-soft);z-index:8;padding:40px 24px;display:flex;flex-direction:column;gap:14px}
+.emerg h2{font-family:var(--display);color:var(--crit);margin:0}
+.emerg .num{font-size:2.2em;font-weight:700;font-family:var(--display)}
+.guide{border:1px dashed var(--accent);background:var(--accent-soft)}
+.ribbon{font-size:.72em;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:2px 8px;display:inline-block;margin-bottom:6px}
+svg.radar text{font-size:11px;fill:var(--fg)}
+.check{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.done{color:var(--accent);font-weight:600}
+.body{width:100%;max-width:200px;margin:0 auto;display:block}
+.disclaimer{font-size:.75em;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="stage">
+<aside class="side" id="side"></aside>
+
+<div class="phone" id="phone">
+  <div class="statusbar"><span id="clock">9:41</span><span id="sbTerm">霜降 · 10月23日</span><span>●●● ▮</span></div>
+  <div class="topbar" id="topbar"></div>
+  <div class="content" id="view"></div>
+  <div class="tabbar" id="tabbar"></div>
+  <div class="toast" id="toast"></div>
+</div>
+</div>
+<div class="seal" aria-hidden="true">治未病</div>
+
+<script>
+/* ---------- i18n helpers ---------- */
+let S;
+const EN = ()=> S && S.lang==="en";
+const tt = (zh,en)=> EN()? en : zh;            // inline bilingual pair
+const pick = (o)=> EN()? o.en : o.zh;          // {zh,en} object
+
+/* ---------- data ---------- */
+const ITEMS_ZH = {
+Q01:"您精力充沛吗?",Q02:"您容易疲乏吗?",Q03:"您说话声音低弱无力吗?",Q04:"您感到闷闷不乐、情绪低沉吗?",Q05:"您比一般人耐受不了寒冷吗?",Q06:"您能适应外界自然和社会环境的变化吗?",Q07:"您容易失眠吗?",Q08:"您容易忘事(健忘)吗?",
+Q09:"您容易气短(呼吸短促,接不上气)吗?",Q10:"您容易心慌吗?",Q11:"您容易头晕或站起时晕眩吗?",Q12:"您比别人容易患感冒吗?",Q13:"您喜欢安静、懒得说话吗?",Q14:"您活动量稍大就容易出虚汗吗?",
+Q15:"您手脚发凉吗?",Q16:"您胃脘部、背部或腰膝部怕冷吗?",Q17:"您感到怕冷、衣服比别人穿得多吗?",Q18:"您吃(喝)凉的东西会感到不舒服或者怕吃(喝)凉东西吗?",Q19:"您受凉或吃(喝)凉的东西后,容易腹泻吗?",
+Q20:"您感到手脚心发热吗?",Q21:"您感觉身体、脸上发热吗?",Q22:"您皮肤或口唇干吗?",Q23:"您口唇的颜色比一般人红吗?",Q24:"您容易便秘或大便干燥吗?",Q25:"您面部两颧潮红或偏红吗?",Q26:"您感到眼睛干涩吗?",Q27:"您感到口干咽燥、总想喝水吗?",
+Q28:"您感到胸闷或腹部胀满吗?",Q29:"您感到身体沉重不轻松或不爽快吗?",Q30:"您腹部肥满松软吗?",Q31:"您有额部油脂分泌多的现象吗?",Q32:"您上眼睑比别人肿吗?",Q33:"您嘴里有黏黏的感觉吗?",Q34:"您平时痰多,特别是咽喉部总感到有痰堵着吗?",Q35:"您舌苔厚腻或有舌苔厚厚的感觉吗?",
+Q36:"您面部或鼻部有油腻感或者油亮发光吗?",Q37:"您容易生痤疮或疮疖吗?",Q38:"您感到口苦或嘴里有异味吗?",Q39:"您大便黏滞不爽、有解不尽的感觉吗?",Q40:"您小便时尿道有发热感、尿色浓(深)吗?",Q41:"您带下色黄(白带颜色发黄)吗?",
+Q42:"您的皮肤在不知不觉中会出现青紫瘀斑吗?",Q43:"您两颧部有细微红丝吗?",Q44:"您身体上有哪里疼痛吗?",Q45:"您面色晦暗或容易出现褐斑吗?",Q46:"您容易有黑眼圈吗?",Q47:"您口唇颜色偏暗吗?",
+Q48:"您容易精神紧张、焦虑不安吗?",Q49:"您多愁善感、感情脆弱吗?",Q50:"您容易感到害怕或受到惊吓吗?",Q51:"您胁肋部或乳房胀痛吗?",Q52:"您无缘无故叹气吗?",Q53:"您咽喉部有异物感,且吐之不出、咽之不下吗?",
+Q54:"您没有感冒时也会打喷嚏吗?",Q55:"您没有感冒时也会鼻塞、流鼻涕吗?",Q56:"您有因季节变化、温度变化或异味等原因而咳喘的现象吗?",Q57:"您容易过敏(对药物、食物、气味、花粉或季节交替时)吗?",Q58:"您的皮肤容易起荨麻疹吗?",Q59:"您的皮肤因过敏出现过紫癜吗?",Q60:"您的皮肤一抓就红,并出现抓痕吗?"};
+const ITEMS_EN = {
+Q01:"Do you feel energetic?",Q02:"Do you get tired easily?",Q03:"Is your voice low and weak when you speak?",Q04:"Do you feel down or low in mood?",Q05:"Are you less tolerant of cold than most people?",Q06:"Do you adapt well to changes in your environment?",Q07:"Do you have trouble sleeping?",Q08:"Are you forgetful?",
+Q09:"Do you get short of breath easily?",Q10:"Do you experience palpitations easily?",Q11:"Do you feel dizzy, or lightheaded when standing up?",Q12:"Do you catch colds more easily than others?",Q13:"Do you prefer quiet and feel too tired to talk?",Q14:"Do you sweat easily with slight exertion?",
+Q15:"Are your hands and feet cold?",Q16:"Do your stomach, back, lower back or knees feel sensitive to cold?",Q17:"Do you feel cold and wear more clothing than others?",Q18:"Do cold foods or drinks make you uncomfortable, or do you avoid them?",Q19:"Do you get diarrhea after catching cold or having cold food or drink?",
+Q20:"Do your palms and soles feel hot?",Q21:"Do you feel heat in your body or face?",Q22:"Are your skin or lips dry?",Q23:"Are your lips redder than most people's?",Q24:"Are you prone to constipation or dry stools?",Q25:"Are your cheeks flushed or reddish?",Q26:"Do your eyes feel dry?",Q27:"Do you have a dry mouth and throat and feel constantly thirsty?",
+Q28:"Do you feel chest tightness or abdominal fullness?",Q29:"Does your body feel heavy and sluggish?",Q30:"Is your abdomen large and soft?",Q31:"Is your forehead oily?",Q32:"Are your upper eyelids puffier than other people's?",Q33:"Does your mouth feel sticky?",Q34:"Do you have a lot of phlegm, especially stuck in the throat?",Q35:"Is your tongue coating thick and greasy?",
+Q36:"Is your face or nose oily or shiny?",Q37:"Are you prone to acne or boils?",Q38:"Do you have a bitter taste or bad odor in your mouth?",Q39:"Are your stools sticky and hard to pass completely?",Q40:"Do you feel burning when urinating, or is your urine dark?",Q41:"Is your vaginal discharge yellowish?",
+Q42:"Do bruises appear on your skin without a known injury?",Q43:"Do you have fine red capillaries on your cheeks?",Q44:"Do you have pain anywhere in your body?",Q45:"Is your complexion dull, or do you get brown spots easily?",Q46:"Do you get dark circles under your eyes easily?",Q47:"Are your lips dark in color?",
+Q48:"Do you feel nervous or anxious easily?",Q49:"Are you sentimental and emotionally fragile?",Q50:"Are you easily frightened or startled?",Q51:"Do you have distending pain in the ribs or breasts?",Q52:"Do you sigh for no apparent reason?",Q53:"Do you feel a lump in your throat you can neither cough up nor swallow?",
+Q54:"Do you sneeze even when you don't have a cold?",Q55:"Do you have a stuffy or runny nose even without a cold?",Q56:"Do you cough or wheeze with seasonal or temperature changes, or odors?",Q57:"Are you prone to allergies (medicines, food, odors, pollen, seasonal change)?",Q58:"Do you get hives easily?",Q59:"Have you had purpura (purple-red spots) from allergy?",Q60:"Does your skin turn red and show marks when scratched?"};
+const IT = id => (EN()?ITEMS_EN:ITEMS_ZH)[id];
+const SCALES = [
+{code:"pinghe",zh:"平和质",en:"Balanced",short:{zh:"平和",en:"Bal"},type:"balanced",items:[["Q01",0],["Q02",1],["Q03",1],["Q04",1],["Q05",1],["Q06",0],["Q07",1],["Q08",1]]},
+{code:"qixu",zh:"气虚质",en:"Qi Deficiency",short:{zh:"气虚",en:"Qi↓"},items:[["Q02",0],["Q09",0],["Q10",0],["Q11",0],["Q12",0],["Q13",0],["Q03",0],["Q14",0]]},
+{code:"yangxu",zh:"阳虚质",en:"Yang Deficiency",short:{zh:"阳虚",en:"Yang↓"},items:[["Q15",0],["Q16",0],["Q17",0],["Q05",0],["Q12",0],["Q18",0],["Q19",0]]},
+{code:"yinxu",zh:"阴虚质",en:"Yin Deficiency",short:{zh:"阴虚",en:"Yin↓"},items:[["Q20",0],["Q21",0],["Q22",0],["Q23",0],["Q24",0],["Q25",0],["Q26",0],["Q27",0]]},
+{code:"tanshi",zh:"痰湿质",en:"Phlegm-Damp",short:{zh:"痰湿",en:"Phlegm"},items:[["Q28",0],["Q29",0],["Q30",0],["Q31",0],["Q32",0],["Q33",0],["Q34",0],["Q35",0]]},
+{code:"shire",zh:"湿热质",en:"Damp-Heat",short:{zh:"湿热",en:"DampHt"},items:[["Q36",0],["Q37",0],["Q38",0],["Q39",0],["Q40",0],["Q41",0]]},
+{code:"xueyu",zh:"血瘀质",en:"Blood Stasis",short:{zh:"血瘀",en:"Stasis"},items:[["Q42",0],["Q43",0],["Q44",0],["Q45",0],["Q46",0],["Q08",0],["Q47",0]]},
+{code:"qiyu",zh:"气郁质",en:"Qi Stagnation",short:{zh:"气郁",en:"Stagn"},items:[["Q04",0],["Q48",0],["Q49",0],["Q50",0],["Q51",0],["Q52",0],["Q53",0]]},
+{code:"tebing",zh:"特禀质",en:"Allergic (Special)",short:{zh:"特禀",en:"Allergy"},items:[["Q54",0],["Q55",0],["Q56",0],["Q57",0],["Q58",0],["Q59",0],["Q60",0]]}];
+const SC = code => SCALES.find(s=>s.code===code);
+const sn = s => EN()? s.en : s.zh;               // scale display name
+const SCREENER = ["Q01","Q02","Q15","Q05","Q27","Q30","Q36","Q45","Q04","Q57"];
+const LIKERT_ZH = ["没有","很少","有时","经常","总是"], LIKERT_EN=["Never","Rarely","Sometimes","Often","Always"];
+const LK = ()=> EN()?LIKERT_EN:LIKERT_ZH;
+// free-text → item mapping for the conversational demo (both languages)
+const PHRASES = [
+ [/怕冷|畏寒|耐不了冷|受不了冷|cold.?(intoleran|sensitiv)|hate.*cold|feel.*cold.*(easily|all the time)|always cold|run cold|get cold easily|can'?t stand (the )?cold/i,[["Q05",4],["Q17",4]]],
+ [/手脚.*(凉|冰|冷)|手.*脚.*凉|cold (hands|feet)|hands and feet.*cold/i,[["Q15",5]]],
+ [/凉的.*(拉肚子|腹泻)|吃凉.*不舒服|cold (food|drink).*(diarrh|stomach|upset)|diarrh.*cold/i,[["Q19",4],["Q18",4]]],
+ [/疲乏|疲劳|累|没精神|乏力|tired|fatigue|exhausted|no energy|low energy/i,[["Q02",4],["Q01",2]]],
+ [/气短|喘不上|short(ness)? of breath|breathless/i,[["Q09",4]]],[/出汗|虚汗|sweat/i,[["Q14",4]]],[/感冒|catch.*cold|colds? (often|easily)/i,[["Q12",4]]],
+ [/口干|口渴|想喝水|咽干|dry (mouth|throat)|thirsty/i,[["Q27",4]]],[/手心.*热|脚心.*热|五心烦热|hot (palms|soles|hands)/i,[["Q20",4]]],[/便秘|大便干|constipat/i,[["Q24",4]]],[/眼睛干|dry eyes/i,[["Q26",4]]],
+ [/胖|肚子.*(大|软)|腹部.*松|belly|overweight|soft abdomen/i,[["Q30",4]]],[/舌苔.*厚|苔腻|thick.*coat|coated tongue/i,[["Q35",4]]],[/痰多|有痰|phlegm|mucus/i,[["Q34",4]]],[/身体.*沉重|不爽快|heavy|sluggish/i,[["Q29",4]]],
+ [/油腻|油光|出油|脸油|oily|greasy (face|skin)/i,[["Q36",4]]],[/痘|痤疮|acne|pimple/i,[["Q37",4]]],[/口苦|口臭|bitter taste|bad breath/i,[["Q38",4]]],[/大便.*黏|解不尽|sticky stool/i,[["Q39",4]]],
+ [/面色.*(暗|黄)|色斑|褐斑|dull (skin|complexion)|brown spots|dark spots/i,[["Q45",4]]],[/黑眼圈|dark circles/i,[["Q46",4]]],[/瘀斑|青紫|bruise/i,[["Q42",4]]],[/疼痛|痛|pain|ache/i,[["Q44",3]]],
+ [/情绪低|闷闷不乐|心情不好|抑郁|低落|low mood|depress|feel down|sad/i,[["Q04",4]]],[/焦虑|紧张|不安|anxious|anxiety|nervous|stress/i,[["Q48",4]]],[/叹气|sigh/i,[["Q52",4]]],[/多愁善感|脆弱|sentimental|fragile|cry easily/i,[["Q49",4]]],
+ [/过敏|花粉|allerg|pollen|hay fever/i,[["Q57",5]]],[/打喷嚏|喷嚏|sneez/i,[["Q54",4]]],[/鼻塞|流鼻涕|stuffy|runny nose/i,[["Q55",4]]],[/荨麻疹|风团|hives|urticaria/i,[["Q58",4]]],
+ [/睡不好|失眠|睡眠差|insomnia|can'?t sleep|poor sleep|sleep badly/i,[["Q07",4]]],[/精力.*(好|充沛)|状态不错|挺好|energetic|feel great|pretty good/i,[["Q01",4],["Q02",2]]],[/还行|还好|一般|okay|fine|so-so/i,[]]];
+
+const CONTENT_ZH = {
+pinghe:{sum:"阴阳气血调和,精力充沛,适应力强。保持即可,顺应节气微调。",diet:{y:["五谷杂粮","应季蔬果","清淡少盐"],n:["暴饮暴食","过度进补"]},recipe:{name:"山药小米粥",fit:"平和质 · 霜降",ing:["山药 100g","小米 60g","红枣 3 枚"],how:["山药去皮切块","与小米、红枣同煮 30 分钟","温热食用"],note:"健脾养胃,秋季润燥"},sleep:"亥时(21–23点)前入睡,卯时(5–7点)起",move:"快走、太极、八段锦,每周 4 次",acu:[{n:"足三里",loc:"外膝眼下 3 寸,胫骨外一横指",how:"拇指按揉 2 分钟,每日早晚",m:"ST36"}]},
+qixu:{sum:"元气不足,易疲乏、气短、自汗、易感冒。重在补气健脾,少耗多养。",diet:{y:["山药、红枣、小米","鸡肉、牛肉","南瓜、胡萝卜"],n:["生冷瓜果","耗气的辛辣、浓茶咖啡"]},recipe:{name:"黄芪红枣鸡汤",fit:"气虚质 · 秋季",ing:["鸡腿 1 只","红枣 5 枚","山药 150g","生姜 3 片"],how:["鸡肉焯水","所有食材入锅加水","小火炖 1.5 小时,少盐"],note:"补中益气;感冒发热期间不宜"},sleep:"保证 7–8 小时,午间小憩 20 分钟",move:"低强度:散步、八段锦,避免大汗",acu:[{n:"足三里",loc:"外膝眼下 3 寸",how:"按揉 3 分钟,早晚各一次",m:"ST36"},{n:"气海",loc:"脐下 1.5 寸",how:"掌心顺时针摩 3 分钟",m:"CV6"}]},
+yangxu:{sum:"阳气不足,畏寒怕冷、手足不温、喜热饮。重在温阳散寒,护住腰腹与足部。",diet:{y:["羊肉、牛肉","生姜、桂圆、核桃","韭菜、南瓜"],n:["生冷寒凉:冷饮、西瓜、螃蟹","清晨空腹喝凉水"]},recipe:{name:"当归生姜羊肉汤",fit:"阳虚质 · 秋冬",ing:["羊肉 300g","生姜 30g","当归 10g","葱、盐少许"],how:["羊肉切块焯水","加生姜、当归,小火炖 2 小时","出锅前加盐"],note:"温中补血,祛寒;阴虚火旺者不宜"},sleep:"早睡,睡前温水泡脚 15 分钟",move:"上午阳光下活动;避免夜间剧烈运动",acu:[{n:"关元",loc:"脐下 3 寸",how:"掌心温热后按压,每日 5 分钟",m:"CV4"},{n:"涌泉",loc:"足底前 1/3 凹陷处",how:"睡前搓揉至发热",m:"KI1"}]},
+yinxu:{sum:"阴液亏少,口干咽燥、手足心热、易便秘、睡眠浅。重在滋阴润燥,忌熬夜。",diet:{y:["百合、银耳、梨","鸭肉、豆腐","黑芝麻、桑葚"],n:["辛辣燥热:辣椒、羊肉","熬夜、浓茶"]},recipe:{name:"银耳百合莲子羹",fit:"阴虚质 · 霜降润燥",ing:["银耳 1 朵","百合 20g","莲子 20g","冰糖少许"],how:["银耳泡发撕小朵","所有食材加水炖 1 小时","冰糖调味"],note:"滋阴润肺;脾虚便溏者减量"},sleep:"子时(23点)前必须入睡,午间闭目养神",move:"游泳、瑜伽、太极;避免大汗",acu:[{n:"三阴交",loc:"内踝尖上 3 寸,胫骨后缘",how:"按揉 3 分钟,睡前",m:"SP6"},{n:"太溪",loc:"内踝与跟腱之间凹陷",how:"按揉 2 分钟",m:"KI3"}]},
+tanshi:{sum:"痰湿凝聚,体型偏胖、身重不爽、口黏苔腻。重在健脾化湿,管住甜腻。",diet:{y:["薏米、赤小豆、冬瓜","白萝卜、山药","陈皮水"],n:["甜食、油腻、奶油","啤酒、冷饮"]},recipe:{name:"薏米赤小豆冬瓜汤",fit:"痰湿质",ing:["薏米 30g","赤小豆 30g","冬瓜 200g","陈皮 1 小片"],how:["薏米、赤小豆提前泡 2 小时","煮 40 分钟后加冬瓜","再煮 10 分钟"],note:"利湿健脾;孕期慎用薏米"},sleep:"不晚于 23 点,避免饭后即睡",move:"中等强度有氧,出微汗;每周 5 次",acu:[{n:"丰隆",loc:"外踝尖上 8 寸,胫骨前缘外两横指",how:"用力按揉 3 分钟",m:"ST40"},{n:"阴陵泉",loc:"胫骨内侧髁下缘凹陷",how:"按揉 2 分钟",m:"SP9"}]},
+shire:{sum:"湿热内蕴,面垢油光、口苦、大便黏滞。重在清热利湿,忌辛辣烟酒。",diet:{y:["绿豆、苦瓜、芹菜","冬瓜、黄瓜、莲藕","薏米、赤小豆"],n:["辛辣、烧烤、油炸","烟酒、甜饮料"]},recipe:{name:"绿豆薏米汤",fit:"湿热质",ing:["绿豆 50g","薏米 30g","莲子 15g"],how:["绿豆、薏米泡 1 小时","加水煮 40 分钟","可微甜,不加冰"],note:"清热利湿;脾胃虚寒者少食"},sleep:"规律作息,避免熬夜生内热",move:"游泳、慢跑等出汗运动,每周 4–5 次",acu:[{n:"曲池",loc:"屈肘,肘横纹外侧端",how:"按揉 2 分钟",m:"LI11"},{n:"阴陵泉",loc:"胫骨内侧髁下缘凹陷",how:"按揉 2 分钟",m:"SP9"}]},
+xueyu:{sum:"血行不畅,肤色晦暗、易瘀斑、唇暗。重在活血行气,多动少坐。",diet:{y:["山楂、黑木耳、洋葱","玫瑰花茶","少量黄酒(非孕期)"],n:["寒凉生冷","高脂油腻"]},recipe:{name:"山楂红糖饮",fit:"血瘀质",ing:["干山楂 15g","红糖 10g","玫瑰花 5 朵"],how:["山楂洗净","加水煮 15 分钟","加红糖、玫瑰花焖 3 分钟"],note:"活血化瘀;孕期、经期量多者不宜"},sleep:"规律入睡;避免久坐久卧",move:"每天活动量充足,舞蹈、快走、太极",acu:[{n:"血海",loc:"髌骨内上缘上 2 寸",how:"按揉 3 分钟",m:"SP10"},{n:"膈俞",loc:"第 7 胸椎棘突下旁开 1.5 寸",how:"他人协助按揉或艾灸",m:"BL17"}]},
+qiyu:{sum:"气机郁滞,情绪低落、易紧张、胸胁胀满。重在疏肝理气,多与人交流。",diet:{y:["佛手、玫瑰花、陈皮","金橘、柑橘","小麦、百合"],n:["过饱","睡前咖啡因"]},recipe:{name:"玫瑰佛手茶",fit:"气郁质",ing:["玫瑰花 5 朵","佛手片 3 片","陈皮 1 小片"],how:["沸水冲泡","焖 5 分钟","午后饮用"],note:"疏肝解郁;孕期慎用玫瑰"},sleep:"睡前 1 小时放下手机,听舒缓音乐",move:"户外、集体运动:登山、球类、舞蹈",acu:[{n:"太冲",loc:"足背第 1、2 跖骨结合部前凹陷",how:"按揉 2 分钟,有酸胀感",m:"LR3"},{n:"膻中",loc:"两乳头连线中点",how:"掌心轻揉 2 分钟",m:"CV17"}]},
+tebing:{sum:"先天禀赋异常,过敏体质。重在益气固表,避开过敏原。",diet:{y:["清淡均衡","益气固表:黄芪、山药","富含维 C 蔬果"],n:["已知过敏食物","海鲜、辛辣(发物)"]},recipe:{name:"黄芪山药粥",fit:"特禀质",ing:["黄芪 15g","山药 100g","大米 60g"],how:["黄芪煎水取汁","山药、大米入黄芪水煮粥","温热食"],note:"益气固表;感冒期间停用"},sleep:"保持卧室清洁,减少尘螨",move:"规律中等运动增强体质,花粉季减少户外",acu:[{n:"迎香",loc:"鼻翼外缘中点旁",how:"食指按揉 1 分钟,早晚",m:"LI20"},{n:"足三里",loc:"外膝眼下 3 寸",how:"按揉 3 分钟",m:"ST36"}]}};
+const CONTENT_EN = {
+pinghe:{sum:"Yin, yang, qi and blood in balance; good energy and adaptability. Maintain, and make small seasonal adjustments.",diet:{y:["Whole grains","Seasonal fruit and vegetables","Light, low-salt cooking"],n:["Overeating","Excessive tonics"]},recipe:{name:"Yam & millet congee",fit:"Balanced · Frost's Descent",ing:["Chinese yam 100 g","Millet 60 g","Red dates 3"],how:["Peel and cube the yam","Simmer with millet and dates 30 min","Serve warm"],note:"Strengthens the spleen and stomach; moistens autumn dryness"},sleep:"Asleep before 11 pm (Hai hour); up at 5–7 am",move:"Brisk walking, tai chi, Baduanjin — 4× a week",acu:[{n:"Zusanli",loc:"3 cun below the outer knee hollow, one finger-width lateral to the shin",how:"Press and knead with the thumb 2 min, morning and evening",m:"ST36"}]},
+qixu:{sum:"Insufficient qi: easy fatigue, shortness of breath, spontaneous sweating, frequent colds. Focus on tonifying qi and the spleen; conserve more than you spend.",diet:{y:["Chinese yam, red dates, millet","Chicken, beef","Pumpkin, carrot"],n:["Raw, cold fruit","Qi-depleting spicy food, strong tea and coffee"]},recipe:{name:"Astragalus, red date & chicken soup",fit:"Qi Deficiency · autumn",ing:["Chicken leg 1","Red dates 5","Chinese yam 150 g","Ginger 3 slices"],how:["Blanch the chicken","Add all ingredients and water","Simmer 1.5 h; season lightly"],note:"Tonifies middle qi; avoid during colds or fever"},sleep:"7–8 hours; a 20-minute midday nap",move:"Low intensity: walking, Baduanjin; avoid heavy sweating",acu:[{n:"Zusanli",loc:"3 cun below the outer knee hollow",how:"Knead 3 min, morning and evening",m:"ST36"},{n:"Qihai",loc:"1.5 cun below the navel",how:"Rub clockwise with the palm 3 min",m:"CV6"}]},
+yangxu:{sum:"Insufficient yang: aversion to cold, cold limbs, preference for warm drinks. Focus on warming yang and dispelling cold; keep the lower back, abdomen and feet warm.",diet:{y:["Lamb, beef","Ginger, longan, walnut","Chives, pumpkin"],n:["Raw and cold: iced drinks, watermelon, crab","Cold water on an empty stomach in the morning"]},recipe:{name:"Lamb soup with angelica & ginger",fit:"Yang Deficiency · autumn–winter",ing:["Lamb 300 g","Ginger 30 g","Angelica (dang gui) 10 g","Scallion, a little salt"],how:["Cube and blanch the lamb","Add ginger and angelica; simmer 2 h","Salt before serving"],note:"Warms the middle, nourishes blood, dispels cold; not for yin-deficient heat"},sleep:"Early to bed; soak feet in warm water 15 min beforehand",move:"Be active in morning sunlight; avoid vigorous exercise at night",acu:[{n:"Guanyuan",loc:"3 cun below the navel",how:"Warm the palm, then press 5 min daily",m:"CV4"},{n:"Yongquan",loc:"Hollow in the front third of the sole",how:"Rub until warm before bed",m:"KI1"}]},
+yinxu:{sum:"Insufficient yin fluids: dry mouth and throat, hot palms and soles, constipation, light sleep. Focus on nourishing yin and moistening; no late nights.",diet:{y:["Lily bulb, white fungus, pear","Duck, tofu","Black sesame, mulberry"],n:["Spicy and heating: chili, lamb","Late nights, strong tea"]},recipe:{name:"White fungus, lily & lotus seed soup",fit:"Yin Deficiency · Frost's Descent dryness",ing:["White fungus 1","Lily bulb 20 g","Lotus seed 20 g","A little rock sugar"],how:["Soak and tear the fungus","Simmer everything 1 h","Sweeten lightly"],note:"Nourishes yin, moistens the lungs; reduce if stools are loose"},sleep:"Must be asleep before 11 pm; rest the eyes at midday",move:"Swimming, yoga, tai chi; avoid heavy sweating",acu:[{n:"Sanyinjiao",loc:"3 cun above the inner ankle, behind the shin bone",how:"Knead 3 min before bed",m:"SP6"},{n:"Taixi",loc:"Hollow between inner ankle and Achilles tendon",how:"Knead 2 min",m:"KI3"}]},
+tanshi:{sum:"Phlegm-damp accumulation: heavier build, heavy body, sticky mouth, greasy tongue coat. Focus on strengthening the spleen and resolving damp; watch sweets and grease.",diet:{y:["Job's tears, adzuki bean, winter melon","Daikon, Chinese yam","Tangerine-peel tea"],n:["Sweets, grease, cream","Beer, iced drinks"]},recipe:{name:"Job's tears, adzuki & winter melon soup",fit:"Phlegm-Damp",ing:["Job's tears 30 g","Adzuki beans 30 g","Winter melon 200 g","Dried tangerine peel, 1 small piece"],how:["Soak grains and beans 2 h","Cook 40 min, then add melon","Cook 10 min more"],note:"Drains damp, strengthens spleen; use Job's tears cautiously in pregnancy"},sleep:"No later than 11 pm; don't sleep right after meals",move:"Moderate aerobic exercise to a light sweat; 5× a week",acu:[{n:"Fenglong",loc:"8 cun above the outer ankle, two finger-widths lateral to the shin",how:"Knead firmly 3 min",m:"ST40"},{n:"Yinlingquan",loc:"Hollow below the inner knee bone",how:"Knead 2 min",m:"SP9"}]},
+shire:{sum:"Damp-heat inside: oily face, bitter taste, sticky stools. Focus on clearing heat and draining damp; no spicy food, alcohol or smoking.",diet:{y:["Mung bean, bitter melon, celery","Winter melon, cucumber, lotus root","Job's tears, adzuki bean"],n:["Spicy, barbecued, fried","Alcohol, tobacco, sugary drinks"]},recipe:{name:"Mung bean & Job's tears soup",fit:"Damp-Heat",ing:["Mung beans 50 g","Job's tears 30 g","Lotus seed 15 g"],how:["Soak 1 h","Simmer 40 min","Lightly sweet; never iced"],note:"Clears heat, drains damp; go easy if digestion runs cold"},sleep:"Regular hours; late nights breed internal heat",move:"Sweaty exercise such as swimming or jogging, 4–5× a week",acu:[{n:"Quchi",loc:"Outer end of the elbow crease when bent",how:"Knead 2 min",m:"LI11"},{n:"Yinlingquan",loc:"Hollow below the inner knee bone",how:"Knead 2 min",m:"SP9"}]},
+xueyu:{sum:"Sluggish blood flow: dull complexion, easy bruising, dark lips. Focus on moving blood and qi; sit less, move more.",diet:{y:["Hawthorn, black fungus, onion","Rose tea","A little rice wine (not in pregnancy)"],n:["Cold and raw food","High-fat, greasy food"]},recipe:{name:"Hawthorn & brown sugar drink",fit:"Blood Stasis",ing:["Dried hawthorn 15 g","Brown sugar 10 g","Rose buds 5"],how:["Rinse the hawthorn","Simmer 15 min","Add sugar and roses; steep 3 min"],note:"Moves blood; not for pregnancy or heavy periods"},sleep:"Regular bedtime; avoid long sitting or lying",move:"Plenty of daily movement: dance, brisk walking, tai chi",acu:[{n:"Xuehai",loc:"2 cun above the inner upper corner of the kneecap",how:"Knead 3 min",m:"SP10"},{n:"Geshu",loc:"1.5 cun lateral to the 7th thoracic vertebra",how:"Have someone knead or apply moxa",m:"BL17"}]},
+qiyu:{sum:"Stagnant qi: low mood, easy tension, fullness in the chest and ribs. Focus on soothing the liver and moving qi; connect with people.",diet:{y:["Buddha's hand, rose, tangerine peel","Kumquat, citrus","Wheat, lily bulb"],n:["Overeating","Caffeine before bed"]},recipe:{name:"Rose & Buddha's hand tea",fit:"Qi Stagnation",ing:["Rose buds 5","Buddha's hand slices 3","Dried tangerine peel, 1 small piece"],how:["Steep in boiling water","Cover 5 min","Drink in the afternoon"],note:"Soothes the liver, relieves stagnation; rose with care in pregnancy"},sleep:"Put the phone down an hour before bed; calm music",move:"Outdoor and group activity: hiking, ball games, dance",acu:[{n:"Taichong",loc:"Hollow on the top of the foot before the 1st–2nd metatarsal junction",how:"Knead 2 min until it aches slightly",m:"LR3"},{n:"Danzhong",loc:"Midpoint between the nipples",how:"Rub gently with the palm 2 min",m:"CV17"}]},
+tebing:{sum:"Constitutional sensitivity: allergy-prone. Focus on strengthening qi and the body's surface; avoid allergens.",diet:{y:["Light, balanced meals","Surface-strengthening: astragalus, Chinese yam","Vitamin-C-rich produce"],n:["Known allergens","Seafood and spicy triggers"]},recipe:{name:"Astragalus & yam congee",fit:"Allergic constitution",ing:["Astragalus 15 g","Chinese yam 100 g","Rice 60 g"],how:["Decoct astragalus; keep the liquid","Cook yam and rice in it","Serve warm"],note:"Strengthens qi and the surface; stop during colds"},sleep:"Keep the bedroom clean; reduce dust mites",move:"Regular moderate exercise; less outdoors in pollen season",acu:[{n:"Yingxiang",loc:"Beside the midpoint of the nostril wing",how:"Knead with the index finger 1 min, morning and evening",m:"LI20"},{n:"Zusanli",loc:"3 cun below the outer knee hollow",how:"Knead 3 min",m:"ST36"}]}};
+const CT = code => (EN()?CONTENT_EN:CONTENT_ZH)[code]||(EN()?CONTENT_EN:CONTENT_ZH).pinghe;
+const GOALS = [["sleep",{zh:"睡眠",en:"Sleep"}],["stress",{zh:"压力",en:"Stress"}],["digest",{zh:"消化",en:"Digestion"}],["energy",{zh:"精力",en:"Energy"}],["weight",{zh:"体重管理",en:"Weight"}]];
+const GL = g => pick(GOALS.find(x=>x[0]===g)[1]);
+const CLINIC = {name:{zh:"旧金山仁和中医诊所",en:"Renhe TCM Clinic, San Francisco"},addr:"1234 Clement St, San Francisco, CA 94118",tel:"(415) 555-0128",hours:{zh:"周一至周六 9:00–18:00",en:"Mon–Sat 9:00–18:00"}};
+const TERM = {zh:"霜降",en:"Frost's Descent"};
+
+/* ---------- state ---------- */
+const mem=(id,name,initial,sex,minor)=>({id,name,initial,sex,minor:!!minor,answers:{},goals:[],plan:null,checkins:{},screenerDone:false,formal:false,formalShown:false});
+const DEFAULT = ()=>({
+  members:[mem("m1",{zh:"我",en:"Me"},{zh:"我",en:"M"},"f"), mem("m2",{zh:"妈妈",en:"Mom"},{zh:"妈",en:"Mo"},"f"), mem("m3",{zh:"小明",en:"Ming"},{zh:"明",en:"Mi"},"m",true)],
+  cur:"m1", tab:"today", stack:[], elder:false, clinicBound:true, day:"d1", lang:"zh"
+});
+try{ S = JSON.parse(localStorage.getItem("tcmdemo")||"null") }catch(e){ S=null }
+if(!S || !S.lang || typeof S.members[0].name==="string") S = DEFAULT();
+function save(){ try{ localStorage.setItem("tcmdemo",JSON.stringify(S)) }catch(e){} }
+const M = ()=>S.members.find(m=>m.id===S.cur);
+const mn = m => typeof m.name==="string"? m.name : pick(m.name);
+const mi = m => typeof m.initial==="string"? m.initial : pick(m.initial);
+
+/* ---------- scoring (ZYYXH/T 157-2009 + early stop) ---------- */
+// conclusion codes: "no" | "yes" | "tend" | "pending-balanced" ; confidence: "confirmed" | "prelim" | "open"
+function scaleState(sc, answers){
+  const n = sc.items.length; let sum=0, k=0, ansCount=0;
+  for(const [id,rev] of sc.items){ const v=answers[id]; if(v==null){k++;continue} ansCount++; sum += rev? 6-v : v; }
+  const t = (raw)=> (raw-n)/(n*4)*100;
+  const tmin=t(sum+k), tmax=t(sum+k*5);
+  const est = ansCount? t(sum + k*(sum/ansCount)) : t(sum+k);
+  let concl=null;
+  if(sc.type==="balanced"){ if(tmax<60) concl="no"; else if(k===0) concl="pending-balanced"; }
+  else { if(tmax<30) concl="no"; else if(tmin>=40) concl="yes"; else if(tmin>=30&&tmax<40) concl="tend"; }
+  const conf = concl? "confirmed" : (tmax-tmin<=25? "prelim":"open");
+  return {code:sc.code,zh:sc.zh,en:sc.en,short:sc.short,n,k,tmin,tmax,est,concl,conf,remaining:k};
+}
+const CONF = {confirmed:{zh:"已确认",en:"Confirmed",cls:"ok"},prelim:{zh:"初步",en:"Preliminary",cls:"wn"},open:{zh:"待定",en:"Undetermined",cls:"cr"}};
+const CONCL = {no:{zh:"否",en:"No"},yes:{zh:"是",en:"Yes"},tend:{zh:"倾向是",en:"Tendency"},"basically":{zh:"基本是",en:"Mostly"}};
+function assess(m){
+  const st = SCALES.map(sc=>scaleState(sc,m.answers));
+  const biased = st.filter(s=>s.code!=="pinghe");
+  const ph = st[0];
+  const allB = biased.every(s=>s.concl);
+  let phLabel = ph.concl;
+  if(ph.concl==="pending-balanced" || (ph.concl!=="no" && allB && ph.k===0)){
+    if(ph.est>=60 && biased.every(s=>s.tmax<30)) phLabel="yes";
+    else if(ph.est>=60 && biased.every(s=>s.tmax<40)) phLabel="basically";
+    else if(ph.k===0) phLabel="no";
+  }
+  const yes = biased.filter(s=>s.concl==="yes"||(!s.concl&&s.est>=40)).sort((a,b)=>b.est-a.est);
+  const tend = biased.filter(s=>s.concl==="tend"||(!s.concl&&s.est>=30&&s.est<40)).sort((a,b)=>b.est-a.est);
+  let primary, primaryConf;
+  const sorted=[...biased].sort((a,b)=>b.est-a.est); const gap = sorted.length>1? sorted[0].est-sorted[1].est : 99;
+  const provisionalConf = ()=> gap>=15 ? "prelim" : "open";
+  if(yes.length){ primary=yes[0]; primaryConf= yes[0].concl==="yes" ? "confirmed" : provisionalConf(); }
+  else if(phLabel==="yes"||phLabel==="basically"||(ph.est>=60&&!biased.some(s=>s.est>=30))){ primary=ph; primaryConf=ph.k===0?"confirmed":ph.conf; }
+  else if(tend.length){ primary=tend[0]; primaryConf= tend[0].concl==="tend" ? "confirmed" : provisionalConf(); }
+  else { primary = sorted[0]; primaryConf="open"; }
+  // distinct unanswered items across unsettled scales (shared items counted once)
+  const pend=new Set(); SCALES.forEach((sc,i)=>{ const s=st[i]; if(s.concl && s.concl!=="pending-balanced") return; sc.items.forEach(([id])=>{ if(m.answers[id]==null) pend.add(id); }); }); const remaining=pend.size;
+  const formal = st.every(s=>s.concl && s.concl!=="pending-balanced") || Object.keys(m.answers).length>=60;
+  return {st, primary, primaryConf, secondary: yes.slice(1), tendencies: tend, remaining, formal, phLabel};
+}
+function nextItems(m, limit){
+  const st = SCALES.map(sc=>({sc, s:scaleState(sc,m.answers)})).filter(x=>!x.s.concl||x.s.concl==="pending-balanced");
+  const out=[]; let progress=true;
+  while(out.length<limit && progress){
+    progress=false;
+    for(const {sc} of st){
+      const next = sc.items.map(i=>i[0]).find(id=> m.answers[id]==null && !out.includes(id));
+      if(next){ out.push(next); progress=true; if(out.length>=limit) break; }
+    }
+  }
+  return out;
+}
+function setAnswer(m,id,v){ m.answers[id]=v; const a=assess(m); if(a.formal && !m.formal){ m.formal=true; } save(); }
+const confPill = c => `<span class="pill ${CONF[c].cls}">${pick(CONF[c])}</span>`;
+
+/* ---------- plan ---------- */
+function buildPlan(m){ const a=assess(m); m.plan={code:a.primary.code, provisional:!m.formal, goals:[...m.goals]}; save(); }
+
+/* ---------- nav ---------- */
+let sheet=null;
+function leavingAcu(){ const t=S.stack[S.stack.length-1]; if(t&&t.page==="acupoint"&&TIMER.running){ stopTimer(); toast(tt("计时已暂停","Timer paused")); } }
+function go(tab){ leavingAcu(); S.tab=tab; S.stack=[]; sheet=null; save(); render(); }
+function push(page,params){ S.stack.push({page,params}); save(); render(); }
+function pop(){ leavingAcu(); S.stack.pop(); save(); render(); }
+function openSheet(kind,params){ sheet={kind,params}; render(); }
+function closeSheet(){ sheet=null; render(); }
+let toastT; function toast(t){ const el=document.getElementById("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),1800); }
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function setLang(l){ S.lang=l; if(sheet&&sheet.params){ delete sheet.params.log; sheet.params.doneMsg=false; sheet.params.pending=null; } save(); render(); }
+
+/* ---------- render ---------- */
+const ICONS={today:'<svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+ constitution:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg>',
+ plan:'<svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>',
+ me:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'};
+const TABS = ()=>[["today",tt("今日","Today")],["constitution",tt("我的体质","My Type")],["plan",tt("调养方案","My Plan")],["me",tt("我的","Me")]];
+function render(){
+  const phone=document.getElementById("phone"); phone.dataset.elder=S.elder?"1":"0"; phone.dataset.lang=S.lang;
+  document.documentElement.lang = EN()?"en":"zh-CN";
+  document.getElementById("sbTerm").textContent = tt("霜降 · 10月23日","Frost's Descent · Oct 23");
+  renderSide();
+  const m=M(); const top=S.stack[S.stack.length-1];
+  const tb=document.getElementById("topbar");
+  const langBtn=`<button class="lang" data-act="lang" title="Switch language">${EN()?"中":"EN"}</button>`;
+  if(top){ tb.innerHTML=`<button class="back" id="backBtn">‹ ${tt("返回","Back")}</button><div class="title">${esc(pageTitle(top))}</div>${langBtn}`; document.getElementById("backBtn").onclick=pop; }
+  else { tb.innerHTML=`<div class="member" id="memberBtn"><span class="avatar">${esc(mi(m))}</span><span>${esc(mn(m))}</span><span class="muted">▾</span></div><div class="title" style="text-align:right;font-weight:500;color:var(--muted);font-size:.9em">${esc(Object.fromEntries(TABS())[S.tab])}</div>${langBtn}`; document.getElementById("memberBtn").onclick=()=>openSheet("members"); }
+  bind(tb);
+  document.getElementById("tabbar").innerHTML=TABS().map(([k,l])=>`<button class="${S.tab===k&&!top?"on":""}" data-tab="${k}">${ICONS[k]}<span>${l}</span></button>`).join("");
+  document.querySelectorAll("#tabbar button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+  const v=document.getElementById("view");
+  v.innerHTML = top? renderPage(top) : renderTab(S.tab);
+  v.scrollTop=0;
+  bind(v);
+  document.querySelectorAll(".sheet,.emerg").forEach(e=>e.remove());
+  if(sheet) renderSheet();
+}
+function renderSide(){
+  const el=document.getElementById("side");
+  el.innerHTML = EN()? `
+  <h1>TCM AI Health Manager · clickable demo</h1>
+  <p>The phone (above on narrow screens) is an interactive prototype of the client MVP; all 14 screens are reachable. Content is sample data, but the constitution scoring is real: a 10-item screener with adaptive early stopping, computed by the ZYYXH/T 157-2009 rules.</p>
+  <p><strong>Suggested route:</strong></p>
+  <ol>
+    <li><b>Today</b> → tap the guide card and take the <b>quick screener</b> (10 items; form or chat; in chat try "I'm always cold, my hands and feet are freezing, and cold food gives me diarrhea")</li>
+    <li>See the <b>preliminary report</b>: confidence label and the radar's range band → pick goals → generate a first plan</li>
+    <li>Back on Today, <b>check in</b>; a "3 quick questions" card appears. Repeat a few times and watch early stopping shrink the remaining count</li>
+    <li>On the plan page tap "Ask", type "my blood pressure is 150, what herbs should I take" for the <b>referral card</b>; type "chest pain" for the emergency card</li>
+    <li><b>Me</b> → switch family members, turn on large-text mode</li>
+  </ol>
+  <p><span class="tag">S01–S14</span><span class="tag">early-stop scoring</span><span class="tag">referral / emergency</span><span class="tag">large text</span></p>
+  <p><button data-side="zh">中文</button><button class="on" data-side="en">English</button><button id="resetBtn">Reset demo data</button></p>` : `
+  <h1>中医AI健康管家 · 可点击演示</h1>
+  <p>右侧(手机宽度时在上方)是客户端 MVP 的交互原型,14 个页面全部可达。数据是演示用的,但体质评分是真的:10 题初探 + 自适应早停,按 ZYYXH/T 157-2009 规则计算。</p>
+  <p><strong>建议的体验路线:</strong></p>
+  <ol>
+    <li>「今日」→ 点引导卡做 <b>快速初探</b>(问卷或对话;对话里试着输入"我特别怕冷,手脚老凉,一吃凉的就拉肚子")</li>
+    <li>看 <b>初步体质报告</b> 的置信度与雷达图区间 → 选目标 → 生成初版方案</li>
+    <li>回「今日」<b>打卡</b>,打卡后会出现「体质小问题 3 题」;连续几次后观察早停如何缩短剩余题数</li>
+    <li>在方案页点「问一问」,输入"我血压 150 该吃什么中药"看 <b>分流卡</b>;输入"胸痛"看紧急卡</li>
+    <li>「我的」→ 切换家庭成员、开老年模式;右上角「EN」切换英文</li>
+  </ol>
+  <p><span class="tag">S01–S14</span><span class="tag">早停评分</span><span class="tag">分流 / 紧急</span><span class="tag">老年模式</span><span class="tag">中 / EN</span></p>
+  <p><button class="on" data-side="zh">中文</button><button data-side="en">English</button><button id="resetBtn">重置演示数据</button></p>`;
+  el.querySelectorAll("[data-side]").forEach(b=>b.onclick=()=>setLang(b.dataset.side));
+  document.getElementById("resetBtn").onclick=resetAll;
+}
+function pageTitle(p){ return pick({checkin:{zh:"打卡",en:"Check-in"},weekly:{zh:"本周回顾",en:"This week"},recipe:{zh:"食疗方",en:"Food therapy"},acupoint:{zh:"穴位",en:"Acupoint"},family:{zh:"家庭成员",en:"Family"},clinic:{zh:"联系我的诊所",en:"My clinic"},settings:{zh:"设置 · 隐私与数据",en:"Settings · Privacy"},history:{zh:"历史评估",en:"History"}}[p.page]||{zh:"",en:""}); }
+
+/* --- Tab roots --- */
+function renderTab(tab){ return {today:S01,constitution:S04,plan:S06,me:ME}[tab](); }
+function S01(){
+  const m=M(); const a=assess(m); const todayC=m.checkins[S.day]||{};
+  const doneN=["sleep","diet","move","mood"].filter(k=>todayC[k]!=null).length;
+  let html=`<div class="card soft"><div class="k">${tt("霜降 · 第 18 个节气","Frost's Descent · 18th solar term")}</div><div>${m.plan?esc(seasonTip(m.plan.code)):tt("霜降是秋季最后一个节气,昼夜温差大。护住脖颈、腰腹和脚;饮食平补,多吃芝麻、山药、梨,少辛辣。","Frost's Descent is autumn's last solar term, with big day–night swings. Keep neck, waist and feet warm; eat gently nourishing food — sesame, yam, pear — and go easy on spice.")}</div></div>`;
+  if(!m.screenerDone){
+    html+=`<div class="card guide"><h3>${tt("2 分钟了解你的体质","Know your constitution in 2 minutes")}</h3><p class="small muted" style="margin:0 0 10px">${tt("10 个小问题,马上拿到初步判断和一份初版调养方案。可以随时中断。","10 quick questions for a preliminary type and a first wellness plan. Stop any time.")}</p><div class="row"><button class="btn" data-act="startChat">${tt("对话方式","Chat")}</button><button class="btn sec" data-act="startForm">${tt("问卷方式","Questionnaire")}</button></div></div>`;
+  } else if(m.plan){
+    const c=CT(m.plan.code);
+    html+=`<div class="card">${m.plan.provisional?`<span class="ribbon">${tt("初版 · 基于快速初探","First version · from quick screener")}</span>`:''}<h3>${tt("今日方案摘要","Today's plan")} · ${esc(sn(SC(m.plan.code)))}</h3><ul class="list small"><li>${tt("宜","Favor")}: ${esc(c.diet.y[0])}; ${tt("忌","Avoid")}: ${esc(c.diet.n[0])}</li><li>${esc(c.sleep)}</li><li>${tt("穴位","Acupoint")}: ${esc(c.acu[0].n)} — ${esc(c.acu[0].how)}</li></ul><button class="btn ghost sm" data-act="goPlan">${tt("查看完整方案 ›","Full plan ›")}</button></div>`;
+  } else {
+    html+=`<div class="card guide"><h3>${tt("初步体质","Preliminary type")}: ${esc(sn(a.primary))}</h3><p class="small muted" style="margin:0 0 10px">${tt("选 1–2 个目标,生成你的初版方案。","Pick 1–2 goals to generate your first plan.")}</p><button class="btn" data-act="goals">${tt("选择目标","Choose goals")}</button></div>`;
+  }
+  html+=`<div class="card"><div class="check"><h3 style="margin:0">${tt("今日打卡","Today's check-in")}</h3>${doneN===4?`<span class="done">✓ ${tt("已完成","Done")}</span>`:`<span class="muted small">${doneN}/4</span>`}</div><div class="prog"><i style="width:${doneN*25}%"></i></div>${doneN<4?`<button class="btn sm" data-act="checkin">${tt("去打卡 · 约 30 秒","Check in · ~30 s")}</button>`:`<button class="btn ghost sm" data-act="weekly">${tt("看本周回顾 ›","This week ›")}</button>`}</div>`;
+  if(m.screenerDone && !m.formal && doneN>0){
+    html+=`<div class="card warn"><h3>${tt("今天 3 道体质小问题","3 quick questions today")}</h3><p class="small" style="margin:0 0 8px">${tt(`还差约 <b>${a.remaining}</b> 题就能生成正式报告。已确认的体质不会再问。`,`About <b>${a.remaining}</b> more to reach your formal report. Confirmed types won't be asked again.`)}</p><div class="row"><button class="btn sm" data-act="drip">${tt("现在回答","Answer now")}</button><button class="btn ghost sm" data-act="dripSkip">${tt("今天不答","Not today")}</button></div></div>`;
+  }
+  if(m.formal && !m.formalShown){
+    html+=`<div class="card soft"><h3>${tt("你的正式体质报告已生成","Your formal report is ready")}</h3><p class="small" style="margin:0 0 8px">${tt("完整雷达图已解锁","Full radar unlocked")}${m.plan&&m.plan.provisional?tt(",方案可升级为正式版",", and your plan can be upgraded"):""}.</p><button class="btn sm" data-act="seeFormal">${tt("查看报告","View report")}</button></div>`;
+  }
+  html+=`<div class="card"><div class="k">${tt("下次提醒","Next reminder")}</div><div>${tt("21:00 · 亥时 · 准备入睡,温水泡脚","9:00 pm · Hai hour · wind down, warm foot soak")}</div></div>`;
+  return html;
+}
+function seasonTip(code){ return pick({
+ yangxu:{zh:"霜降阳气入藏,阳虚体质早晚护好腰腹和脚,今晚泡脚;“补冬不如补霜降”,晚餐可来一碗羊肉汤。",en:"At Frost's Descent yang goes into storage. Keep lower back, belly and feet warm morning and evening; soak your feet tonight — and a bowl of lamb soup suits the season."},
+ yinxu:{zh:"秋燥伤阴,今天多喝温水,晚上来一碗银耳羹。",en:"Autumn dryness taxes yin — warm water through the day, white-fungus soup tonight."},
+ qixu:{zh:"气虚体质秋季易感冒,出门加件外套,别赶时间快跑。",en:"Qi deficiency catches autumn colds easily. Take a jacket; don't rush."},
+ tanshi:{zh:"秋高气爽正适合活动,今天走够 6000 步。",en:"Crisp autumn air is made for moving — 6,000 steps today."},
+ shire:{zh:"天凉了也别贪辣,清淡一天。",en:"Cooler weather is no excuse for chili. Keep it light today."},
+ xueyu:{zh:"久坐伤血,每小时起来活动 3 分钟。",en:"Long sitting stagnates blood. Stand and move 3 minutes every hour."},
+ qiyu:{zh:"秋日易生悲,午后出门晒晒太阳,约个朋友。",en:"Autumn invites low spirits. Get afternoon sun and call a friend."},
+ tebing:{zh:"换季是过敏高发期,早晚戴口罩,回家洗脸。",en:"Season change means allergy season. Mask up early and late; wash your face when home."},
+ pinghe:{zh:"顺应秋收,早睡早起,饮食清润。",en:"Follow autumn's gathering: early to bed, early to rise, light and moistening food."}}[code]); }
+
+function S04(){
+  const m=M(); if(!m.screenerDone) return `<div class="card guide"><h3>${tt("还没有体质评估","No assessment yet")}</h3><p class="small muted">${tt("10 题快速初探,2 分钟。","10-item quick screener, 2 minutes.")}</p><div class="row"><button class="btn" data-act="startChat">${tt("对话方式","Chat")}</button><button class="btn sec" data-act="startForm">${tt("问卷方式","Questionnaire")}</button></div></div>`;
+  const a=assess(m); const p=a.primary; const c=CT(p.code);
+  let html=`<h2 class="sec">${m.formal?tt("体质报告","Constitution report"):tt("初步体质判断","Preliminary assessment")}</h2><div class="card">${radar(a)}<div style="text-align:center;margin-top:6px"><div style="font-family:var(--display);font-size:1.4em;font-weight:700">${esc(sn(p))} <span class="muted small">${esc(EN()?p.zh:p.en)}</span></div>${confPill(a.primaryConf)}${a.secondary.length?` <span class="small muted">${tt("兼夹","with")}: ${a.secondary.map(s=>esc(sn(s))).join(tt("、",", "))}</span>`:""}</div></div>`;
+  if(!m.formal) html+=`<div class="card warn"><div class="check"><div><b>${tt(`再答约 ${a.remaining} 题可确认`,`About ${a.remaining} more questions to confirm`)}</b><div class="small">${tt(`已答 ${Object.keys(m.answers).length} 题 · 早停已省去 ${60-Object.keys(m.answers).length-a.remaining} 题`,`${Object.keys(m.answers).length} answered · early stopping skipped ${60-Object.keys(m.answers).length-a.remaining}`)}</div></div><button class="btn sm" data-act="oneShot">${tt("一次答完","Finish now")}</button></div></div>`;
+  html+=`<div class="card"><h3>${tt("这意味着什么","What this means")}</h3><p class="small" style="margin:0">${esc(c.sum)}</p></div>`;
+  html+=`<div class="card"><h3>${tt("为什么是这个结果","Why this result")}</h3><ul class="list small">${SC(p.code).items.filter(([id])=>m.answers[id]!=null).slice(0,4).map(([id])=>`<li>${esc(IT(id))} → <b>${LK()[m.answers[id]-1]}</b></li>`).join("")}</ul><div class="small muted" style="margin-top:6px">${tt("各体质分数","Scores")}: ${a.st.map(s=>`${esc(pick(s.short))} ${s.concl&&s.concl!=="pending-balanced"?Math.round(s.est):`${Math.round(s.tmin)}–${Math.round(s.tmax)}`}`).join(" · ")}</div><div style="margin-top:8px"><span class="src" data-act="src">${tt("来源:中华中医药学会《中医体质分类与判定》ZYYXH/T 157-2009","Source: CACM, Classification and Determination of Constitution in TCM, ZYYXH/T 157-2009")}</span></div></div>`;
+  html+=`<div class="row"><button class="btn full" data-act="${m.plan?"goPlan":"goals"}">${m.plan?tt("查看我的方案","View my plan"):tt("生成我的方案","Generate my plan")}</button></div><div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="redo">${tt("重新评估","Reassess")}</button><button class="btn ghost sm" data-act="history">${tt("历史评估","History")}</button>${m.formal?`<button class="btn ghost sm" data-act="share">${tt("分享为图片","Share image")}</button>`:''}</div>`;
+  return html;
+}
+function radar(a){
+  const cx=150,cy=130,R=95,n=9; const pt=(i,r)=>{const ang=-Math.PI/2+i*2*Math.PI/n; return [cx+r*Math.cos(ang),cy+r*Math.sin(ang)]};
+  let g=""; for(const f of [.25,.5,.75,1]) g+=`<polygon points="${a.st.map((_,i)=>pt(i,R*f).join(",")).join(" ")}" fill="none" stroke="var(--line)"/>`;
+  a.st.forEach((s,i)=>{ const [x,y]=pt(i,R+18); g+=`<line x1="${cx}" y1="${cy}" x2="${pt(i,R)[0]}" y2="${pt(i,R)[1]}" stroke="var(--line)"/><text x="${x}" y="${y+4}" text-anchor="middle" font-weight="${s.code===a.primary.code?700:400}">${esc(pick(s.short))}</text>`; });
+  const settled = a.st.every(s=>s.concl);
+  if(!settled){ const band=a.st.map((s,i)=>pt(i,R*Math.min(100,Math.max(0,s.tmax))/100).join(",")).join(" "); const inner=a.st.map((s,i)=>pt(i,R*Math.min(100,Math.max(0,s.tmin))/100).join(",")).join(" "); g+=`<polygon points="${band}" fill="var(--accent)" opacity=".12"/><polygon points="${inner}" fill="none" stroke="var(--accent)" stroke-dasharray="3 3" opacity=".6"/>`; }
+  g+=`<polygon points="${a.st.map((s,i)=>pt(i,R*Math.min(100,Math.max(0,s.est))/100).join(",")).join(" ")}" fill="var(--accent)" opacity=".35" stroke="var(--accent)" stroke-width="2"/>`;
+  return `<svg class="radar" viewBox="0 0 300 265" style="width:100%;max-width:300px;display:block;margin:0 auto">${g}</svg>${settled?"":`<div class="small muted" style="text-align:center">${tt("阴影带 = 可能区间;实线 = 当前估计","Shaded band = possible range; solid = current estimate")}</div>`}`;
+}
+function S06(){
+  const m=M(); if(!m.plan) return `<div class="card guide"><h3>${tt("还没有方案","No plan yet")}</h3><p class="small muted">${tt("先完成快速初探并选择目标。","Take the quick screener and choose goals first.")}</p><button class="btn" data-act="goConst">${tt("去我的体质","Go to My Type")}</button></div>`;
+  const p=m.plan,c=CT(p.code); const sec=p.sec||"diet";
+  let html=`<div class="card soft" style="padding:10px 14px">${p.provisional?`<span class="ribbon">${tt("初版 · 基于快速初探","First version · from quick screener")}</span>`:(m.formal&&!p.upgraded?`<span class="ribbon" style="color:var(--accent);background:var(--accent-soft)">${tt("正式报告已生成","Formal report ready")} · <u data-act="upgrade" style="cursor:pointer">${tt("升级方案","Upgrade plan")}</u></span>`:'')}<div class="small"><b>${esc(sn(SC(p.code)))}</b> · ${pick(TERM)} · ${tt("目标","Goals")}: ${p.goals.map(GL).join(tt("、",", "))||"—"}</div></div>`;
+  html+=`<div class="tabs2">${[["diet",tt("饮食","Diet")],["recipe",tt("食疗","Recipe")],["sleep",tt("作息","Routine")],["move",tt("运动","Movement")],["acu",tt("穴位","Acupoints")]].map(([k,l])=>`<button class="${sec===k?"on":""}" data-sec="${k}">${l}</button>`).join("")}</div>`;
+  const srcT=`<span class="src">${tt("教材","Textbook")}</span>`;
+  if(sec==="diet") html+=`<div class="card"><h3>${tt("宜","Favor")} ${srcT}</h3><ul class="list">${c.diet.y.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div class="card"><h3>${tt("忌","Avoid")} ${srcT}</h3><ul class="list">${c.diet.n.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  if(sec==="recipe") html+=`<div class="card" data-act="recipe" style="cursor:pointer"><div class="k">${tt("推荐食疗方","Recommended recipe")}</div><h3>${esc(c.recipe.name)} ›</h3><div class="small muted">${esc(c.recipe.fit)} · ${esc(c.recipe.note)}</div></div>`;
+  if(sec==="sleep") html+=`<div class="card"><h3>${tt("作息","Daily rhythm")} <span class="src">${tt("子午流注","Organ clock")}</span></h3><p style="margin:0">${esc(c.sleep)}</p></div><div class="card"><div class="k">${tt("今日提醒","Today's reminders")}</div><div>${tt("21:00 睡前准备 · 07:00 早餐","9:00 pm wind-down · 7:00 am breakfast")}</div></div>`;
+  if(sec==="move") html+=`<div class="card"><h3>${tt("运动与导引","Movement & qigong")} ${srcT}</h3><p style="margin:0 0 8px">${esc(c.move)}</p><button class="btn ghost sm" data-act="video">▶ ${tt("八段锦 · 12 分钟","Baduanjin · 12 min")}</button></div>`;
+  if(sec==="acu") html+=c.acu.map((a,i)=>`<div class="card" data-act="acu" data-i="${i}" style="cursor:pointer"><h3>${esc(a.n)} <span class="muted small">${a.m}</span> ›</h3><div class="small muted">${esc(a.loc)}</div></div>`).join("");
+  html+=`<button class="btn sec full" data-act="ask">${tt("有疑问?问一问","Have a question? Ask")}</button><div class="disclaimer">${tt("本方案为中医养生建议,不构成医疗诊断或治疗意见。如有疾病或正在用药,请咨询医生。","This plan is traditional wellness guidance, not a medical diagnosis or treatment. If you have a condition or take medication, consult your doctor.")}</div>`;
+  return html;
+}
+function ME(){
+  const m=M();
+  return `<div class="card" data-act="family" style="cursor:pointer"><div class="check"><div><h3 style="margin:0">${tt("家庭成员","Family")}</h3><div class="small muted">${tt(`${S.members.length} 位 · 当前:${esc(mn(m))}`,`${S.members.length} members · current: ${esc(mn(m))}`)}</div></div><span class="muted">›</span></div></div>
+  <div class="card" data-act="ask" style="cursor:pointer"><div class="check"><div><h3 style="margin:0">${tt("养生问答","Wellness Q&A")}</h3><div class="small muted">${tt("问体质、食材、穴位、节气","Ask about types, foods, acupoints, seasons")}</div></div><span class="muted">›</span></div></div>
+  <div class="card" data-act="clinic" style="cursor:pointer"><div class="check"><div><h3 style="margin:0">${tt("联系我的诊所","My clinic")}</h3><div class="small muted">${S.clinicBound?esc(pick(CLINIC.name)):tt("未绑定","Not linked")}</div></div><span class="muted">›</span></div></div>
+  <div class="card" data-act="settings" style="cursor:pointer"><div class="check"><div><h3 style="margin:0">${tt("设置 · 隐私与数据","Settings · Privacy & data")}</h3><div class="small muted">${tt(`老年模式${S.elder?"已开":"关闭"} · ${EN()?"English":"简体中文"} · 导出 · 删除账户`,`Large text ${S.elder?"on":"off"} · English · export · delete`)}</div></div><span class="muted">›</span></div></div>`;
+}
+
+/* --- pushed pages --- */
+function renderPage(p){ return ({checkin:S09,weekly:S10,recipe:S07,acupoint:S08,family:S12,clinic:S13,settings:S14,history:HIST})[p.page](p.params); }
+function S09(){
+  const m=M(); const c=m.checkins[S.day]||(m.checkins[S.day]={});
+  const sleepV=c.sleep, out=[];
+  const SQ=[["差",tt("差","Poor")],["一般",tt("一般","OK")],["好",tt("好","Good")]], DQ=[["是",tt("是","Yes")],["部分",tt("部分","Partly")],["否",tt("否","No")]];
+  out.push(`<div class="card"><div class="check"><h3>${tt("睡眠","Sleep")} ${c.sleepPre?`<span class="pill ok">${tt("已自动获取","Auto-filled")}</span>`:''}</h3>${sleepV!=null?'<span class="done">✓</span>':''}</div><input type="range" id="sleepR" min="4" max="10" step="0.5" value="${sleepV??7}" style="width:100%"><div class="small muted"><span id="sleepLbl">${sleepV??7}</span> ${tt("小时","hours")}</div><div class="opts">${SQ.map(([v,l])=>`<button class="opt ${c.sleepQ===v?"on":""}" data-ck="sleepQ" data-v="${v}">${l}</button>`).join("")}</div></div>`);
+  out.push(`<div class="card"><div class="check"><h3>${tt("饮食 · 今日宜忌遵循了吗","Diet · followed today's guidance?")}</h3>${c.diet!=null?'<span class="done">✓</span>':''}</div><div class="opts">${DQ.map(([v,l])=>`<button class="opt ${c.diet===v?"on":""}" data-ck="diet" data-v="${v}">${l}</button>`).join("")}</div></div>`);
+  out.push(`<div class="card"><div class="check"><h3>${tt("运动","Movement")} <span class="pill ok">${tt("步数 4,820","4,820 steps")}</span></h3>${c.move!=null?'<span class="done">✓</span>':''}</div><div class="opts">${["0","15","30","45+"].map(q=>`<button class="opt ${c.move===q?"on":""}" data-ck="move" data-v="${q}">${q} ${tt("分钟","min")}</button>`).join("")}</div></div>`);
+  out.push(`<div class="card"><div class="check"><h3>${tt("情绪","Mood")}</h3>${c.mood!=null?'<span class="done">✓</span>':''}</div><div class="opts">${["😞","😕","😐","🙂","😄"].map((q,i)=>`<button class="opt ${c.mood===i+1?"on":""}" data-ck="mood" data-v="${i+1}" style="font-size:1.3em">${q}</button>`).join("")}</div></div>`);
+  const doneN=["sleep","diet","move","mood"].filter(k=>c[k]!=null).length;
+  if(doneN===4){ const a=assess(m); out.push(`<div class="card soft"><h3>${tt("今天完成了 ✓","Done for today ✓")}</h3><p class="small" style="margin:0">${esc(feedback(m))}</p></div>`); if(m.screenerDone&&!m.formal) out.push(`<div class="card warn"><h3>${tt("顺便答 3 道体质小问题?","3 quick questions while you're here?")}</h3><p class="small" style="margin:0 0 8px">${tt(`还差约 ${a.remaining} 题生成正式报告。`,`About ${a.remaining} more to your formal report.`)}</p><div class="row"><button class="btn sm" data-act="drip">${tt("好","Sure")}</button><button class="btn ghost sm" data-act="back">${tt("今天不答","Not today")}</button></div></div>`); }
+  return out.join("");
+}
+function feedback(m){ const code=m.plan?m.plan.code:"pinghe"; return pick({
+ yangxu:{zh:"今晚记得泡脚,把腰腹盖好。",en:"Soak your feet tonight and keep your belly covered."},yinxu:{zh:"今晚 23 点前睡,比吃什么都补阴。",en:"In bed before 11 tonight nourishes yin more than any food."},
+ qixu:{zh:"今天别熬夜,明早精力会好一点。",en:"No late night today; tomorrow's energy will thank you."},tanshi:{zh:"明天争取多走 2000 步。",en:"Aim for 2,000 more steps tomorrow."},
+ shire:{zh:"今天忍住没吃辣,很好。",en:"You skipped the chili today — good."},xueyu:{zh:"久坐记得起来活动。",en:"Remember to get up and move."},
+ qiyu:{zh:"明天找个人聊 10 分钟。",en:"Find someone to talk to for 10 minutes tomorrow."},tebing:{zh:"回家洗脸、换衣,减少过敏原。",en:"Wash your face and change clothes when you get home."},
+ pinghe:{zh:"保持住,顺应节气就好。",en:"Keep it up; just follow the season."}}[code]); }
+function S10(){
+  const m=M(); const days=Object.values(m.checkins); const n=Math.max(days.length,1);
+  const rate=k=>Math.round(100*days.filter(d=>d[k]!=null).length/n);
+  if(days.length<3) return `<div class="card"><h3>${tt("再坚持几天","A few more days")}</h3><p class="small muted" style="margin:0">${tt(`打满 3 天后开始显示趋势。目前 ${days.length} 天。`,`Trends appear after 3 days of check-ins. ${days.length} so far.`)}</p></div>${barsMock()}`;
+  return `<div class="card"><h3>${tt("本周完成率","This week's completion")}</h3>${[["sleep",tt("睡眠","Sleep")],["diet",tt("饮食","Diet")],["move",tt("运动","Move")],["mood",tt("情绪","Mood")]].map(([k,l])=>`<div class="bar"><span style="width:3.5em">${l}</span><i style="width:${rate(k)*0.6}%"></i><span class="muted">${rate(k)}%</span></div>`).join("")}</div>${barsMock()}<div class="card soft"><div class="k">${tt("一句话建议","One-line tip")}</div>${esc(feedback(m))}</div>`;
+}
+function barsMock(){ const d=EN()?["M","T","W","T","F","S","S"]:["一","二","三","四","五","六","日"]; return `<div class="card"><h3>${tt("睡眠时长(示例数据)","Sleep hours (sample data)")}</h3><svg viewBox="0 0 300 90" style="width:100%"><polyline fill="none" stroke="var(--accent)" stroke-width="2" points="10,60 55,45 100,50 145,30 190,38 235,25 280,32"/><g fill="var(--accent)">${[10,55,100,145,190,235,280].map((x,i)=>`<circle cx="${x}" cy="${[60,45,50,30,38,25,32][i]}" r="3"/>`).join("")}</g><g font-size="10" fill="var(--muted)">${d.map((x,i)=>`<text x="${10+i*45}" y="84" text-anchor="middle">${x}</text>`).join("")}</g></svg></div>`; }
+function S07(){ const c=CT(M().plan.code).recipe; return `<div class="card"><div class="k">${esc(c.fit)}</div><h2 class="sec" style="margin-top:0">${esc(c.name)}</h2><h3>${tt("食材","Ingredients")}</h3><ul class="list">${c.ing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>${tt("做法","Method")}</h3><ol class="list">${c.how.map(x=>`<li>${esc(x)}</li>`).join("")}</ol><h3>${tt("性味与注意","Properties & cautions")}</h3><p class="small" style="margin:0 0 8px">${esc(c.note)}</p><span class="src" data-act="src">${tt("来源:《中医食疗学》教材","Source: TCM Dietetics textbook")}</span></div><div class="row"><button class="btn" data-act="didIt">${tt("今天做了 ✓ 计入饮食打卡","Made it today ✓ count toward diet")}</button><button class="btn sec" data-act="ask">${tt("问一问","Ask")}</button></div><div class="disclaimer">${tt("食疗方为传统食养建议,不替代药物治疗;孕期、哺乳期、慢性病患者请先咨询医生。","Food therapy is traditional dietary guidance, not a substitute for medication. If pregnant, nursing or managing a chronic condition, consult your doctor first.")}</div>`; }
+function S08(p){ const a=CT(M().plan.code).acu[p.i]; return `<div class="card"><svg class="body" viewBox="0 0 120 240"><g fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="60" cy="22" r="14"/><path d="M60 36v70M40 50l20-10 20 10M40 50l-8 50M80 50l8 50M60 106l-14 110M60 106l14 110"/></g><circle cx="${{ST36:"48",CV6:"60",CV4:"60",KI1:"46",SP6:"50",KI3:"49",ST40:"48",SP9:"51",LI11:"36",SP10:"52",BL17:"60",LR3:"46",CV17:"60",LI20:"56"}[a.m]}" cy="${{ST36:"150",CV6:"92",CV4:"98",KI1:"226",SP6:"196",KI3:"204",ST40:"170",SP9:"150",LI11:"78",SP10:"136",BL17:"70",LR3:"220",CV17:"58",LI20:"26"}[a.m]}" r="5" fill="var(--crit)"/></svg><h2 class="sec" style="text-align:center;margin-top:4px">${esc(a.n)} <span class="muted small">${a.m}</span></h2><h3>${tt("定位","Location")}</h3><p class="small">${esc(a.loc)}</p><h3>${tt("按压方法","How to press")}</h3><p class="small">${esc(a.how)}</p>${timerBlock(a)}<div style="margin-top:8px"><span class="src">${tt("来源:《经络腧穴学》","Source: Meridians & Acupoints textbook")}</span></div></div><div class="disclaimer">${tt("孕期请避免按压腹部及三阴交、合谷等穴位。","In pregnancy, avoid pressing abdominal points and SP6 / LI4.")}</div>`; }
+/* --- acupressure countdown --- */
+const TIMER={total:120,left:120,running:false,handle:null,point:null,side:1};
+function timerBlock(a){
+  if(TIMER.point!==a.m){ stopTimer(); TIMER.point=a.m; TIMER.left=TIMER.total; TIMER.side=1; }
+  const pct=1-TIMER.left/TIMER.total, r=34, C=2*Math.PI*r;
+  return `<div class="card soft" style="text-align:center;margin:12px 0 0"><div class="k">${tt(`按压计时 · 第 ${TIMER.side} 侧`,`Acupressure timer · side ${TIMER.side}`)}</div>
+  <svg viewBox="0 0 80 80" style="width:96px;height:96px;display:block;margin:4px auto"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--line)" stroke-width="6"/><circle id="tRing" cx="40" cy="40" r="${r}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .3s"/><text id="tText" x="40" y="46" text-anchor="middle" style="font-size:18px;font-weight:700;fill:var(--fg);font-variant-numeric:tabular-nums">${fmtT(TIMER.left)}</text></svg>
+  <div class="small muted" id="tHint" style="margin-bottom:8px">${TIMER.running?tt("拇指按揉,力度以酸胀为度","Knead with the thumb until it aches slightly"):TIMER.left===TIMER.total?tt("每侧 2 分钟,做完提示换另一侧","2 minutes per side; you'll be prompted to switch"):tt("已暂停","Paused")}</div>
+  <div class="row" style="justify-content:center"><button class="btn sm" data-act="tToggle">${TIMER.running?tt("⏸ 暂停","⏸ Pause"):TIMER.left===TIMER.total?tt("▶ 开始","▶ Start"):tt("▶ 继续","▶ Resume")}</button><button class="btn ghost sm" data-act="tReset" ${TIMER.left===TIMER.total&&!TIMER.running?"disabled":""}>${tt("重置","Reset")}</button></div></div>`;
+}
+function fmtT(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
+function stopTimer(){ if(TIMER.handle){ clearInterval(TIMER.handle); TIMER.handle=null; } TIMER.running=false; }
+function tickTimer(){
+  TIMER.left=Math.max(0,TIMER.left-1);
+  const C=2*Math.PI*34, ring=document.getElementById("tRing"), txt=document.getElementById("tText");
+  if(ring) ring.setAttribute("stroke-dashoffset", C*(TIMER.left/TIMER.total));
+  if(txt) txt.textContent=fmtT(TIMER.left);
+  if(TIMER.left===0){ stopTimer(); if(TIMER.side===1){ TIMER.side=2; TIMER.left=TIMER.total; toast(tt("第 1 侧完成,换另一侧","Side 1 done — switch sides")); } else { TIMER.side=1; TIMER.left=TIMER.total; toast(tt("两侧完成 ✓ 已记录到今日","Both sides done ✓ logged for today")); const c=M().checkins[S.day]||(M().checkins[S.day]={}); c.acu=true; save(); } render(); }
+}
+function S12(){ return `<h2 class="sec">${tt("家庭成员","Family members")}</h2>${S.members.map(m=>{const a=m.screenerDone?assess(m):null; return `<div class="card" data-act="switch" data-id="${m.id}" style="cursor:pointer;${m.id===S.cur?"border-color:var(--accent)":""}"><div class="check"><div style="display:flex;gap:10px;align-items:center"><span class="avatar">${esc(mi(m))}</span><div><b>${esc(mn(m))}</b>${m.minor?` <span class="pill gd">${tt("监护","Guardian")}</span>`:''}${m.id===S.cur?` <span class="pill ok">${tt("当前","Current")}</span>`:''}<div class="small muted">${a?esc(sn(a.primary))+(m.formal?tt(" · 正式"," · formal"):tt(" · 初步"," · preliminary")):tt("未评估","Not assessed")}</div></div></div>${m.id!=="m1"?`<span class="small muted">${tt("已授权","Authorized")}</span>`:''}</div></div>`}).join("")}<button class="btn sec full" data-act="addMember">＋ ${tt("添加成员","Add member")}</button><p class="small muted" style="margin-top:10px">${tt("成年成员需本人确认授权;未成年成员由监护人创建,数据不进入任何分析。","Adults confirm their own authorization; minors are created by a guardian and their data never enters analytics.")}</p>`; }
+function S13(p){ const sym=p&&p.symptom; const now=new Date(); return `${sym?`<div class="card warn"><div class="k">${tt("症状摘要(将带给医生)","Symptom note (for your doctor)")}</div><div>${esc(sym)}</div><div class="small muted" style="margin-top:4px">${tt("记录时间:今天","Recorded today")} ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}</div></div>`:""}<div class="card"><div class="k">${tt("合作诊所","Partner clinic")}</div><h3>${esc(pick(CLINIC.name))}</h3><div class="kv"><span class="muted">${tt("地址","Address")}</span><span style="text-align:right">${esc(CLINIC.addr)}</span></div><div class="kv"><span class="muted">${tt("电话","Phone")}</span><span>${esc(CLINIC.tel)}</span></div><div class="kv"><span class="muted">${tt("时间","Hours")}</span><span>${esc(pick(CLINIC.hours))}</span></div><div class="row" style="margin-top:10px"><button class="btn" data-act="call">${tt("拨打电话","Call")}</button><button class="btn sec" data-act="copy">${tt("复制号码","Copy number")}</button></div></div><p class="small muted">${tt("演示中拨打与复制仅作提示。","In this demo, call and copy only show a notice.")}</p>`; }
+function S14(){ return `<div class="card"><div class="kv"><span>${tt("语言 / Language","Language / 语言")}</span><span class="seg"><button class="${EN()?"":"on"}" data-act="setZh">中文</button><button class="${EN()?"on":""}" data-act="setEn">English</button></span></div><div class="kv"><span>${tt("老年模式(字号 +25%)","Large text (+25%)")}</span><button class="toggle ${S.elder?"on":""}" data-act="elder" aria-label="${tt("老年模式","Large text")}"></button></div><div class="kv"><span>${tt("提醒时间","Reminders")}</span><span class="muted">07:00 · 21:00</span></div><div class="kv"><span>${tt("健康数据(睡眠、步数)只读","Health data (sleep, steps) read-only")}</span><button class="toggle on" aria-label="${tt("健康数据","Health data")}"></button></div></div><div class="card"><div class="kv" data-act="export" style="cursor:pointer"><span>${tt("导出我的数据(JSON)","Export my data (JSON)")}</span><span class="muted">›</span></div><div class="kv" data-act="del" style="cursor:pointer;color:var(--crit)"><span>${tt("删除账户","Delete account")}</span><span>›</span></div></div><div class="card"><div class="kv"><span>${tt("隐私政策","Privacy policy")}</span><span class="muted">›</span></div><div class="kv"><span>${tt("同意记录","Consent record")}</span><span class="muted small">${tt("2026-10-23 已确认 3 项","3 items confirmed 2026-10-23")}</span></div></div><button class="btn ghost full" data-act="resetDemo">${tt("重置演示数据","Reset demo data")}</button>`; }
+function HIST(){ const m=M(); return `<div class="card"><div class="check"><div><b>${m.formal?tt("正式报告","Formal report"):tt("初步判断","Preliminary")}</b><div class="small muted">${tt(`今天 · 已答 ${Object.keys(m.answers).length} 题`,`Today · ${Object.keys(m.answers).length} answered`)}</div></div><span class="pill ok">${tt("当前","Current")}</span></div></div><p class="small muted">${tt("历史评估会在重新评估后保留在这里。","Past assessments are kept here after you reassess.")}</p>`; }
+
+/* --- sheets (modal) --- */
+function renderSheet(){
+  const phone=document.getElementById("phone"); const el=document.createElement("div");
+  if(sheet.kind==="emergency"){ el.className="emerg"; el.innerHTML=`<h2>${tt("请立即寻求帮助","Please get help now")}</h2><p>${tt("你提到的情况可能需要紧急处理。AI 对话已暂停。","What you described may need urgent care. The AI chat is paused.")}</p><div class="card crit"><div class="k">${tt("紧急医疗","Emergency")}</div><div class="num">911</div></div><div class="card crit"><div class="k">${tt("心理危机热线(美国)","Suicide & Crisis Lifeline (US)")}</div><div class="num">988</div></div><button class="btn ghost" data-act="closeSheet">${tt("我没事,返回","I'm okay, go back")}</button>`; phone.appendChild(el); bind(el); return; }
+  el.className="sheet"; const titles={members:tt("切换成员","Switch member"),assess:tt("快速初探","Quick screener"),drip:tt("体质小问题","Quick questions"),oneShot:tt("一次答完","Finish assessment"),goals:tt("选择目标","Choose goals"),ask:tt("养生问答","Wellness Q&A"),addMember:tt("添加成员","Add member"),src:tt("来源","Source"),video:tt("八段锦 · 导引","Baduanjin · qigong")};
+  el.innerHTML=`<div><div class="hd"><b>${titles[sheet.kind]||""}</b><button class="back" data-act="closeSheet">${tt("关闭","Close")}</button></div><div class="bd" id="sheetBody">${sheetBody()}</div></div>`;
+  phone.appendChild(el); bind(el); const sb=el.querySelector("#sheetBody"); if(sheet.kind==="ask"||sheet.kind==="assess") sb.scrollTop=sb.scrollHeight;
+}
+function sheetBody(){
+  const m=M(); const k=sheet.kind, P=sheet.params||{};
+  if(k==="members") return S.members.map(x=>`<div class="card" data-act="switch" data-id="${x.id}" style="cursor:pointer"><div style="display:flex;gap:10px;align-items:center"><span class="avatar">${esc(mi(x))}</span><b>${esc(mn(x))}</b>${x.minor?` <span class="pill gd">${tt("监护","Guardian")}</span>`:''}${x.id===S.cur?` <span class="pill ok">${tt("当前","Current")}</span>`:''}</div></div>`).join("")+`<button class="btn ghost full" data-act="family">${tt("管理家庭成员","Manage family")}</button>`;
+  if(k==="src") return `<div class="card"><b>${tt("中华中医药学会《中医体质分类与判定》","CACM — Classification and Determination of Constitution in TCM")}</b><div class="small muted">ZYYXH/T 157-2009 · 2009 · Wang Qi et al.</div><p class="small" style="margin:8px 0 0">${tt("App 内所有体质判定均按此标准的 60 题量表与阈值规则计算;对话与初探只是不同的作答方式,评分逻辑相同。","Every constitution result in the app is computed from this standard's 60-item scale and thresholds. Chat and the screener are just different ways of answering; the scoring is identical.")}</p></div>`;
+  if(k==="video") { const moves=EN()?[["Two hands hold up the heavens","90 s"],["Draw the bow to shoot the hawk","90 s"],["Separate heaven and earth","90 s"],["Wise owl gazes backward","90 s"],["Sway the head and shake the tail","90 s"],["Two hands hold the feet","90 s"],["Clench fists and glare","90 s"],["Bounce on the toes","60 s"]]:[["两手托天理三焦","90 秒"],["左右开弓似射雕","90 秒"],["调理脾胃须单举","90 秒"],["五劳七伤往后瞧","90 秒"],["摇头摆尾去心火","90 秒"],["两手攀足固肾腰","90 秒"],["攒拳怒目增气力","90 秒"],["背后七颠百病消","60 秒"]]; const code=m.plan?m.plan.code:"pinghe"; const tip=pick({qixu:{zh:"气虚质:动作放缓,以不出大汗为度;第三式“调理脾胃须单举”多做一遍。",en:"Qi deficiency: slow the pace, stop before heavy sweating; repeat the third movement."},yangxu:{zh:"阳虚质:上午阳光下练,练前热身充分。",en:"Yang deficiency: practice in morning sun; warm up well."},yinxu:{zh:"阴虚质:傍晚练,避免午间日晒;动作柔缓。",en:"Yin deficiency: practice in the evening, avoid midday sun; keep it gentle."},tanshi:{zh:"痰湿质:可加快节奏至微微出汗。",en:"Phlegm-damp: pick up the pace to a light sweat."},shire:{zh:"湿热质:练后及时擦汗换衣。",en:"Damp-heat: dry off and change right after."},xueyu:{zh:"血瘀质:重点做第二、四式,活动肩背。",en:"Blood stasis: emphasize movements 2 and 4 to open the shoulders and back."},qiyu:{zh:"气郁质:配合深长呼吸,第五式舒展胸胁。",en:"Qi stagnation: breathe long and deep; movement 5 opens the chest."},tebing:{zh:"特禀质:室内练,避开花粉时段。",en:"Allergic: practice indoors, away from pollen hours."},pinghe:{zh:"平和质:按标准节奏完整练习即可。",en:"Balanced: the full routine at standard pace."}}[code]); return `<div class="card soft"><div class="k">${tt("适合你的练法","How to practice for your type")}</div><div class="small">${esc(tip)}</div></div><div class="card"><div class="k">${tt("八式 · 约 12 分钟","Eight movements · about 12 min")}</div>${moves.map((x,i)=>`<div class="kv"><span>${i+1}. ${esc(x[0])}</span><span class="muted small">${x[1]}</span></div>`).join("")}</div><a class="btn full" href="${EN()?"https://www.youtube.com/results?search_query=baduanjin+eight+brocades+full+12+minutes":"https://www.youtube.com/results?search_query=%E5%85%AB%E6%AE%B5%E9%94%A6+%E5%AE%8C%E6%95%B4%E7%89%88+12%E5%88%86%E9%92%9F"}" target="_blank" rel="noopener" style="text-decoration:none">▶ ${tt("在 YouTube 打开完整视频","Open full video on YouTube")}</a><p class="small muted" style="margin-top:8px">${tt("演示版链出到公开视频;正式版内置自有导引视频,支持分式跟练与计时。","The demo links to public video; the product ships its own guided video with per-movement follow-along and timing.")}</p>`; }
+  if(k==="goals") return `<p class="small muted">${tt("最多选 2 个。方案会围绕体质和目标生成。","Pick up to 2. Your plan is built around your type and goals.")}</p>${GOALS.map(([g,l])=>`<div class="card ${m.goals.includes(g)?"soft":""}" data-act="goal" data-g="${g}" style="cursor:pointer;${!m.goals.includes(g)&&m.goals.length>=2?"opacity:.45":""}"><b>${pick(l)}</b><div class="small muted">${goalHint(g, assess(m).primary.code)}</div></div>`).join("")}<button class="btn full" data-act="genPlan" ${m.goals.length?"":"disabled"}>${m.formal?tt("生成方案","Generate plan"):tt("生成初版方案","Generate first plan")}</button>`;
+  if(k==="addMember") return `<div class="card"><div class="k">${tt("成员类型","Member type")}</div><div class="opts"><button class="opt ${P.minor?"":"on"}" data-act="amType" data-v="0">${tt("成年人","Adult")}</button><button class="opt ${P.minor?"on":""}" data-act="amType" data-v="1">${tt("未成年人","Minor")}</button></div><div style="margin-top:12px"><input id="amName" placeholder="${tt("姓名","Name")}" style="width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg)" value="${esc(P.name||"")}"></div>${P.minor?`<p class="small muted" style="margin:10px 0 0">${tt("我确认是该未成年人的监护人。其数据仅用于家庭档案,不进入任何分析或模型评估。","I confirm I am this minor's guardian. Their data is used only for the family record and never for analytics or model evaluation.")}</p>`:`<p class="small muted" style="margin:10px 0 0">${tt("将向对方发送授权链接,确认后才会出现在成员列表。","An authorization link will be sent; they appear in the list once they confirm.")}</p>`}</div><button class="btn full" data-act="amSave">${P.minor?tt("创建","Create"):tt("发送授权邀请","Send invitation")}</button>`;
+  if(k==="assess"||k==="drip"||k==="oneShot") return P.mode==="chat"? chatAssessBody() : formBody();
+  if(k==="ask") return askBody();
+  return "";
+}
+function goalHint(g,code){ const z=sn(SC(code)); return EN()? {sleep:`Sleep for ${z}: bedtime rhythm + calming food + pre-sleep acupoints`,stress:`Stress for ${z}: emotional care + teas + LR3 / CV17`,digest:`Digestion for ${z}: do/don't list + recipe + ST36`,energy:`Energy for ${z}: rhythm + nourishing food + qigong`,weight:`Weight for ${z}: food structure + exercise intensity + damp-resolving points`}[g] : {sleep:`${z}的睡眠建议:作息时辰 + 安神食疗 + 睡前穴位`,stress:`${z}的情志调摄:疏导方法 + 茶饮 + 太冲/膻中`,digest:`${z}的脾胃调理:宜忌清单 + 食疗方 + 足三里`,energy:`${z}的精力管理:节律 + 补养食疗 + 导引`,weight:`${z}的体重管理:饮食结构 + 运动强度 + 化湿穴位`}[g]; }
+
+/* form assessment */
+function formBody(){
+  const m=M(); const P=sheet.params;
+  if(!P.ids){ P.ids = sheet.kind==="assess"? SCREENER.filter(id=>m.answers[id]==null) : nextItems(m, sheet.kind==="drip"?3:60); P.i=0; }
+  const ids=P.ids; const total=ids.length;
+  if(total===0 || P.i>=total){ return finishBody(); }
+  const id=ids[P.i];
+  const settledNote = sheet.kind!=="assess"? `<div class="small muted" style="margin-bottom:6px">${tt("剩余待判定题:约","Remaining undetermined: about")} ${assess(m).remaining}</div>`:"";
+  return `${settledNote}<div class="prog"><i style="width:${P.i/total*100}%"></i></div><div class="small muted">${tt(`第 ${P.i+1} / ${total} 题 · 近一年来`,`Question ${P.i+1} of ${total} · over the past year`)}</div><div class="card" style="margin-top:8px"><h3 style="font-size:1.1em;line-height:1.5">${esc(IT(id))}</h3><div class="likert">${LK().map((l,i)=>`<button class="${m.answers[id]===i+1?"on":""}" data-act="ans" data-id="${id}" data-v="${i+1}">${l}</button>`).join("")}</div></div><div class="row" style="justify-content:space-between"><button class="btn ghost sm" data-act="prev" ${P.i===0?"disabled":""}>${tt("上一题","Previous")}</button>${sheet.kind==="assess"?`<button class="btn ghost sm" data-act="toChat">${tt("换成对话","Switch to chat")}</button>`:''}</div>`;
+}
+function finishBody(){
+  const m=M(); const a=assess(m);
+  if(sheet.kind==="assess") m.screenerDone=true;
+  save();
+  const settled = a.st.filter(s=>s.concl&&s.concl!=="pending-balanced").length;
+  return `<div class="card soft" style="text-align:center"><div class="k">${m.formal?tt("正式结果","Formal result"):tt("初步判断","Preliminary result")}</div><div style="font-family:var(--display);font-size:1.5em;font-weight:700">${esc(sn(a.primary))}</div>${confPill(a.primaryConf)}<p class="small" style="margin:8px 0 0">${m.formal?tt("所有体质已判定,正式报告已生成。","All nine types determined; your formal report is ready."):tt(`已判定 ${settled}/9 种体质,再答约 <b>${a.remaining}</b> 题可确认。`,`${settled} of 9 types determined; about <b>${a.remaining}</b> more questions to confirm.`)}</p></div><div class="row"><button class="btn full" data-act="toReport">${m.formal?tt("查看正式报告","View formal report"):tt("查看初步报告","View preliminary report")}</button></div>${!m.formal&&sheet.kind!=="oneShot"?`<div class="row" style="margin-top:8px"><button class="btn ghost full" data-act="continueAll">${tt("继续答完剩余题目","Continue with the rest")}</button></div>`:''}`;
+}
+/* chat assessment */
+function chatAssessBody(){
+  const m=M(); const P=sheet.params;
+  if(!P.log){ P.log=[{ai:true,t:tt("你好!我来帮你了解自己的体质。可以直接告诉我你最近身体上最明显的感觉,比如怕不怕冷、容易不容易累;也可以直接回答我的问题。","Hi! I'll help you learn your constitution. Tell me the most noticeable things about how your body feels lately — whether you run cold, tire easily — or just answer my questions.")}]; P.pending=null; }
+  if(!P.ids) P.ids=SCREENER;
+  const remainingIds = P.ids.filter(id=>m.answers[id]==null);
+  if(!P.pending && remainingIds.length){ P.pending=remainingIds[0]; P.log.push({ai:true,q:P.pending}); }
+  if(!remainingIds.length && !P.doneMsg){ P.doneMsg=true; P.log.push({ai:true,t:tt("初探完成。下面是你的初步判断。","Screener complete. Here is your preliminary result.")}); }
+  const done = !remainingIds.length;
+  const total=P.ids.length, answered=P.ids.filter(id=>m.answers[id]!=null).length;
+  let html=`<div class="prog"><i style="width:${answered/total*100}%"></i></div><div class="small muted">${answered} / ${total} · ${tt("可自由描述,一句话常能回答好几题","Describe freely — one sentence often answers several questions")}</div><div style="margin-top:8px">${P.log.map(b=>`<div class="bubble ${b.ai?"ai":"me"}">${esc(b.q?IT(b.q):b.t)}${b.map?`<div class="small" style="opacity:.75;margin-top:4px">${esc(b.map)}</div>`:""}</div>`).join("")}</div>`;
+  if(done){ html+=finishBody(); }
+  else html+=`<div class="opts">${LK().map((l,i)=>`<button class="opt" data-act="chatAns" data-v="${i+1}">${l}</button>`).join("")}</div><div class="inputrow"><input id="chatIn" placeholder="${tt("或者直接描述,例如:我特别怕冷,手脚老凉","Or just describe, e.g. I'm always cold, hands and feet freezing")}"><button class="btn" data-act="chatSend">${tt("发送","Send")}</button></div><div class="row" style="margin-top:6px"><button class="btn ghost sm" data-act="toForm">${tt("换成问卷","Switch to form")}</button></div>`;
+  return html;
+}
+function mapText(text){ const hits=[]; for(const [re,pairs] of PHRASES){ if(re.test(text)) for(const p of pairs) if(!hits.find(h=>h[0]===p[0])) hits.push(p); } return hits; }
+const itemGist = id => EN()? ITEMS_EN[id].replace(/^(Do you |Are you |Are your |Is your |Does your |Do your |Have you )/,"").replace(/\?$/,"") : ITEMS_ZH[id].replace(/您|吗\?/g,"");
+
+/* Q&A */
+function askBody(){
+  const P=sheet.params; if(!P.log){ P.log=[{ai:true,t:P.ctx?tt(`关于「${P.ctx}」,想了解什么?`,`What would you like to know about "${P.ctx}"?`):tt("我可以回答体质、食材、穴位、节气相关的养生问题。涉及疾病和用药的问题,我会帮你转给医生。","I can answer wellness questions about constitution, foods, acupoints and seasons. For anything about illness or medication, I'll refer you to your doctor.")}]; }
+  let html=`<div>${P.log.map(b=>b.card==="referral"?referralCard(b):`<div class="bubble ${b.ai?"ai":"me"}">${esc(b.t)}${b.src?`<div style="margin-top:6px"><span class="src">${esc(b.src)}</span></div>`:""}</div>`).join("")}</div>`;
+  const chips = P.ctx? (EN()?["Is this right for me?","Safe in pregnancy?","Best time of day?"]:["这个适合我吗?","孕期能用吗?","什么时候做最好?"]) : (EN()?["What to eat at Frost's Descent?","Can Yang deficiency drink coffee?","Where is Zusanli (ST36)?"]:["霜降该怎么吃?","阳虚体质能喝咖啡吗?","足三里在哪里?"]);
+  if(!P.log.some(b=>b.card==="referral"&&!b.resolved)) html+=`<div class="opts">${chips.map(q=>`<button class="opt" data-act="askQ" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>`;
+  html+=`<div class="inputrow"><input id="askIn" placeholder="${tt("输入问题…","Type a question…")}"><button class="btn" data-act="askSend">${tt("发送","Send")}</button></div>`;
+  return html;
+}
+function referralCard(b){ return `<div class="card warn" style="max-width:92%"><div class="k">${tt("需要医生评估","Needs a doctor")}</div><p style="margin:0 0 8px">${tt("这个问题涉及具体病情和用药,超出了养生建议的范围。我可以帮你把症状记下来,带给你的医生。","This involves a specific condition and medication, which is beyond wellness guidance. I can note your symptoms to bring to your doctor.")}</p>${b.resolved?`<div class="small muted">${b.resolved==="record"?tt("已记录并转到诊所页","Recorded; opened clinic page"):tt("已选择了解一般养生知识","Chose general wellness instead")}</div>`:`<div class="row"><button class="btn sm" data-act="refRecord" data-s="${esc(b.symptom)}">${tt("记录症状并联系诊所","Note symptoms & contact clinic")}</button><button class="btn ghost sm" data-act="refGeneral">${tt("了解一般养生知识","General wellness instead")}</button></div>`}</div>`; }
+function classify(t){
+  if(/胸痛|呼吸困难|喘不过气|自杀|不想活|大出血|晕倒|昏迷|chest pain|can'?t breathe|trouble breathing|suicid|kill myself|end my life|heavy bleeding|passed out|fainted|unconscious/i.test(t)) return "emergency";
+  if(/血压|血糖|糖尿病|吃什么药|中药|开方|处方|停药|降压|癌|肿瘤|发烧|发热|疼了.*天|确诊|是不是.*病|blood pressure|blood sugar|diabet|what (herb|medicine|drug)|prescri|stop (taking|my)|cancer|tumou?r|fever|diagnos|do i have/i.test(t)) return "medical";
+  if(/天气|股票|电影|weather|stock|movie/i.test(t)) return "off";
+  return "wellness";
+}
+function answerWellness(q){
+  const m=M(); const code=m.plan?m.plan.code:(m.screenerDone?assess(m).primary.code:null); const z=code?sn(SC(code)):"";
+  if(/霜降|寒露|节气|秋|frost|cold dew|season|autumn|fall/i.test(q)) return {t:tt("霜降是秋季最后一个节气,燥与寒并至。总体原则是“平补、润燥、防寒”:多吃芝麻、山药、梨、银耳、栗子这类清润平补的食材,少辛辣;昼夜温差大,早晚护住脖颈、腰腹和脚。民间说“补冬不如补霜降”,此时进补以平和为上。","Frost's Descent is autumn's last solar term, when dryness meets cold. The principle is gentle nourishment, moistening and warmth: more sesame, yam, pear, white fungus and chestnut; less spice; with big day–night swings, keep neck, lower back and feet covered. Tradition favors mild tonifying now over heavy winter tonics.")+(code?tt(`你是${z},${CT(code).diet.y[0]}尤其适合。`,` For ${z}, ${CT(code).diet.y[0].toLowerCase()} suits you especially well.`):""),src:tt("《中医养生学》· 节气养生","TCM Health Preservation · seasonal care")};
+  if(/咖啡|茶|coffee|tea/i.test(q)) return {t:tt("咖啡性温而走窜,少量可以提神,但阳虚体质本身阳气不足,靠咖啡提神会越喝越乏。建议上午一杯、不空腹、不加冰;下午改成姜枣茶或桂圆红枣茶。","Coffee is warm and dispersing; a little lifts you, but with yang deficiency relying on it leaves you more drained. One cup in the morning, not on an empty stomach, never iced; in the afternoon switch to ginger-date or longan-date tea."),src:tt("《中医食疗学》· 饮品宜忌","TCM Dietetics · beverages")};
+  if(/足三里|穴位|在哪|zusanli|st36|acupoint|where is/i.test(q)) return {t:tt("足三里在外膝眼(膝盖外侧凹陷)直下 3 寸,约四横指宽,胫骨外侧一横指处。按下去有明显酸胀感就对了。拇指按揉 2–3 分钟,早晚各一次,是最常用的健脾强壮穴。","Zusanli (ST36) is 3 cun — about four finger-widths — below the outer knee hollow, one finger-width lateral to the shin bone. A clear ache on pressing means you've found it. Knead with the thumb 2–3 minutes, morning and evening; it's the classic strengthening point."),src:tt("《经络腧穴学》ST36","Meridians & Acupoints · ST36")};
+  if(/适合我|right for me|suit me|good for me/i.test(q)) return {t:code?tt(`这项建议是按你的${z}生成的,整体适合。食疗方请按食材级配方,不加药材剂量;如果有已知过敏,先避开相应食材。`,`This was generated for your ${z} type, so overall yes. Treat recipes as food-level, without medicinal doses, and skip any ingredient you're allergic to.`):tt("先做一次体质初探,我才能告诉你是否适合。","Take the quick screener first and I can tell you."),src:tt("方案依据:体质 × 节气","Basis: constitution × season")};
+  if(/孕期|怀孕|哺乳|pregnan|nursing|breastfeed/i.test(q)) return {t:tt("孕期和哺乳期的饮食和穴位有特殊禁忌(例如三阴交、合谷、腹部穴位应避免按压;薏米、山楂、玫瑰等食材需慎用)。请在基础信息中勾选孕哺期,方案会自动过滤;具体情况仍建议咨询医生。","Pregnancy and nursing carry specific cautions: avoid pressing SP6, LI4 and abdominal points; use Job's tears, hawthorn and rose with care. Tick pregnancy/nursing in your profile and the plan filters automatically — and do check with your doctor."),src:tt("《中医妇科学》· 妊娠禁忌","TCM Gynecology · pregnancy cautions")};
+  if(/什么时候|时辰|when|best time|time of day/i.test(q)) return {t:tt("穴位按压一般早晚各一次;安神类(如三阴交、涌泉)放在睡前;健脾类(如足三里)饭后一小时。按子午流注,21–23 点三焦经当令,是收敛入睡的好时段。","Acupressure is usually morning and evening; calming points (SP6, KI1) before bed, digestive points (ST36) an hour after meals. By the organ clock, 9–11 pm is the Triple Burner hour — a good window to wind down."),src:tt("《针灸学》· 子午流注","Acupuncture · organ clock")};
+  return {t:tt("这是一个养生范围内的问题。","That's within wellness scope. ")+(code?tt(`以你的${z}来说,${CT(code).sum}`,`For your ${z}: ${CT(code).sum}`):tt("建议先完成体质初探,我能给出更有针对性的回答。","Take the quick screener and I can be more specific."))+tt(" 如果有具体症状或在用药,请点「联系我的诊所」。"," If you have specific symptoms or take medication, use “My clinic”."),src:tt("中医基础理论","TCM foundations")};
+}
+
+/* ---------- events ---------- */
+function bind(root){
+  root.querySelectorAll("[data-act]").forEach(el=>{ el.onclick=(e)=>{ e.stopPropagation(); act(el.dataset.act, el.dataset, el); }; });
+  root.querySelectorAll("[data-sec]").forEach(el=>el.onclick=()=>{ M().plan.sec=el.dataset.sec; save(); render(); });
+  root.querySelectorAll("[data-ck]").forEach(el=>el.onclick=()=>{ const c=M().checkins[S.day]; c[el.dataset.ck]= el.dataset.ck==="mood"? +el.dataset.v : el.dataset.v; if(el.dataset.ck==="sleepQ"){ c.sleep=+document.getElementById("sleepR").value; } save(); render(); });
+  const r=root.querySelector("#sleepR"); if(r){ r.oninput=()=>{ document.getElementById("sleepLbl").textContent=r.value; }; }
+  root.querySelectorAll("#chatIn,#askIn").forEach(i=>i.onkeydown=(e)=>{ if(e.key==="Enter") act(i.id==="chatIn"?"chatSend":"askSend"); });
+}
+function act(a,d,el){
+  const m=M();
+  switch(a){
+    case "lang": setLang(EN()?"zh":"en"); break;
+    case "setZh": setLang("zh"); break;
+    case "setEn": setLang("en"); break;
+    case "startChat": openSheet("assess",{mode:"chat"}); break;
+    case "startForm": openSheet("assess",{mode:"form"}); break;
+    case "toChat": sheet.params={mode:"chat"}; render(); break;
+    case "toForm": sheet.params={mode:"form"}; render(); break;
+    case "drip": openSheet("drip",{mode:"form"}); break;
+    case "dripSkip": toast(tt("明天再问你","We'll ask again tomorrow")); m.checkins[S.day].dripSkipped=true; save(); render(); break;
+    case "oneShot": case "continueAll": openSheet("oneShot",{mode:"form"}); break;
+    case "ans": setAnswer(m,d.id,+d.v); sheet.params.i++; if(sheet.kind==="assess"&&sheet.params.i>=sheet.params.ids.length) m.screenerDone=true; save(); render(); break;
+    case "prev": sheet.params.i=Math.max(0,sheet.params.i-1); render(); break;
+    case "chatAns": { const P=sheet.params; if(P.pending){ setAnswer(m,P.pending,+d.v); P.log.push({ai:false,t:LK()[d.v-1]}); P.pending=null; } render(); break; }
+    case "chatSend": { const inp=document.getElementById("chatIn"); const t=inp.value.trim(); if(!t) return; const P=sheet.params; P.log.push({ai:false,t}); const hits=mapText(t); if(hits.length){ hits.forEach(([id,v])=>{ if(m.answers[id]==null) setAnswer(m,id,v); }); P.log.push({ai:true,t:tt("明白了。","Got it."),map:tt(`已从你的描述中记录 ${hits.length} 题:${hits.map(h=>itemGist(h[0])).join("、")}`,`Recorded ${hits.length} item${hits.length>1?"s":""} from your description: ${hits.map(h=>itemGist(h[0])).join("; ")}`)}); if(P.pending&&m.answers[P.pending]!=null) P.pending=null; } else if(P.pending){ P.log.push({ai:true,t:tt("我不太确定这对应哪一项。请直接选一个:","I'm not sure which item that matches. Please pick one:")}); } else { P.log.push({ai:true,t:tt("好的,继续。","Okay, let's continue.")}); } render(); break; }
+    case "toReport": closeSheet(); if(m.formal) m.formalShown=true; go("constitution"); break;
+    case "goals": openSheet("goals"); break;
+    case "goal": { const g=d.g; if(m.goals.includes(g)) m.goals=m.goals.filter(x=>x!==g); else if(m.goals.length<2) m.goals.push(g); save(); render(); break; }
+    case "genPlan": buildPlan(m); closeSheet(); go("plan"); toast(m.formal?tt("方案已生成","Plan generated"):tt("初版方案已生成","First plan generated")); break;
+    case "upgrade": buildPlan(m); m.plan.upgraded=true; m.plan.provisional=false; save(); render(); toast(tt("方案已升级为正式版","Plan upgraded to formal")); break;
+    case "goPlan": go("plan"); break;
+    case "goConst": go("constitution"); break;
+    case "seeFormal": m.formalShown=true; save(); go("constitution"); break;
+    case "checkin": push("checkin"); break;
+    case "weekly": push("weekly"); break;
+    case "back": pop(); break;
+    case "recipe": push("recipe"); break;
+    case "acu": push("acupoint",{i:+d.i}); break;
+    case "didIt": { const c=m.checkins[S.day]||(m.checkins[S.day]={}); c.diet="是"; save(); toast(tt("已计入今日饮食打卡","Counted toward today's diet check-in")); pop(); push("checkin"); break; }
+    case "tToggle": if(TIMER.running){ stopTimer(); } else { TIMER.running=true; TIMER.handle=setInterval(tickTimer,1000); } render(); break;
+    case "tReset": stopTimer(); TIMER.left=TIMER.total; TIMER.side=1; render(); break;
+    case "video": openSheet("video",{}); break;
+    case "ask": { const top=S.stack[S.stack.length-1]; const c=m.plan?CT(m.plan.code):null; openSheet("ask",{ctx: top&&top.page==="recipe"&&c? c.recipe.name : top&&top.page==="acupoint"&&c? c.acu[top.params.i].n : null}); break; }
+    case "askQ": handleAsk(d.q); break;
+    case "askSend": { const inp=document.getElementById("askIn"); const t=inp.value.trim(); if(!t) return; handleAsk(t); break; }
+    case "refRecord": { const b=sheet.params.log.find(x=>x.card==="referral"&&!x.resolved); if(b) b.resolved="record"; closeSheet(); S.tab="me"; S.stack=[{page:"clinic",params:{symptom:d.s}}]; save(); render(); break; }
+    case "refGeneral": { const b=sheet.params.log.find(x=>x.card==="referral"&&!x.resolved); if(b) b.resolved="general"; sheet.params.log.push({ai:true,t:tt("好的。我们聊养生范围内的内容:饮食、作息、运动、穴位保健。想从哪一项开始?","Sure. Let's stay within wellness: diet, routine, movement, acupressure. Where would you like to start?")}); render(); break; }
+    case "family": sheet=null; S.tab="me"; S.stack=[{page:"family"}]; save(); render(); break;
+    case "switch": S.cur=d.id; sheet=null; S.stack=[]; save(); render(); toast(tt(`已切换到 ${mn(M())}`,`Switched to ${mn(M())}`)); break;
+    case "addMember": openSheet("addMember",{minor:false}); break;
+    case "amType": sheet.params.minor=d.v==="1"; sheet.params.name=document.getElementById("amName").value; render(); break;
+    case "amSave": { const name=document.getElementById("amName").value.trim()||(sheet.params.minor?tt("孩子","Child"):tt("家人","Family")); S.members.push(mem("m"+Date.now(),name,name[0].toUpperCase(),"f",sheet.params.minor)); save(); const minor=sheet.params.minor; closeSheet(); toast(minor?tt("已创建","Created"):tt("授权邀请已发送(演示中直接加入)","Invitation sent (added directly in the demo)")); render(); break; }
+    case "clinic": push("clinic"); break;
+    case "settings": push("settings"); break;
+    case "history": push("history"); break;
+    case "redo": m.answers={}; m.screenerDone=false; m.formal=false; m.formalShown=false; m.plan=null; m.goals=[]; save(); render(); toast(tt("已清除,可重新评估","Cleared — you can reassess")); break;
+    case "share": toast(tt("已生成分享图(不含姓名)","Share image created (no name)")); break;
+    case "src": openSheet("src",{}); break;
+    case "elder": S.elder=!S.elder; save(); render(); break;
+    case "export": toast(tt("导出已排队,完成后邮件通知","Export queued; you'll get an email")); break;
+    case "del": toast(tt("需二次确认;72 小时内完成(演示)","Needs confirmation; completes within 72 h (demo)")); break;
+    case "call": toast(tt("拨打","Calling")+" "+CLINIC.tel+tt("(演示)"," (demo)")); break;
+    case "copy": navigator.clipboard&&navigator.clipboard.writeText(CLINIC.tel).then(()=>toast(tt("已复制","Copied")),()=>toast(CLINIC.tel)); break;
+    case "closeSheet": closeSheet(); break;
+    case "resetDemo": resetAll(); break;
+  }
+}
+function handleAsk(t){
+  const P=sheet.params; P.log.push({ai:false,t}); const cls=classify(t);
+  if(cls==="emergency"){ sheet={kind:"emergency"}; render(); return; }
+  if(cls==="medical"){ P.log.push({card:"referral",symptom:t}); render(); return; }
+  if(cls==="off"){ P.log.push({ai:true,t:tt("这个超出了我能帮忙的范围。我只回答中医养生相关的问题。","That's outside what I can help with. I only answer TCM wellness questions.")}); render(); return; }
+  const ans=answerWellness(t); P.log.push({ai:true,t:ans.t,src:ans.src}); render();
+}
+function resetAll(){ const lang=S.lang; S=DEFAULT(); S.lang=lang; sheet=null; save(); render(); toast(tt("已重置","Reset")); }
+(function clock(){ const d=new Date(); document.getElementById("clock").textContent=`${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`; setTimeout(clock,30000); })();
+render();
+</script>
+</body>
+</html>

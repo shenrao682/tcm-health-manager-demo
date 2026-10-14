@@ -1,0 +1,1056 @@
+{
+  "$schema_version": "0.1",
+  "instrument": {
+    "name_zh": "中医体质分类与判定表",
+    "name_en": "Constitution in Chinese Medicine Questionnaire (CCMQ)",
+    "standard": "ZYYXH/T 157-2009",
+    "issuer_zh": "中华中医药学会",
+    "issuer_en": "China Association of Chinese Medicine",
+    "year": 2009,
+    "principal_author": "王琦 (Wang Qi)",
+    "population": "成人通用版",
+    "recall_period_zh": "近一年来",
+    "item_count_unique": 60,
+    "item_count_with_overlap": 66,
+    "note": "9 个子量表共 66 个条目位置,其中 6 个条目在两个子量表中共用,去重后为 60 道独立题目。平和质子量表中共用条目为反向计分。",
+    "verification_status": "DRAFT — 条目文字依公开流通版本整理,正式入库前须逐条核对 ZYYXH/T 157-2009 原文,并在 knowledge layer 的 source 字段标注版本与页码。"
+  },
+  "response_scale": {
+    "type": "likert_5",
+    "prompt_zh": "请根据近一年的体验和感觉,回答以下问题。",
+    "options": [
+      {
+        "value": 1,
+        "label_zh": "没有(根本不)",
+        "label_en": "Never"
+      },
+      {
+        "value": 2,
+        "label_zh": "很少(有一点)",
+        "label_en": "Rarely"
+      },
+      {
+        "value": 3,
+        "label_zh": "有时(有些)",
+        "label_en": "Sometimes"
+      },
+      {
+        "value": 4,
+        "label_zh": "经常(相当)",
+        "label_en": "Often"
+      },
+      {
+        "value": 5,
+        "label_zh": "总是(非常)",
+        "label_en": "Always"
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "Q01",
+      "text_zh": "您精力充沛吗?",
+      "text_en": "Do you feel energetic?",
+      "domain": "energy"
+    },
+    {
+      "id": "Q02",
+      "text_zh": "您容易疲乏吗?",
+      "text_en": "Do you get tired easily?",
+      "domain": "energy",
+      "shared_by": [
+        "pinghe",
+        "qixu"
+      ]
+    },
+    {
+      "id": "Q03",
+      "text_zh": "您说话声音低弱无力吗?",
+      "text_en": "Is your voice low and weak when you speak?",
+      "domain": "energy",
+      "shared_by": [
+        "pinghe",
+        "qixu"
+      ]
+    },
+    {
+      "id": "Q04",
+      "text_zh": "您感到闷闷不乐、情绪低沉吗?",
+      "text_en": "Do you feel down or low in mood?",
+      "domain": "mood",
+      "shared_by": [
+        "pinghe",
+        "qiyu"
+      ]
+    },
+    {
+      "id": "Q05",
+      "text_zh": "您比一般人耐受不了寒冷(冬天的寒冷,夏天的冷空调、电扇等)吗?",
+      "text_en": "Are you less tolerant of cold than most people (winter cold, summer air-conditioning or fans)?",
+      "domain": "thermal",
+      "shared_by": [
+        "pinghe",
+        "yangxu"
+      ]
+    },
+    {
+      "id": "Q06",
+      "text_zh": "您能适应外界自然和社会环境的变化吗?",
+      "text_en": "Do you adapt well to changes in your natural and social environment?",
+      "domain": "adaptation"
+    },
+    {
+      "id": "Q07",
+      "text_zh": "您容易失眠吗?",
+      "text_en": "Do you have trouble sleeping?",
+      "domain": "sleep"
+    },
+    {
+      "id": "Q08",
+      "text_zh": "您容易忘事(健忘)吗?",
+      "text_en": "Are you forgetful?",
+      "domain": "cognition",
+      "shared_by": [
+        "pinghe",
+        "xueyu"
+      ]
+    },
+    {
+      "id": "Q09",
+      "text_zh": "您容易气短(呼吸短促,接不上气)吗?",
+      "text_en": "Do you get short of breath easily?",
+      "domain": "respiratory"
+    },
+    {
+      "id": "Q10",
+      "text_zh": "您容易心慌吗?",
+      "text_en": "Do you experience palpitations easily?",
+      "domain": "cardiac"
+    },
+    {
+      "id": "Q11",
+      "text_zh": "您容易头晕或站起时晕眩吗?",
+      "text_en": "Do you feel dizzy, or lightheaded when standing up?",
+      "domain": "neuro"
+    },
+    {
+      "id": "Q12",
+      "text_zh": "您比别人容易患感冒吗?",
+      "text_en": "Do you catch colds more easily than others?",
+      "domain": "immunity",
+      "shared_by": [
+        "qixu",
+        "yangxu"
+      ]
+    },
+    {
+      "id": "Q13",
+      "text_zh": "您喜欢安静、懒得说话吗?",
+      "text_en": "Do you prefer quiet and feel too tired to talk?",
+      "domain": "energy"
+    },
+    {
+      "id": "Q14",
+      "text_zh": "您活动量稍大就容易出虚汗吗?",
+      "text_en": "Do you sweat easily with slight exertion?",
+      "domain": "sweating"
+    },
+    {
+      "id": "Q15",
+      "text_zh": "您手脚发凉吗?",
+      "text_en": "Are your hands and feet cold?",
+      "domain": "thermal"
+    },
+    {
+      "id": "Q16",
+      "text_zh": "您胃脘部、背部或腰膝部怕冷吗?",
+      "text_en": "Do your stomach, back, lower back or knees feel sensitive to cold?",
+      "domain": "thermal"
+    },
+    {
+      "id": "Q17",
+      "text_zh": "您感到怕冷、衣服比别人穿得多吗?",
+      "text_en": "Do you feel cold and wear more clothing than others?",
+      "domain": "thermal"
+    },
+    {
+      "id": "Q18",
+      "text_zh": "您吃(喝)凉的东西会感到不舒服或者怕吃(喝)凉东西吗?",
+      "text_en": "Do cold foods or drinks make you uncomfortable, or do you avoid them?",
+      "domain": "digestive"
+    },
+    {
+      "id": "Q19",
+      "text_zh": "您受凉或吃(喝)凉的东西后,容易腹泻(拉肚子)吗?",
+      "text_en": "Do you get diarrhea after catching cold or having cold food/drink?",
+      "domain": "digestive"
+    },
+    {
+      "id": "Q20",
+      "text_zh": "您感到手脚心发热吗?",
+      "text_en": "Do your palms and soles feel hot?",
+      "domain": "thermal"
+    },
+    {
+      "id": "Q21",
+      "text_zh": "您感觉身体、脸上发热吗?",
+      "text_en": "Do you feel heat in your body or face?",
+      "domain": "thermal"
+    },
+    {
+      "id": "Q22",
+      "text_zh": "您皮肤或口唇干吗?",
+      "text_en": "Are your skin or lips dry?",
+      "domain": "dryness"
+    },
+    {
+      "id": "Q23",
+      "text_zh": "您口唇的颜色比一般人红吗?",
+      "text_en": "Are your lips redder than most people's?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q24",
+      "text_zh": "您容易便秘或大便干燥吗?",
+      "text_en": "Are you prone to constipation or dry stools?",
+      "domain": "digestive"
+    },
+    {
+      "id": "Q25",
+      "text_zh": "您面部两颧潮红或偏红吗?",
+      "text_en": "Are your cheeks flushed or reddish?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q26",
+      "text_zh": "您感到眼睛干涩吗?",
+      "text_en": "Do your eyes feel dry?",
+      "domain": "dryness"
+    },
+    {
+      "id": "Q27",
+      "text_zh": "您感到口干咽燥、总想喝水吗?",
+      "text_en": "Do you have a dry mouth and throat and feel constantly thirsty?",
+      "domain": "dryness"
+    },
+    {
+      "id": "Q28",
+      "text_zh": "您感到胸闷或腹部胀满吗?",
+      "text_en": "Do you feel chest tightness or abdominal fullness?",
+      "domain": "digestive"
+    },
+    {
+      "id": "Q29",
+      "text_zh": "您感到身体沉重不轻松或不爽快吗?",
+      "text_en": "Does your body feel heavy and sluggish?",
+      "domain": "energy"
+    },
+    {
+      "id": "Q30",
+      "text_zh": "您腹部肥满松软吗?",
+      "text_en": "Is your abdomen large and soft?",
+      "domain": "body_shape"
+    },
+    {
+      "id": "Q31",
+      "text_zh": "您有额部油脂分泌多的现象吗?",
+      "text_en": "Is your forehead oily?",
+      "domain": "skin"
+    },
+    {
+      "id": "Q32",
+      "text_zh": "您上眼睑比别人肿(轻微隆起的现象)吗?",
+      "text_en": "Are your upper eyelids puffier than other people's?",
+      "domain": "skin"
+    },
+    {
+      "id": "Q33",
+      "text_zh": "您嘴里有黏黏的感觉吗?",
+      "text_en": "Does your mouth feel sticky?",
+      "domain": "oral"
+    },
+    {
+      "id": "Q34",
+      "text_zh": "您平时痰多,特别是咽喉部总感到有痰堵着吗?",
+      "text_en": "Do you have a lot of phlegm, especially a feeling of phlegm stuck in the throat?",
+      "domain": "respiratory"
+    },
+    {
+      "id": "Q35",
+      "text_zh": "您舌苔厚腻或有舌苔厚厚的感觉吗?",
+      "text_en": "Is your tongue coating thick and greasy, or does your tongue feel coated?",
+      "domain": "oral"
+    },
+    {
+      "id": "Q36",
+      "text_zh": "您面部或鼻部有油腻感或者油亮发光吗?",
+      "text_en": "Is your face or nose oily or shiny?",
+      "domain": "skin"
+    },
+    {
+      "id": "Q37",
+      "text_zh": "您容易生痤疮或疮疖吗?",
+      "text_en": "Are you prone to acne or boils?",
+      "domain": "skin"
+    },
+    {
+      "id": "Q38",
+      "text_zh": "您感到口苦或嘴里有异味吗?",
+      "text_en": "Do you have a bitter taste or bad odor in your mouth?",
+      "domain": "oral"
+    },
+    {
+      "id": "Q39",
+      "text_zh": "您大便黏滞不爽、有解不尽的感觉吗?",
+      "text_en": "Are your stools sticky and difficult to pass completely?",
+      "domain": "digestive"
+    },
+    {
+      "id": "Q40",
+      "text_zh": "您小便时尿道有发热感、尿色浓(深)吗?",
+      "text_en": "Do you feel burning when urinating, or is your urine dark?",
+      "domain": "urinary"
+    },
+    {
+      "id": "Q41",
+      "text_zh": "您带下色黄(白带颜色发黄)吗?",
+      "text_en": "Is your vaginal discharge yellowish?",
+      "domain": "gynecological",
+      "sex": "female",
+      "alternate_of": "Q41M"
+    },
+    {
+      "id": "Q41M",
+      "text_zh": "您的阴囊部位潮湿吗?",
+      "text_en": "Is your scrotal area damp?",
+      "domain": "andrological",
+      "sex": "male",
+      "alternate_of": "Q41"
+    },
+    {
+      "id": "Q42",
+      "text_zh": "您的皮肤在不知不觉中会出现青紫瘀斑(皮下出血)吗?",
+      "text_en": "Do bruises appear on your skin without your noticing an injury?",
+      "domain": "skin"
+    },
+    {
+      "id": "Q43",
+      "text_zh": "您两颧部有细微红丝吗?",
+      "text_en": "Do you have fine red capillaries on your cheeks?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q44",
+      "text_zh": "您身体上有哪里疼痛吗?",
+      "text_en": "Do you have pain anywhere in your body?",
+      "domain": "pain"
+    },
+    {
+      "id": "Q45",
+      "text_zh": "您面色晦暗或容易出现褐斑吗?",
+      "text_en": "Is your complexion dull, or do you get brown spots easily?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q46",
+      "text_zh": "您容易有黑眼圈吗?",
+      "text_en": "Do you get dark circles under your eyes easily?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q47",
+      "text_zh": "您口唇颜色偏暗吗?",
+      "text_en": "Are your lips dark in color?",
+      "domain": "complexion"
+    },
+    {
+      "id": "Q48",
+      "text_zh": "您容易精神紧张、焦虑不安吗?",
+      "text_en": "Do you feel nervous or anxious easily?",
+      "domain": "mood"
+    },
+    {
+      "id": "Q49",
+      "text_zh": "您多愁善感、感情脆弱吗?",
+      "text_en": "Are you sentimental and emotionally fragile?",
+      "domain": "mood"
+    },
+    {
+      "id": "Q50",
+      "text_zh": "您容易感到害怕或受到惊吓吗?",
+      "text_en": "Are you easily frightened or startled?",
+      "domain": "mood"
+    },
+    {
+      "id": "Q51",
+      "text_zh": "您胁肋部或乳房胀痛吗?",
+      "text_en": "Do you have distending pain in the ribs or breasts?",
+      "domain": "pain"
+    },
+    {
+      "id": "Q52",
+      "text_zh": "您无缘无故叹气吗?",
+      "text_en": "Do you sigh for no apparent reason?",
+      "domain": "mood"
+    },
+    {
+      "id": "Q53",
+      "text_zh": "您咽喉部有异物感,且吐之不出、咽之不下吗?",
+      "text_en": "Do you feel a lump in your throat that you can neither cough up nor swallow?",
+      "domain": "throat"
+    },
+    {
+      "id": "Q54",
+      "text_zh": "您没有感冒时也会打喷嚏吗?",
+      "text_en": "Do you sneeze even when you don't have a cold?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q55",
+      "text_zh": "您没有感冒时也会鼻塞、流鼻涕吗?",
+      "text_en": "Do you have a stuffy or runny nose even when you don't have a cold?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q56",
+      "text_zh": "您有因季节变化、温度变化或异味等原因而咳喘的现象吗?",
+      "text_en": "Do you cough or wheeze due to seasonal change, temperature change or odors?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q57",
+      "text_zh": "您容易过敏(对药物、食物、气味、花粉或在季节交替、气候变化时)吗?",
+      "text_en": "Are you prone to allergies (to medicines, food, odors, pollen, or with seasonal and weather changes)?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q58",
+      "text_zh": "您的皮肤容易起荨麻疹(风团、风疹块、风疙瘩)吗?",
+      "text_en": "Do you get hives easily?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q59",
+      "text_zh": "您的皮肤因过敏出现过紫癜(紫红色瘀点、瘀斑)吗?",
+      "text_en": "Have you had purpura (purple-red spots) on your skin due to allergy?",
+      "domain": "allergy"
+    },
+    {
+      "id": "Q60",
+      "text_zh": "您的皮肤一抓就红,并出现抓痕吗?",
+      "text_en": "Does your skin turn red and show marks when scratched?",
+      "domain": "allergy"
+    }
+  ],
+  "scales": [
+    {
+      "code": "pinghe",
+      "name_zh": "平和质",
+      "name_en": "Balanced (Ping He)",
+      "name_en_descriptive": "Balanced · harmonious pattern",
+      "type": "balanced",
+      "item_count": 8,
+      "items": [
+        {
+          "item": "Q01",
+          "reverse": false
+        },
+        {
+          "item": "Q02",
+          "reverse": true
+        },
+        {
+          "item": "Q03",
+          "reverse": true
+        },
+        {
+          "item": "Q04",
+          "reverse": true
+        },
+        {
+          "item": "Q05",
+          "reverse": true
+        },
+        {
+          "item": "Q06",
+          "reverse": false
+        },
+        {
+          "item": "Q07",
+          "reverse": true
+        },
+        {
+          "item": "Q08",
+          "reverse": true
+        }
+      ],
+      "summary_zh": "阴阳气血调和,体态适中,面色红润,精力充沛。"
+    },
+    {
+      "code": "qixu",
+      "name_zh": "气虚质",
+      "name_en": "Qi Deficiency",
+      "name_en_descriptive": "Qi Deficiency · low energy pattern",
+      "type": "biased",
+      "item_count": 8,
+      "items": [
+        {
+          "item": "Q02",
+          "reverse": false
+        },
+        {
+          "item": "Q09",
+          "reverse": false
+        },
+        {
+          "item": "Q10",
+          "reverse": false
+        },
+        {
+          "item": "Q11",
+          "reverse": false
+        },
+        {
+          "item": "Q12",
+          "reverse": false
+        },
+        {
+          "item": "Q13",
+          "reverse": false
+        },
+        {
+          "item": "Q03",
+          "reverse": false
+        },
+        {
+          "item": "Q14",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "元气不足,以疲乏、气短、自汗等气虚表现为主要特征。"
+    },
+    {
+      "code": "yangxu",
+      "name_zh": "阳虚质",
+      "name_en": "Yang Deficiency",
+      "name_en_descriptive": "Yang Deficiency · cold-sensitive pattern",
+      "type": "biased",
+      "item_count": 7,
+      "items": [
+        {
+          "item": "Q15",
+          "reverse": false
+        },
+        {
+          "item": "Q16",
+          "reverse": false
+        },
+        {
+          "item": "Q17",
+          "reverse": false
+        },
+        {
+          "item": "Q05",
+          "reverse": false
+        },
+        {
+          "item": "Q12",
+          "reverse": false
+        },
+        {
+          "item": "Q18",
+          "reverse": false
+        },
+        {
+          "item": "Q19",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "阳气不足,以畏寒怕冷、手足不温等虚寒表现为主要特征。"
+    },
+    {
+      "code": "yinxu",
+      "name_zh": "阴虚质",
+      "name_en": "Yin Deficiency",
+      "name_en_descriptive": "Yin Deficiency · dryness-and-heat pattern",
+      "type": "biased",
+      "item_count": 8,
+      "items": [
+        {
+          "item": "Q20",
+          "reverse": false
+        },
+        {
+          "item": "Q21",
+          "reverse": false
+        },
+        {
+          "item": "Q22",
+          "reverse": false
+        },
+        {
+          "item": "Q23",
+          "reverse": false
+        },
+        {
+          "item": "Q24",
+          "reverse": false
+        },
+        {
+          "item": "Q25",
+          "reverse": false
+        },
+        {
+          "item": "Q26",
+          "reverse": false
+        },
+        {
+          "item": "Q27",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "阴液亏少,以口燥咽干、手足心热等虚热表现为主要特征。"
+    },
+    {
+      "code": "tanshi",
+      "name_zh": "痰湿质",
+      "name_en": "Phlegm-Dampness",
+      "name_en_descriptive": "Phlegm-Dampness · heaviness pattern",
+      "type": "biased",
+      "item_count": 8,
+      "items": [
+        {
+          "item": "Q28",
+          "reverse": false
+        },
+        {
+          "item": "Q29",
+          "reverse": false
+        },
+        {
+          "item": "Q30",
+          "reverse": false
+        },
+        {
+          "item": "Q31",
+          "reverse": false
+        },
+        {
+          "item": "Q32",
+          "reverse": false
+        },
+        {
+          "item": "Q33",
+          "reverse": false
+        },
+        {
+          "item": "Q34",
+          "reverse": false
+        },
+        {
+          "item": "Q35",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "痰湿凝聚,以形体肥胖、腹部肥满、口黏苔腻等痰湿表现为主要特征。"
+    },
+    {
+      "code": "shire",
+      "name_zh": "湿热质",
+      "name_en": "Damp-Heat",
+      "name_en_descriptive": "Damp-Heat · oily-and-inflamed pattern",
+      "type": "biased",
+      "item_count": 6,
+      "items": [
+        {
+          "item": "Q36",
+          "reverse": false
+        },
+        {
+          "item": "Q37",
+          "reverse": false
+        },
+        {
+          "item": "Q38",
+          "reverse": false
+        },
+        {
+          "item": "Q39",
+          "reverse": false
+        },
+        {
+          "item": "Q40",
+          "reverse": false
+        },
+        {
+          "item": "Q41",
+          "reverse": false,
+          "sex_alternates": {
+            "female": "Q41",
+            "male": "Q41M"
+          }
+        }
+      ],
+      "summary_zh": "湿热内蕴,以面垢油光、口苦、苔黄腻等湿热表现为主要特征。"
+    },
+    {
+      "code": "xueyu",
+      "name_zh": "血瘀质",
+      "name_en": "Blood Stasis",
+      "name_en_descriptive": "Blood Stasis · poor-circulation pattern",
+      "type": "biased",
+      "item_count": 7,
+      "items": [
+        {
+          "item": "Q42",
+          "reverse": false
+        },
+        {
+          "item": "Q43",
+          "reverse": false
+        },
+        {
+          "item": "Q44",
+          "reverse": false
+        },
+        {
+          "item": "Q45",
+          "reverse": false
+        },
+        {
+          "item": "Q46",
+          "reverse": false
+        },
+        {
+          "item": "Q08",
+          "reverse": false
+        },
+        {
+          "item": "Q47",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "血行不畅,以肤色晦暗、舌质紫暗等血瘀表现为主要特征。"
+    },
+    {
+      "code": "qiyu",
+      "name_zh": "气郁质",
+      "name_en": "Qi Stagnation",
+      "name_en_descriptive": "Qi Stagnation · low-mood pattern",
+      "type": "biased",
+      "item_count": 7,
+      "items": [
+        {
+          "item": "Q04",
+          "reverse": false
+        },
+        {
+          "item": "Q48",
+          "reverse": false
+        },
+        {
+          "item": "Q49",
+          "reverse": false
+        },
+        {
+          "item": "Q50",
+          "reverse": false
+        },
+        {
+          "item": "Q51",
+          "reverse": false
+        },
+        {
+          "item": "Q52",
+          "reverse": false
+        },
+        {
+          "item": "Q53",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "气机郁滞,以神情抑郁、忧虑脆弱等气郁表现为主要特征。"
+    },
+    {
+      "code": "tebing",
+      "name_zh": "特禀质",
+      "name_en": "Special Diathesis",
+      "name_en_descriptive": "Special Diathesis · allergy-prone pattern",
+      "type": "biased",
+      "item_count": 7,
+      "items": [
+        {
+          "item": "Q54",
+          "reverse": false
+        },
+        {
+          "item": "Q55",
+          "reverse": false
+        },
+        {
+          "item": "Q56",
+          "reverse": false
+        },
+        {
+          "item": "Q57",
+          "reverse": false
+        },
+        {
+          "item": "Q58",
+          "reverse": false
+        },
+        {
+          "item": "Q59",
+          "reverse": false
+        },
+        {
+          "item": "Q60",
+          "reverse": false
+        }
+      ],
+      "summary_zh": "先天失常,以生理缺陷、过敏反应等为主要特征。"
+    }
+  ],
+  "scoring": {
+    "reverse_rule": "reversed_value = 6 - raw_value",
+    "raw_score": "sum of (reversed if flagged) item values within a scale",
+    "transformed_score": {
+      "formula": "(raw_score - item_count) / (item_count * 4) * 100",
+      "range": [
+        0,
+        100
+      ],
+      "note": "归一化到 0–100,使不同条目数的子量表可比。"
+    },
+    "missing_data_policy": {
+      "max_missing_per_scale": 1,
+      "imputation": "该子量表其余已答条目的均值",
+      "note": "超过 1 题缺失的子量表不判定,提示用户补答。标准原文未明确缺失处理,此为实现层约定。"
+    }
+  },
+  "classification": {
+    "balanced": {
+      "scale": "pinghe",
+      "rules": [
+        {
+          "label_zh": "是",
+          "label_en": "Yes",
+          "condition": "pinghe >= 60 AND all biased scales < 30"
+        },
+        {
+          "label_zh": "基本是",
+          "label_en": "Mostly",
+          "condition": "pinghe >= 60 AND all biased scales < 40 AND NOT(all biased scales < 30)"
+        },
+        {
+          "label_zh": "否",
+          "label_en": "No",
+          "condition": "otherwise"
+        }
+      ]
+    },
+    "biased": {
+      "applies_to": [
+        "qixu",
+        "yangxu",
+        "yinxu",
+        "tanshi",
+        "shire",
+        "xueyu",
+        "qiyu",
+        "tebing"
+      ],
+      "rules": [
+        {
+          "label_zh": "是",
+          "label_en": "Yes",
+          "condition": "score >= 40"
+        },
+        {
+          "label_zh": "倾向是",
+          "label_en": "Tendency",
+          "condition": "30 <= score < 40"
+        },
+        {
+          "label_zh": "否",
+          "label_en": "No",
+          "condition": "score < 30"
+        }
+      ]
+    },
+    "primary_constitution": {
+      "rule": "若有一个或多个偏颇体质判定为“是”,转化分最高者为主体质,其余“是”为兼夹体质;若无“是”而平和质为“是/基本是”,主体质为平和质;若均不满足,取转化分最高的“倾向是”作为主要倾向,并标注为低置信度。",
+      "tie_break": "转化分相同时,按原始分;仍相同则并列呈现,不强行排序。"
+    }
+  },
+  "progressive_assessment": {
+    "principle": "体质评估不是首次使用的闸门。先用 10 题初探给出初步结果并生成初版方案;剩余题目在日常使用中分散补完;自适应早停让多数用户无需答满 60 题即可得到与完整量表完全一致的正式结论。",
+    "stages": [
+      {
+        "stage": "screener",
+        "name_zh": "快速初探",
+        "target_duration_sec": 120,
+        "required_before_app_entry": false,
+        "output": "provisional_report",
+        "note": "每个偏颇体质 1 题(阳虚质 2 题,因 Q05 兼为平和质反向题),平和质 1 题;共用题 Q02/Q04/Q05 同时为平和质提供反向计分信息。选题依据临床常识,待 M4 盲评数据回归验证后调整。"
+      },
+      {
+        "stage": "drip",
+        "name_zh": "日常补完",
+        "items_per_day": 3,
+        "entry_point": "checkin_complete",
+        "ordering": "优先问尚未早停的子量表中区分度最高的题;同一子量表的题不连续出现",
+        "skip_rule": "已早停的子量表不再提问"
+      },
+      {
+        "stage": "complete",
+        "name_zh": "正式报告",
+        "trigger": "所有子量表均已判定(答完或早停)",
+        "output": "formal_report",
+        "notify": true
+      }
+    ],
+    "screener_items": [
+      {
+        "item": "Q01",
+        "scale": "pinghe",
+        "rationale": "平和质正向核心题"
+      },
+      {
+        "item": "Q02",
+        "scale": "qixu",
+        "rationale": "气虚核心,兼为平和质反向题"
+      },
+      {
+        "item": "Q15",
+        "scale": "yangxu",
+        "rationale": "手脚发凉,阳虚最典型"
+      },
+      {
+        "item": "Q05",
+        "scale": "yangxu",
+        "rationale": "不耐寒,兼为平和质反向题"
+      },
+      {
+        "item": "Q27",
+        "scale": "yinxu",
+        "rationale": "口干咽燥,阴虚核心"
+      },
+      {
+        "item": "Q30",
+        "scale": "tanshi",
+        "rationale": "腹部肥满,痰湿体征"
+      },
+      {
+        "item": "Q36",
+        "scale": "shire",
+        "rationale": "面部油腻,湿热体征"
+      },
+      {
+        "item": "Q45",
+        "scale": "xueyu",
+        "rationale": "面色晦暗,血瘀体征"
+      },
+      {
+        "item": "Q04",
+        "scale": "qiyu",
+        "rationale": "情绪低沉,兼为平和质反向题"
+      },
+      {
+        "item": "Q57",
+        "scale": "tebing",
+        "rationale": "容易过敏,特禀核心"
+      }
+    ],
+    "screener_item_count": 10,
+    "early_stop": {
+      "principle": "标准判定为阈值规则,因此每答一题即可计算该子量表转化分的可达区间;区间落入单一判定区时该子量表终止提问,结论与答满全部条目完全一致。",
+      "bounds": {
+        "answered_sum": "S = 已答条目(反向后)得分之和",
+        "unanswered_count": "k = 子量表条目数 n − 已答数",
+        "raw_min": "S + k × 1",
+        "raw_max": "S + k × 5",
+        "t_min": "(raw_min − n) / (n × 4) × 100",
+        "t_max": "(raw_max − n) / (n × 4) × 100"
+      },
+      "stop_rules_biased": [
+        {
+          "when": "t_max < 30",
+          "conclude": "否"
+        },
+        {
+          "when": "t_min >= 40",
+          "conclude": "是"
+        },
+        {
+          "when": "t_min >= 30 AND t_max < 40",
+          "conclude": "倾向是"
+        },
+        {
+          "when": "otherwise",
+          "conclude": null,
+          "action": "continue"
+        }
+      ],
+      "stop_rules_balanced": [
+        {
+          "when": "t_max < 60",
+          "conclude": "否",
+          "note": "平和质不可能为是/基本是,其余判定仅取决于偏颇体质"
+        },
+        {
+          "when": "t_min >= 60 AND all biased scales concluded",
+          "conclude": "按 classification.balanced 规则判定"
+        },
+        {
+          "when": "otherwise",
+          "conclude": null,
+          "action": "continue"
+        }
+      ],
+      "primary_constitution_stop": "当所有偏颇体质均已判定,且判定为“是”的体质之间转化分区间不重叠时,主体质可确定;若重叠则继续问相关子量表直至区间分离或答完。",
+      "expected_saving": "按常见答题分布估算平均省 25–35 题;待真实数据验证。"
+    },
+    "provisional_report": {
+      "point_estimate": "未答条目以该子量表已答条目均值填补后计算转化分;子量表无已答条目时以 1 分(没有)填补",
+      "confidence_label": [
+        {
+          "label_zh": "已确认",
+          "when": "该体质已早停或答完"
+        },
+        {
+          "label_zh": "初步",
+          "when": "t_max − t_min <= 25"
+        },
+        {
+          "label_zh": "待定",
+          "when": "t_max − t_min > 25"
+        }
+      ],
+      "display_zh": "初步判断:{primary}倾向。再答约 {remaining} 题可确认。",
+      "plan_generation": "允许基于初步主体质生成初版方案;方案页标注“初版·基于快速初探”;正式报告生成后方案自动升级并提示差异。"
+    }
+  },
+  "app_integration": {
+    "conversational_mode": {
+      "principle": "对话式辨识不替代量表。LLM 只负责把用户自然语言映射到 item_id + value(1–5),未覆盖的条目以问题形式补问。评分与判定由确定性代码执行。对话模式同样受 progressive_assessment.early_stop 约束:一轮自由叙述常可映射 3–6 题,已早停子量表不再追问。",
+      "mapping_output_schema": {
+        "item_id": "string, one of items[].id",
+        "value": "integer 1–5",
+        "confidence": "number 0–1",
+        "evidence_quote": "string, 用户原话片段"
+      },
+      "low_confidence_threshold": 0.7,
+      "low_confidence_action": "以快捷选项形式直接向用户确认该题"
+    },
+    "sex_handling": "注册时性别为女 → 湿热质使用 Q41;为男 → 使用 Q41M;未提供或其他 → 跳过该题,湿热质按 5 题计分并标注。",
+    "elderly_mode": "老年模式默认进入问卷形式而非对话,但同样走初探 → 日常补完路径;选择“一次答完”时每页一个子量表,早停规则仍生效。",
+    "one_shot_mode": "「我的体质」页提供“一次答完”入口,按子量表分页呈现剩余未判定题目;早停规则生效,实际题数通常少于 60。",
+    "source_tag": {
+      "type": "standard",
+      "ref": "ZYYXH/T 157-2009",
+      "title_zh": "中医体质分类与判定",
+      "display_zh": "来源:中华中医药学会《中医体质分类与判定》(ZYYXH/T 157-2009)"
+    }
+  }
+}

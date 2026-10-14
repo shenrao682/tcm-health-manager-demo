@@ -1,0 +1,579 @@
+<title>中医AI健康管家 客户端 MVP</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column with sticky section nav on wide screens; screen specs render as phone-shaped cards in a wrapping grid. */
+:root{
+  --bg:#f7f8f6; --surface:#ffffff; --fg:#1d2420; --muted:#5d6861; --line:#d9ded9;
+  --accent:#2f6f5e; --accent-soft:#e3efe9; --warn:#9a5b14; --warn-soft:#f6ebd9; --crit:#8e3b3b; --crit-soft:#f4e3e3;
+  --display:"Noto Serif SC","Songti SC","SimSun",serif;
+  --body:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --surface:#1c2320; --fg:#e6ebe7; --muted:#9aa69f; --line:#2f3a35;
+  --accent:#7fbfa8; --accent-soft:#1f3a32; --warn:#e0a85a; --warn-soft:#3a2d18; --crit:#e08a8a; --crit-soft:#3a2222; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --surface:#1c2320; --fg:#e6ebe7; --muted:#9aa69f; --line:#2f3a35;
+  --accent:#7fbfa8; --accent-soft:#1f3a32; --warn:#e0a85a; --warn-soft:#3a2d18; --crit:#e08a8a; --crit-soft:#3a2222; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.75;margin:0;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:0 48px}
+@media (min-width:960px){.wrap{grid-template-columns:200px minmax(0,1fr)}}
+nav.toc{display:none}
+@media (min-width:960px){nav.toc{display:block;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:96px;font-size:13px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 12px;border-left:2px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}}
+main{min-width:0}
+
+header.hero{padding-block:56px 24px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.2vw,40px);line-height:1.25;margin:10px 0 8px;text-wrap:balance}
+.sub{color:var(--muted);font-size:17px;margin:0 0 20px;max-width:65ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--muted);font-family:var(--mono)}
+
+h2{font-family:var(--display);font-weight:700;font-size:24px;margin:56px 0 16px;padding-top:8px;text-wrap:balance;scroll-margin-top:24px}
+h2 .n{color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;margin-right:10px;vertical-align:middle}
+h3{font-size:17px;font-weight:700;margin:28px 0 8px;text-wrap:balance}
+p,ul,ol{max-width:72ch}
+p{margin:0 0 14px}
+ul,ol{padding-left:1.3em;margin:0 0 14px}
+li{margin-bottom:4px}
+li::marker{color:var(--accent)}
+strong{font-weight:700}
+
+.thesis{background:var(--accent-soft);border-left:3px solid var(--accent);padding:16px 20px;margin:0 0 24px;max-width:none}
+.thesis p{margin:0;max-width:none;font-size:17px}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0 0 24px}
+.tile{background:var(--surface);border:1px solid var(--line);padding:14px 16px}
+.tile .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.2;margin-top:4px;font-variant-numeric:tabular-nums}
+.tile .d{font-size:13px;color:var(--muted);margin-top:2px}
+
+.tablewrap{overflow-x:auto;margin:0 0 20px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:700;background:var(--surface);font-size:13px;letter-spacing:.02em}
+td:first-child{font-weight:500;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+table.wide td:first-child{white-space:normal}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.7;white-space:nowrap}
+.ok{color:var(--accent);background:var(--accent-soft)}
+.wn{color:var(--warn);background:var(--warn-soft)}
+.cr{color:var(--crit);background:var(--crit-soft)}
+
+.scope{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:0 0 20px}
+.scope>div{background:var(--surface);border:1px solid var(--line);padding:16px 18px}
+.scope h4{margin:0 0 8px;font-size:14px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.scope ul{margin:0;font-size:15px}
+
+.flow{font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface);border:1px solid var(--line);padding:16px 18px;overflow-x:auto;margin:0 0 20px;white-space:pre}
+
+/* screen specs */
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin:0 0 24px}
+.screen{background:var(--surface);border:1px solid var(--line);padding:0;display:flex;flex-direction:column;min-width:0}
+.screen .hd{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.screen .hd b{font-size:14.5px}
+.screen .hd code{font-size:11px;border:none;background:none;color:var(--muted);padding:0}
+.screen .bd{padding:10px 14px 12px;font-size:13.5px;line-height:1.6}
+.screen .bd ul{padding-left:1.1em;margin:0}
+.screen .bd .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:8px 0 2px}
+.screen .bd .lbl:first-child{margin-top:0}
+
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 20px}
+.phase{background:var(--surface);border-top:3px solid var(--accent);padding:12px 14px;font-size:14px}
+.phase .m{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.08em}
+.phase .t{font-weight:700;margin:4px 0 6px}
+.phase ul{padding-left:1.1em;margin:0;font-size:13.5px;color:var(--muted)}
+.phase .gate{margin-top:8px;font-size:12.5px;border-top:1px dashed var(--line);padding-top:6px}
+
+.note{font-size:14px;color:var(--muted);border-top:1px solid var(--line);margin-top:48px;padding-top:16px;max-width:none}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface);border:1px solid var(--line);padding:0 5px;border-radius:3px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="章节">
+  <a href="#s1">1 定位与范围</a>
+  <a href="#s2">2 成功标准</a>
+  <a href="#s3">3 信息架构</a>
+  <a href="#s4">4 核心流程</a>
+  <a href="#s5">5 页面规格</a>
+  <a href="#s6">6 设计原则</a>
+  <a href="#s7">7 客户端技术</a>
+  <a href="#s8">8 服务端接口依赖</a>
+  <a href="#s9">9 无障碍与本地化</a>
+  <a href="#s10">10 埋点与度量</a>
+  <a href="#s11">11 团队与排期</a>
+  <a href="#s12">12 风险与决策</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Client Proposal · MVP</div>
+  <h1>中医AI健康管家 · 客户端 MVP 方案</h1>
+  <p class="sub">言承中医AI大脑服务平台的患者端移动应用。本方案聚焦 iOS / Android 客户端本身:用户看到什么、如何走完关键流程、客户端如何构建。服务端、AI 编排与合规只描述客户端依赖的部分。</p>
+  <div class="meta"><span>版本 0.5 · 草案</span><span>2026-10-12</span><span>周期 6 个月</span><span>依据:《中医AI破局》slide 25–27</span></div>
+</header>
+
+<h2 id="s1"><span class="n">01</span>定位与范围</h2>
+<div class="thesis"><p><strong>客户端的工作:</strong>让用户在 3 分钟内拿到初步体质判断和一份初版方案,在 30 秒内完成每天的打卡,在一周内不知不觉补完正式评估,在任何时候都能一键找到医生。它是诊所的前哨和患者的日常陪伴,不是诊断工具。</p></div>
+<p>演讲稿把患者端描述为"个人与家庭自我健康管理 + 动态家庭健康档案",并列出六个生活方式维度。客户端 MVP 把这个描述落成四个可触达的东西:<strong>一份体质报告、一份随节气更新的调养方案、一个每日打卡、一个家庭切换器</strong>。所有疾病相关内容在客户端只有一个出口:分流到医生。</p>
+<div class="scope">
+  <div><h4 style="color:var(--accent)">客户端做 · In scope</h4><ul>
+    <li>对话式体质辨识与报告页</li>
+    <li>调养方案:饮食、食疗、作息、运动、穴位</li>
+    <li>每日四项打卡、提醒、周报</li>
+    <li>家庭成员档案与切换</li>
+    <li>养生问答(受约束)与分流到诊所</li>
+    <li>中英双语、老年友好模式</li>
+    <li>HealthKit / Health Connect 只读导入睡眠与步数</li>
+    <li>隐私同意、数据导出、账户删除</li>
+  </ul></div>
+  <div><h4 style="color:var(--crit)">客户端不做 · Out of scope</h4><ul>
+    <li>症状自查、疾病分型、任何处方展示</li>
+    <li>舌象/脉象拍摄与判读</li>
+    <li>医生聊天、视频问诊、预约系统</li>
+    <li>商城、支付、药膳购买</li>
+    <li>可穿戴设备写入与实时同步</li>
+    <li>社区、动态、好友</li>
+    <li>Web 端、平板专属布局</li>
+  </ul></div>
+</div>
+
+<h2 id="s2"><span class="n">02</span>成功标准</h2>
+<div class="tiles">
+  <div class="tile"><div class="k">快速初探完成率</div><div class="v">≥ 85%</div><div class="d">开始初探的用户中完成 10 题的比例</div></div>
+  <div class="tile"><div class="k">初探耗时中位数</div><div class="v">≤ 2 分钟</div><div class="d">问卷或对话路径</div></div>
+  <div class="tile"><div class="k">7 日内正式完成率</div><div class="v">≥ 50%</div><div class="d">初探用户中一周内补完正式评估的比例</div></div>
+  <div class="tile"><div class="k">单次打卡耗时</div><div class="v">≤ 30 秒</div><div class="d">P75</div></div>
+  <div class="tile"><div class="k">7 日留存</div><div class="v">≥ 40%</div><div class="d">完成体质评估的用户</div></div>
+  <div class="tile"><div class="k">打卡周活率</div><div class="v">≥ 4 天 / 周</div><div class="d">留存用户的中位数</div></div>
+  <div class="tile"><div class="k">崩溃率</div><div class="v">&lt; 0.3%</div><div class="d">会话级,双平台</div></div>
+</div>
+<p>这六项全部在客户端可观测。AI 质量指标(辨识一致性、越界拦截)由服务端评估流水线负责,客户端只需保证把拦截结果正确呈现。</p>
+
+<h2 id="s3"><span class="n">03</span>信息架构</h2>
+<div class="flow">底部导航(4 个 Tab)
+│
+├─ 今日        当前成员的今日方案摘要 · 打卡入口 · 节气提示 · 提醒
+├─ 我的体质    体质报告 · 历史评估 · 重新评估入口
+├─ 调养方案    饮食宜忌 · 食疗方 · 作息 · 运动 · 穴位 · 来源
+└─ 我的        家庭成员 · 问答入口 · 设置 · 隐私与数据 · 联系诊所
+
+全局
+├─ 顶部成员切换器(头像 + 姓名,所有 Tab 可见)
+├─ 问答浮层(从「我的」或「今日」唤起,全屏对话)
+└─ 分流卡片(问答触发时在对话内呈现;「我的」中常驻「联系我的诊所」)</div>
+<p>两条结构性决定:</p>
+<ul>
+  <li><strong>成员切换器放全局而非藏在「我的」。</strong>家庭管理者是 P0 用户,切换成员是高频动作;放在顶部让"我现在在看谁"始终可见,避免把父亲的方案误当成自己的。</li>
+  <li><strong>问答是浮层,不是 Tab。</strong>避免 App 变成"聊天机器人"。问答服务于方案与体质内容,从具体上下文(某道食疗方、某个穴位)唤起时自动带入话题。</li>
+</ul>
+
+<h2 id="s4"><span class="n">04</span>核心流程</h2>
+
+<h3>流程 A · 首次使用到拿到初版方案(目标 ≤ 6 分钟)</h3>
+<div class="flow">启动 → 语言选择 → 三页价值说明(可跳过)
+  → 隐私与同意(三项逐条勾选:隐私政策 / 健康数据用途 / 非医疗建议)
+  → 注册(手机号或 Apple / Google 登录)
+  → 基础信息(出生年、性别、所在地、过敏、孕哺期)
+  → 进入「今日」(此时已可浏览节气、穴位、食疗内容)
+  → 快速初探(10 题,≤ 2 分钟;问卷或对话任选;可跳过稍后做)
+  → 初步体质报告(主体质 + 置信度标签 + "再答约 N 题可确认")
+  → 选目标(1–2 个:睡眠 / 压力 / 消化 / 精力 / 体重)
+  → 生成初版方案(流式;方案页标注「初版 · 基于快速初探」)
+  → 设置提醒(默认按时辰预填,一键确认)</div>
+<ul>
+  <li><strong>体质评估不是闸门。</strong>基础信息之后用户就在 App 里了;初探可跳过,「今日」页会用引导卡持续邀请。</li>
+  <li>方案生成用流式输出:首个板块 3 秒内可见,全部板块 15 秒内完成。超时显示"稍后在方案页查看",不阻塞。</li>
+</ul>
+
+<h3>流程 A′ · 从初步到正式(目标 ≤ 7 天,用户无感)</h3>
+<div class="flow">每日打卡完成 → 追加一张卡「今天 3 道体质小问题」
+  → 只问尚未判定的子量表;已早停的体质不再出现
+  → 每答一题后台重算各体质分数区间
+  → 所有体质判定完成(答完或早停)
+  → 推送「你的正式体质报告已生成」
+  → 报告页解锁完整雷达图;方案自动升级为正式版,标注与初版的差异
+
+随时可走捷径:「我的体质」→ 一次答完(按子量表分页,只出未判定题)</div>
+<ul>
+  <li><strong>自适应早停</strong>:标准判定是阈值规则(≥ 40 是,&lt; 30 否),每答一题即可算出该体质分数的可达区间;区间落入单一判定区就停止提问,结论与答满 60 题完全一致。按常见答题分布,平均可省 25–35 题。</li>
+  <li><strong>对话模式的省题来源</strong>:一句"我特别怕冷,手脚老凉,一吃凉的就拉肚子"同时覆盖阳虚质 3 题;自由叙述一轮常映射 3–6 题。</li>
+  <li>初步与正式的区别用标签而非弹窗表达;初版方案已经可用,正式版只是更准。</li>
+</ul>
+
+<h3>流程 B · 每日打卡(目标 ≤ 30 秒)</h3>
+<div class="flow">推送通知 → 直达「今日」打卡卡片
+  → 睡眠:时长滑块 + 质量三选一(已从 HealthKit 预填则只需确认)
+  → 饮食:今日宜忌是否遵循(是 / 部分 / 否)
+  → 运动:分钟数(步数已预填则换算建议)
+  → 情绪:五个表情
+  → 完成动效 + 一句话反馈 → 返回「今日」</div>
+<ul>
+  <li>四项可任选其一单独完成,不强制全部。</li>
+  <li>当天多次打开只显示未完成项。</li>
+</ul>
+
+<h3>流程 C · 用户问了医疗问题(分流)</h3>
+<div class="flow">用户输入 "我最近血压 150,该吃什么中药"
+  → 客户端先发给分类接口 → 返回 medical_advice
+  → 对话内显示分流卡片(非弹窗):
+      "这个问题需要医生评估。我可以帮你把症状记下来,带给你的医生。"
+      [记录症状并联系诊所]  [了解一般养生知识]
+  → 选前者:症状摘要表单(预填用户输入)→ 显示合作诊所信息 + 一键拨打 / 复制
+  → 选后者:回到问答,但话题限定为与血压无关的体质养生
+
+紧急关键词(胸痛、呼吸困难、自杀意念等)
+  → 跳过分类,全屏显示 911 / 988 卡片,对话暂停</div>
+
+<h3>流程 D · 添加家庭成员</h3>
+<div class="flow">「我的」→ 家庭成员 → 添加
+  → 成年人:填姓名 + 手机/邮箱 → 发送授权链接 → 对方确认后出现在切换器
+  → 未成年人:监护人声明 → 直接创建 → 成员卡显示「监护」标识
+  → 新成员进入流程 A 的"基础信息 → 体质辨识"段</div>
+
+<h2 id="s5"><span class="n">05</span>页面规格</h2>
+<p>共 14 个主要页面,按三层组织:4 个 Tab 作为根、每个 Tab 下挂的二级页、以及跨 Tab 的浮层和全局组件。先看它们怎么连起来,再看每页的规格。</p>
+
+<h3>导航组织</h3>
+<div class="tablewrap" style="background:var(--surface);border:1px solid var(--line);padding:12px">
+<pre class="mermaid">
+flowchart TB
+  classDef tab fill:#2f6f5e,stroke:#2f6f5e,color:#fff,font-weight:bold
+  classDef page fill:#e3efe9,stroke:#2f6f5e,color:#1d2420
+  classDef modal fill:#ffffff,stroke:#9a5b14,stroke-dasharray:4 3,color:#1d2420
+  classDef global fill:#f6ebd9,stroke:#9a5b14,color:#1d2420
+  SW["成员切换器（全局顶部）"]:::global
+  subgraph T1["Tab 1 · 今日"]
+    S01["S01 今日"]:::tab
+    S09["S09 打卡"]:::page
+    S10["S10 周报"]:::page
+    S01 --> S09
+    S01 --> S10
+  end
+  subgraph T2["Tab 2 · 我的体质"]
+    S04["S04 体质报告（初步 / 正式）"]:::tab
+    S02["S02 辨识 · 对话"]:::modal
+    S03["S03 辨识 · 问卷"]:::modal
+    S05["S05 目标选择"]:::modal
+    S04 --> S02
+    S04 --> S03
+    S02 <-. 切换 .-> S03
+    S02 --> S05
+    S03 --> S05
+  end
+  subgraph T3["Tab 3 · 调养方案"]
+    S06["S06 调养方案"]:::tab
+    S07["S07 食疗方详情"]:::page
+    S08["S08 穴位详情"]:::page
+    S06 --> S07
+    S06 --> S08
+  end
+  subgraph T4["Tab 4 · 我的"]
+    S12["S12 家庭成员"]:::page
+    S13["S13 联系我的诊所"]:::page
+    S14["S14 设置 · 隐私与数据"]:::page
+  end
+  S11["S11 养生问答（全屏浮层）"]:::modal
+  S01 -- "未初探引导卡" --> S02
+  S09 -- "体质小问题 3 题" --> S03
+  S05 -- "生成方案" --> S06
+  S06 -- "问一问" --> S11
+  S07 -- "问一问" --> S11
+  S08 -- "问一问" --> S11
+  S01 -- "问答入口" --> S11
+  S11 -- "分流卡" --> S13
+  S07 -- "今天做了" --> S09
+  SW -.-> S01
+  SW -.-> S04
+  SW -.-> S06
+  SW -.-> S12
+</pre>
+</div>
+<p style="font-size:13.5px;color:var(--muted)">深绿 = Tab 根页面;浅绿 = 推入的二级页;虚线框 = 模态流程页 / 浮层;橙色 = 全局组件。</p>
+
+<h3>按 Tab 归属</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Tab</th><th>根页面(点 Tab 直达)</th><th>推入的二级页</th><th>模态流程页 / 浮层</th></tr></thead>
+<tbody>
+<tr><td>1 今日</td><td>S01 今日</td><td>S09 打卡 · S10 周报</td><td>—</td></tr>
+<tr><td>2 我的体质</td><td>S04 体质报告</td><td>—</td><td>S02 辨识·对话 · S03 辨识·问卷 · S05 目标选择</td></tr>
+<tr><td>3 调养方案</td><td>S06 调养方案</td><td>S07 食疗方详情 · S08 穴位详情</td><td>—</td></tr>
+<tr><td>4 我的</td><td>列表页(不计入 14 页)</td><td>S12 家庭成员 · S13 联系我的诊所 · S14 设置</td><td>—</td></tr>
+<tr><td>跨 Tab</td><td>—</td><td>—</td><td>S11 养生问答</td></tr>
+</tbody></table></div>
+
+<h3>按呈现方式</h3>
+<p>呈现方式决定导航栈和返回行为,是三类页面最本质的区别:</p>
+<ul>
+  <li><strong>Tab 根页(S01、S04、S06、「我的」列表)</strong>:点底部 Tab 直达;无返回键;切换 Tab 时各自的栈状态保留。</li>
+  <li><strong>推入页(S07、S08、S09、S10、S12、S13、S14)</strong>:从父页面点进去,左上角返回;属于所在 Tab 的导航栈。浏览食疗方时切去打卡再回来,应该还停在那道食疗方上。</li>
+  <li><strong>模态流程页 / 浮层(S02、S03、S05、S11)</strong>:从底部弹出,覆盖 Tab 栏。它们是要完成或退出的任务,不是浏览的地方:S02/S03/S05 是"评估 → 选目标 → 生成方案"的线性流程,完成后落到 S06;S11 从多处唤起,关闭后回到唤起它的页面。评估做到一半切 Tab 会丢上下文,所以用模态把用户留在流程里。</li>
+</ul>
+
+<h3>关键的跨 Tab 跳转</h3>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>从</th><th>到</th><th>触发</th><th>为什么要跨</th></tr></thead>
+<tbody>
+<tr><td>S01 今日</td><td>S02 对话辨识</td><td>未初探时的引导卡</td><td>新用户不知道去「我的体质」,在首页直接邀请</td></tr>
+<tr><td>S09 打卡</td><td>S03 问卷(3 题)</td><td>打卡完成后</td><td>渐进式补完,题目跟着打卡走</td></tr>
+<tr><td>S05 目标选择</td><td>S06 调养方案</td><td>生成方案</td><td>评估流程的终点自然落到方案 Tab</td></tr>
+<tr><td>S06 / S07 / S08</td><td>S11 问答</td><td>"问一问"</td><td>带着当前上下文(某道菜、某个穴位)提问</td></tr>
+<tr><td>S11 问答</td><td>S13 联系诊所</td><td>分流卡</td><td>医疗问题的唯一出口</td></tr>
+<tr><td>S07 食疗方</td><td>S09 打卡</td><td>"今天做了"</td><td>做了这道菜直接计入饮食打卡</td></tr>
+</tbody></table></div>
+
+<h3>路由文件结构(Expo Router)</h3>
+<div class="flow">app/
+├─ (tabs)/
+│  ├─ today/          index (S01) · checkin (S09) · weekly (S10)
+│  ├─ constitution/   index (S04)
+│  ├─ plan/           index (S06) · recipe/[id] (S07) · acupoint/[id] (S08)
+│  └─ me/             index · family (S12) · clinic (S13) · settings (S14)
+├─ (assessment)/      modal 组:chat (S02) · form (S03) · goals (S05)
+└─ chat.tsx           modal:S11 养生问答</div>
+<p><code>(tabs)</code> 组内每个文件夹是一个独立导航栈;<code>(assessment)</code> 和 <code>chat</code> 定义为 <code>presentation: "modal"</code>,从任何位置都能弹出并覆盖 Tab 栏。</p>
+
+<h3>页面规格</h3>
+<p>每页列出核心元素、主要状态和关键交互。</p>
+<div class="screens">
+
+<div class="screen"><div class="hd"><b>今日</b><code>S01</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>成员切换器</li><li>节气卡:当前节气 + 一句宜忌</li><li>今日方案摘要:3 条可执行项</li><li>打卡卡片(未完成项高亮)</li><li>体质小问题卡(打卡后出现,3 题)</li><li>下次提醒时间</li></ul>
+<div class="lbl">状态</div><ul><li>未初探:引导卡"3 分钟了解你的体质"替代方案摘要</li><li>初探已做、正式未完成:方案摘要带「初版」标签,小问题卡显示剩余题数</li><li>方案生成中:骨架屏</li><li>全部打卡完成:收起为一行</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>体质辨识 · 对话</b><code>S02</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>进度条(按"剩余待判定题数"动态估算,早停后缩短)</li><li>AI 问题气泡(流式)</li><li>答案快捷选项 + 自由输入</li><li>"换成问卷模式"链接</li></ul>
+<div class="lbl">交互</div><ul><li>快捷选项点击即提交</li><li>自由输入经分类后映射到一题或多题,置信度低的以快捷选项回问确认</li><li>初探阶段 10 题后即可"先看结果";退出保存进度</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>体质辨识 · 问卷</b><code>S03</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>初探:10 题一页滚动</li><li>补完:3 题一卡(嵌在打卡后)或"一次答完"按子量表分页</li><li>五级量表(没有 / 很少 / 有时 / 经常 / 总是)</li><li>进度按待判定题数显示</li></ul>
+<div class="lbl">状态</div><ul><li>已早停的体质在"一次答完"中显示为"已确认,无需作答"</li><li>本组未答完不可下一步,高亮未答项</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>体质报告</b><code>S04</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>九维雷达图(主体质高亮;初步状态下未确认轴以虚线 + 区间带显示)</li><li>主体质名 + 置信度标签(已确认 / 初步 / 待定)+ 150 字解释</li><li>"再答约 N 题可确认"进度与 [继续答题] 按钮</li><li>兼夹体质折叠区</li><li>"为什么是这个结果"判定依据列表</li><li>来源标签</li><li>[生成我的方案] 主按钮</li></ul>
+<div class="lbl">状态</div><ul><li>初步:标题"初步体质判断",分享按钮隐藏</li><li>正式:标题"体质报告",显示与初步结果的差异(若有)</li></ul>
+<div class="lbl">交互</div><ul><li>点雷达图某一轴展开该体质说明</li><li>正式报告可分享为图片(不含姓名)</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>目标选择</b><code>S05</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>5 个目标卡,最多选 2</li><li>每卡一句"对你的体质意味着什么"</li></ul>
+<div class="lbl">状态</div><ul><li>选满 2 个后其余置灰</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>调养方案</b><code>S06</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>顶部:体质 + 节气 + 目标 摘要条</li><li>五个板块 Tab:饮食 / 食疗 / 作息 / 运动 / 穴位</li><li>每条建议右侧来源标签</li><li>底部固定免责声明</li><li>"有疑问?问一问" 入口</li></ul>
+<div class="lbl">状态</div><ul><li>生成中:按板块逐个出现</li><li>节气更新:顶部提示"方案已随节气更新"</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>食疗方详情</b><code>S07</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>名称、适合体质、食材清单(食材级,无剂量单位"钱")</li><li>做法步骤</li><li>性味归经说明</li><li>不适合人群(由禁忌校验生成)</li><li>来源</li></ul>
+<div class="lbl">交互</div><ul><li>标记"今天做了"计入饮食打卡</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>穴位详情</b><code>S08</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>14 经络动态人体图,穴位高亮</li><li>定位文字 + 取穴动图</li><li>按压方法、时长、频率</li><li>注意事项(孕期等)</li></ul>
+<div class="lbl">交互</div><ul><li>人体图可旋转/缩放</li><li>"开始计时"按压计时器</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>打卡</b><code>S09</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>四张卡片竖向排列</li><li>HealthKit 预填项带"已自动获取"标识</li><li>完成动效</li><li>完成后追加「体质小问题」卡(3 题,正式评估完成后不再出现)</li></ul>
+<div class="lbl">交互</div><ul><li>每项独立提交</li><li>可补录昨日(限 1 天)</li><li>小问题卡可"今天不答",次日再出现</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>周报</b><code>S10</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>四项打卡完成率条形</li><li>睡眠与情绪趋势折线</li><li>一句话建议(来自服务端)</li></ul>
+<div class="lbl">状态</div><ul><li>不足 3 天数据:显示"再坚持几天"</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>养生问答</b><code>S11</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>全屏对话,顶部显示当前成员与话题上下文</li><li>推荐问题 chips</li><li>回答带来源脚注</li><li>分流卡片(内嵌)</li><li>紧急卡片(全屏覆盖)</li></ul>
+<div class="lbl">交互</div><ul><li>从食疗/穴位页唤起时自动带入</li><li>长按消息可举报"回答不当"</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>家庭成员</b><code>S12</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>成员卡列表:头像、姓名、体质、授权状态</li><li>添加按钮</li><li>监护标识</li></ul>
+<div class="lbl">交互</div><ul><li>待授权成员显示"重新发送"</li><li>成员可自行移除授权</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>联系我的诊所</b><code>S13</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>绑定的合作诊所信息(名称、地址、电话、营业时间)</li><li>症状摘要表单(可选)</li><li>电话号码可复制、可拨打</li></ul>
+<div class="lbl">状态</div><ul><li>未绑定:输入诊所邀请码或浏览合作诊所列表</li></ul>
+</div></div>
+
+<div class="screen"><div class="hd"><b>设置 · 隐私与数据</b><code>S14</code></div><div class="bd">
+<div class="lbl">元素</div><ul><li>语言、字号、老年模式</li><li>提醒时间</li><li>HealthKit 授权开关</li><li>导出我的数据(JSON,邮件发送)</li><li>删除账户(二次确认,72 小时)</li><li>隐私政策、同意记录</li></ul>
+</div></div>
+
+</div>
+
+<h2 id="s6"><span class="n">06</span>设计原则</h2>
+<ol>
+  <li><strong>先结论,再解释。</strong>体质报告先给名字和一句话,依据折叠;方案先给今天做什么,原理放详情。用户多为中老年,不要让他们读完才知道结论。</li>
+  <li><strong>每条建议有出处。</strong>来源标签不是装饰,是产品可信度的载体。标签统一样式,点开统一格式(书名 / 标准号 + 章节)。</li>
+  <li><strong>医疗边界用界面表达,不靠小字。</strong>分流卡片是正式组件,有自己的视觉语言;紧急卡片全屏且不可忽略。免责声明固定在方案底部,不弹窗。</li>
+  <li><strong>默认值做足,让确认替代填写。</strong>提醒时间按时辰预填,睡眠步数从系统健康读取,目标卡预选最常见项。</li>
+  <li><strong>先给价值,再要投入。</strong>10 题换一份可用的初版方案;剩下的题拆成每天 3 道,跟着打卡走。永远不把 60 题摆在用户面前。</li>
+  <li><strong>双语是两套排版,不是翻译。</strong>中文用宋体标题 + 黑体正文,英文用对应衬线/无衬线;体质名英文采用描述式("Qi Deficiency · low energy pattern"),不用拼音。</li>
+  <li><strong>老年模式是一等公民。</strong>字号 +25%、对比度提升、触控目标 ≥ 48pt、取消手势依赖,所有页面在该模式下必须通过验收。</li>
+</ol>
+
+<h2 id="s7"><span class="n">07</span>客户端技术方案</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>层面</th><th>选型</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td>框架</td><td>React Native 0.7x + Expo (managed → bare 可退)</td><td>双平台一套代码;团队 2 人可维护;Expo 提供 OTA 更新,Beta 期迭代快</td></tr>
+<tr><td>语言</td><td>TypeScript strict</td><td>与服务端共享接口类型</td></tr>
+<tr><td>导航</td><td>Expo Router(文件路由)</td><td>深链接直达打卡与分流页</td></tr>
+<tr><td>状态</td><td>Zustand(客户端状态)+ TanStack Query(服务端状态)</td><td>轻量;Query 自带缓存、重试、离线队列基础</td></tr>
+<tr><td>本地存储</td><td>SQLite(expo-sqlite)+ SecureStore(令牌)</td><td>打卡与方案离线可读;健康数据不落明文</td></tr>
+<tr><td>流式</td><td>SSE(react-native-sse)</td><td>对话与方案生成逐字呈现;比 WebSocket 简单且易穿透</td></tr>
+<tr><td>图表</td><td>react-native-svg + d3-shape(自绘雷达图/折线)</td><td>避免重型图表库;雷达图需定制交互</td></tr>
+<tr><td>经络人体图</td><td>Skia(@shopify/react-native-skia)渲染矢量 + 穴位坐标数据</td><td>可缩放旋转;穴位高亮为数据驱动</td></tr>
+<tr><td>健康数据</td><td>react-native-health(iOS)/ Health Connect(Android),只读</td><td>只读睡眠与步数,最小权限</td></tr>
+<tr><td>推送</td><td>Expo Notifications + 本地定时通知</td><td>提醒不依赖服务端;服务端只推周报</td></tr>
+<tr><td>i18n</td><td>i18next + ICU 消息格式</td><td>复数与性别变体;中英独立排版 token</td></tr>
+<tr><td>崩溃与性能</td><td>Sentry</td><td>崩溃率是验收指标</td></tr>
+<tr><td>分发</td><td>TestFlight / Google Play 内测轨道;EAS Build</td><td>MVP 不公开上架</td></tr>
+</tbody></table></div>
+
+<h3>离线与弱网</h3>
+<ul>
+  <li>已生成的方案、体质报告、本周打卡本地缓存,离线可读。</li>
+  <li>打卡写入本地队列,联网后同步;冲突以客户端时间戳为准(同一天同一项取最后一次)。</li>
+  <li>对话与方案生成需要联网;断网时显示明确状态,不显示通用错误。</li>
+</ul>
+
+<h3>安全</h3>
+<ul>
+  <li>令牌存 SecureStore;健康数据在 SQLite 中以 SQLCipher 加密。</li>
+  <li>切后台时遮罩敏感页面(体质报告、家庭成员);支持 Face ID / 指纹作为可选应用锁。</li>
+  <li>截屏不禁止(老年用户常用截屏分享给子女),但分享图不含姓名。</li>
+  <li>证书固定(pinning)在 Beta 后期启用,避免早期调试成本。</li>
+</ul>
+
+<h3>客户端侧的边界守卫</h3>
+<p>Guardrails 主体在服务端,客户端承担三件事:</p>
+<ul>
+  <li><strong>紧急关键词本地词典</strong>:无需等待网络即可弹出 911 / 988 卡片。</li>
+  <li><strong>渲染白名单</strong>:对话回答按结构化块渲染(文本、来源、分流卡、紧急卡),不渲染服务端未定义的块类型。</li>
+  <li><strong>举报通道</strong>:长按消息举报,带上下文发给服务端评估队列。</li>
+</ul>
+
+<h2 id="s8"><span class="n">08</span>服务端接口依赖</h2>
+<p>客户端开发不等服务端完成。接口以 OpenAPI 定义先行,客户端用 Mock 服务开发,M3 联调。</p>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>接口</th><th>用途</th><th>客户端期望</th></tr></thead>
+<tbody>
+<tr><td><code>POST /auth/*</code></td><td>注册、登录、成员授权</td><td>手机号 OTP、Apple、Google;成员授权返回待确认状态</td></tr>
+<tr><td><code>POST /assessment/answers</code></td><td>提交任意数量题目答案(初探、每日 3 题、一次答完共用)</td><td>幂等;返回各子量表状态(已判定 / 进行中)、分数区间、下一批推荐题目、剩余待判定题数</td></tr>
+<tr><td><code>POST /assessment/chat</code> (SSE)</td><td>对话式辨识</td><td>每轮返回:映射到的题目与置信度、需确认的题、下一问题 + 快捷选项;后台同样调用 answers 逻辑</td></tr>
+<tr><td><code>GET /assessment/next?limit=3</code></td><td>取下一批题</td><td>只返回未判定子量表的题;早停后为空</td></tr>
+<tr><td><code>GET /report/current</code></td><td>体质报告(初步或正式)</td><td>九维分数 + 区间、各体质置信度标签、主/兼夹体质、<code>status: provisional|formal</code>、解释、判定依据、来源</td></tr>
+<tr><td><code>POST /plan</code> (SSE)</td><td>生成方案</td><td>按板块流式返回;每条建议含 <code>source_id</code>;含禁忌校验结果</td></tr>
+<tr><td><code>GET /plan/current</code></td><td>当前方案(含节气更新)</td><td>带 <code>updated_reason</code> 字段供顶部提示</td></tr>
+<tr><td><code>POST /checkin</code></td><td>打卡</td><td>幂等(按成员 + 日期 + 项);批量提交支持离线队列</td></tr>
+<tr><td><code>GET /report/weekly</code></td><td>周报</td><td>四项完成率、趋势序列、一句话建议</td></tr>
+<tr><td><code>POST /chat/classify</code></td><td>问答入口分类</td><td>&lt; 500ms;返回五类之一</td></tr>
+<tr><td><code>POST /chat/message</code> (SSE)</td><td>问答主链路</td><td>结构化块流:text / source / referral_card / emergency_card</td></tr>
+<tr><td><code>GET /knowledge/acupoint/{id}</code><br><code>GET /knowledge/recipe/{id}</code></td><td>穴位与食疗详情</td><td>静态可缓存;穴位含经络图坐标</td></tr>
+<tr><td><code>GET /clinic/mine</code> · <code>POST /clinic/bind</code></td><td>诊所信息与绑定</td><td>邀请码绑定;返回联系方式与营业时间</td></tr>
+<tr><td><code>POST /data/export</code> · <code>DELETE /account</code></td><td>数据导出与删除</td><td>异步;邮件通知完成</td></tr>
+</tbody></table></div>
+<p>客户端需要服务端承诺的三个非功能指标:分类接口 P95 &lt; 500ms;SSE 首字节 &lt; 3s;知识详情接口可 CDN 缓存 24 小时。</p>
+
+<h2 id="s9"><span class="n">09</span>无障碍与本地化</h2>
+<h3>无障碍</h3>
+<ul>
+  <li>全部页面通过 VoiceOver / TalkBack 走查;雷达图与人体图提供文字替代(各维度分数列表、穴位定位文字)。</li>
+  <li>动态字体支持到系统最大档;老年模式在此基础上再 +25%。</li>
+  <li>色彩不作为唯一信息载体:打卡完成同时用图标与文字;雷达图主体质用加粗轴线标注。</li>
+  <li>所有计时器、动效遵循"减少动态效果"系统设置。</li>
+</ul>
+<h3>本地化</h3>
+<ul>
+  <li>MVP 支持简体中文、英文;繁体中文在 M5 视 Beta 用户构成决定。</li>
+  <li>体质名、穴位名、节气名使用术语表统一管理,英文采用"描述 + 原名"双写,由英语母语中医师审校。</li>
+  <li>日期、时辰、单位按地区格式化;时辰提醒在英文界面显示为时间段("9–11 pm · Triple Burner hour")。</li>
+  <li>中英各自独立的字体与行高 token;中文正文 16/1.75,英文正文 16/1.6。</li>
+</ul>
+
+<h2 id="s10"><span class="n">10</span>埋点与度量</h2>
+<p>所有事件去标识化,不含健康数值本身,只含行为与耗时。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>事件</th><th>属性</th><th>服务的指标</th></tr></thead>
+<tbody>
+<tr><td><code>onboarding_step</code></td><td>step, duration_ms, skipped</td><td>首次使用漏斗</td></tr>
+<tr><td><code>screener_start / _complete / _abandon</code></td><td>mode(chat|form), duration_ms, abandon_at</td><td>初探完成率、耗时中位数</td></tr>
+<tr><td><code>drip_answer</code> · <code>formal_complete</code></td><td>items_answered, scales_stopped_early, days_since_screener, total_items_asked</td><td>7 日内正式完成率、早停实际省题数</td></tr>
+<tr><td><code>plan_generated</code></td><td>ttfb_ms, total_ms, sections_count</td><td>流式体验</td></tr>
+<tr><td><code>plan_section_view</code> · <code>source_tap</code></td><td>section, dwell_ms</td><td>哪些板块被看,来源是否被点</td></tr>
+<tr><td><code>checkin_submit</code></td><td>item, prefilled, duration_ms, is_backfill</td><td>单次耗时、周活</td></tr>
+<tr><td><code>chat_message</code></td><td>classification, had_referral, had_emergency</td><td>问答使用与分流频率</td></tr>
+<tr><td><code>referral_action</code></td><td>action(record|call|copy|dismiss)</td><td>分流转化</td></tr>
+<tr><td><code>member_switch</code> · <code>member_add</code></td><td>member_count, is_minor</td><td>家庭功能采用</td></tr>
+<tr><td><code>report_flag</code></td><td>message_id</td><td>内容质量信号</td></tr>
+</tbody></table></div>
+
+<h2 id="s11"><span class="n">11</span>团队与排期</h2>
+<h3>客户端团队</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>角色</th><th>人数</th><th>职责</th></tr></thead>
+<tbody>
+<tr><td>移动端工程师</td><td>2</td><td>一位主导架构、导航、状态、离线;一位主导对话/流式、图表、Skia 人体图</td></tr>
+<tr><td>产品设计师</td><td>1</td><td>双语设计系统、14 页高保真、老年模式、可用性测试</td></tr>
+<tr><td>产品经理</td><td>0.5</td><td>与服务端共用;负责范围与诊所反馈</td></tr>
+<tr><td>QA</td><td>0.5(M4 起)</td><td>双平台回归、无障碍走查、老年模式验收</td></tr>
+<tr><td>中医顾问</td><td>按需</td><td>内容审校、术语表、英文审校</td></tr>
+</tbody></table></div>
+<h3>六个月排期</h3>
+<div class="timeline">
+  <div class="phase"><div class="m">M1</div><div class="t">设计与骨架</div><ul><li>设计系统与术语表</li><li>14 页线框 → 高保真(中文)</li><li>项目脚手架、导航、认证、i18n</li><li>OpenAPI 定义 + Mock 服务</li></ul><div class="gate">门槛:5 位目标用户走查线框</div></div>
+  <div class="phase"><div class="m">M2</div><div class="t">辨识与报告</div><ul><li>初探 10 题、每日 3 题、一次答完三种入口</li><li>对话式辨识(SSE)与早停进度</li><li>初步/正式两态报告与雷达图</li><li>首次使用流程全贯通(Mock)</li></ul><div class="gate">门槛:Mock 下流程 A ≤ 6 分钟</div></div>
+  <div class="phase"><div class="m">M3</div><div class="t">方案与打卡</div><ul><li>方案五板块、食疗与穴位详情</li><li>Skia 经络人体图</li><li>打卡、本地提醒、离线队列</li><li>与真实服务端联调</li></ul><div class="gate">门槛:内部 alpha 20 人</div></div>
+  <div class="phase"><div class="m">M4</div><div class="t">家庭、问答、合规</div><ul><li>家庭成员与授权流程</li><li>问答浮层、分流卡、紧急卡</li><li>隐私同意、导出、删除</li><li>英文版、老年模式</li></ul><div class="gate">门槛:无障碍走查通过;法务文案审查通过</div></div>
+  <div class="phase"><div class="m">M5</div><div class="t">诊所 Beta</div><ul><li>TestFlight / Play 内测分发</li><li>Sentry、埋点上线</li><li>每周 5 位用户访谈,双周迭代</li></ul><div class="gate">门槛:200 用户;崩溃率 &lt; 0.3%</div></div>
+  <div class="phase"><div class="m">M6</div><div class="t">打磨与决策</div><ul><li>留存与打卡数据复盘</li><li>性能与弱网优化</li><li>V2 客户端方案(诊所绑定、复诊问诊)</li></ul><div class="gate">门槛:7 日留存 ≥ 40%;Go / No-go</div></div>
+</div>
+<h3>客户端预算(6 个月)</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>项目</th><th>估算(USD)</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>人力</td><td>$280k – $360k</td><td>2 移动端 + 1 设计 + 0.5 PM + 0.5 QA,湾区水平</td></tr>
+<tr><td>工具与服务</td><td>$6k – $9k</td><td>Expo EAS、Sentry、Figma、TestFlight/Play 账户</td></tr>
+<tr><td>内容与媒资</td><td>$20k – $30k</td><td>经络矢量图与穴位坐标、导引视频、英文审校</td></tr>
+<tr><td>可用性测试</td><td>$8k – $12k</td><td>M1、M4 两轮,各 8–10 人,含老年用户</td></tr>
+<tr><td><strong>合计</strong></td><td><strong>$314k – $411k</strong></td><td>不含服务端、AI 与法务</td></tr>
+</tbody></table></div>
+
+<h2 id="s12"><span class="n">12</span>风险与决策</h2>
+<div class="tablewrap"><table class="wide">
+<thead><tr><th>风险</th><th>等级</th><th>应对</th></tr></thead>
+<tbody>
+<tr><td>对话式辨识让老年用户困惑,完成率不达标</td><td><span class="pill wn">中</span></td><td>初探只有 10 题,大幅降低风险;问卷模式始终一键可达;老年模式默认问卷;M1 线框测试含 60 岁以上用户</td></tr>
+<tr><td>初步结果不准,用户按初版方案调养后正式报告改判,信任受损</td><td><span class="pill wn">中</span></td><td>初步结果明确标注置信度与"再答 N 题可确认";初版方案只用主体质通用宜忌,不用兼夹体质细则;M4 用 200 例数据回测初探 10 题对主体质的命中率,目标 ≥ 75%,不达标则调整选题或增至 14 题</td></tr>
+<tr><td>日常补完被忽略,大量用户停留在初步状态</td><td><span class="pill wn">中</span></td><td>小问题卡与打卡绑定,不单独推送;第 5 天起报告页显示"只差 N 题";正式报告解锁完整雷达图与分享作为激励;指标:7 日内正式完成率 ≥ 50%</td></tr>
+<tr><td>Skia 人体图在低端 Android 上性能差</td><td><span class="pill wn">中</span></td><td>M3 在 3 台低端机验证;降级方案为静态 SVG 分经络图</td></tr>
+<tr><td>服务端接口延期,客户端无法联调</td><td><span class="pill wn">中</span></td><td>OpenAPI 先行 + Mock 服务,客户端 M1–M2 完全独立;联调窗口 M3 预留 3 周</td></tr>
+<tr><td>HealthKit 权限引发 App Store 审核问题</td><td><span class="pill wn">中</span></td><td>只读、最小权限、用途说明明确;Beta 用 TestFlight,审核压力低;权限请求放在打卡页首次使用时而非首次启动</td></tr>
+<tr><td>分流卡被当成"推销诊所",用户反感</td><td><span class="pill wn">中</span></td><td>分流卡文案先说"为什么",再给选项;"了解一般养生知识"始终是平等选项;Beta 访谈专门验证</td></tr>
+<tr><td>双语内容不同步,英文落后中文</td><td><span class="pill ok">低</span></td><td>术语表与内容 CMS 强制双字段;缺英文时显示中文并标注,不空白</td></tr>
+</tbody></table></div>
+
+<h3>需要确认的三项决策</h3>
+<ol>
+  <li><strong>框架</strong>:确认 React Native + Expo。替代方案为 Flutter(更好的自绘性能,但团队招聘面窄)或原生双端(成本翻倍)。</li>
+  <li><strong>首发语言与平台</strong>:确认中文优先、iOS 与 Android 同步,英文在 M4 加入。若 Beta 诊所用户以 iPhone 为主,可考虑 Android 推迟到 M5。</li>
+  <li><strong>客户端预算</strong>:批准 $314k–$411k,并在 M1 前到位 2 位移动端工程师与 1 位设计师。</li>
+</ol>
+
+<p class="note">本文为客户端视角草案。服务端架构、AI 编排、评估流水线与合规方案见配套文档。预算为区间估算,未含税费与招聘成本。</p>
+</main>
+</div>
