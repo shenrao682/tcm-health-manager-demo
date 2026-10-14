@@ -305,6 +305,60 @@ function nextItems(m, limit){
 function setAnswer(m,id,v){ m.answers[id]=v; const a=assess(m); if(a.formal && !m.formal){ m.formal=true; } save(); }
 const confPill = c => `<span class="pill ${CONF[c].cls}">${pick(CONF[c])}</span>`;
 
+/* ---------- today's 3 actionable picks ---------- */
+// Candidates come from the constitution's plan content; scored by term match, goal match,
+// actionability, recent repetition and recent check-in feedback. Deterministic for a given day.
+const GOAL_RULES = {
+  sleep:  {types:["sleep"], acu:["SP6","KI1","KI3","CV17"]},
+  stress: {types:["recipe"], acu:["LR3","CV17"]},
+  digest: {types:["diet_y","recipe"], acu:["ST36","SP9","ST40"]},
+  energy: {types:["sleep","diet_y","move"], acu:["ST36","CV6","CV4"]},
+  weight: {types:["move","diet_n"], acu:["ST40","SP9"]},
+};
+function pickCandidates(code){
+  const z=CONTENT_ZH[code]||CONTENT_ZH.pinghe; const out=[];
+  z.diet.y.forEach((t,i)=>out.push({id:`diet_y:${i}`,type:"diet_y",zh:t}));
+  z.diet.n.forEach((t,i)=>out.push({id:`diet_n:${i}`,type:"diet_n",zh:t}));
+  out.push({id:"sleep",type:"sleep",zh:z.sleep});
+  out.push({id:"move",type:"move",zh:z.move});
+  out.push({id:"recipe",type:"recipe",zh:z.recipe.name});
+  z.acu.forEach((a,i)=>out.push({id:`acu:${i}`,type:"acu",zh:a.n+a.how,m:a.m}));
+  return out;
+}
+function dailyPicks(m){
+  m.picksLog=m.picksLog||{};
+  const code=m.plan.code, T=termAt(), cands=pickCandidates(code);
+  const dayKeys=Object.keys(m.checkins).concat(Object.keys(m.picksLog)).filter((v,i,a)=>a.indexOf(v)===i).sort();
+  const prevDays=dayKeys.filter(d=>d<S.day).slice(-3);
+  const recent=new Set(prevDays.flatMap(d=>m.picksLog[d]||[]));
+  const lastDiet=prevDays.length? (m.checkins[prevDays[prevDays.length-1]]||{}).diet : null;
+  const termFoods=T.def.diet||[];
+  const scored=cands.map(c=>{
+    let score=0; const why=[];
+    if(c.type==="diet_y"||c.type==="diet_n"||c.type==="recipe"){ if(termFoods.some(f=>c.zh.includes(f.replace(/\(.*?\)/,"")))){ score+=2; why.push(tt(`${T.name}宜食`,`${T.name} food`)); } }
+    for(const g of m.plan.goals||[]){ const r=GOAL_RULES[g]; if(!r) continue; if(r.types.includes(c.type)||(c.type==="acu"&&r.acu.includes(c.m))){ score+=2; why.push(tt(`${GL(g)}目标`,`${GL(g)} goal`)); } }
+    if(c.type==="diet_n"||c.type==="acu"||c.type==="sleep") score+=1;
+    if(recent.has(c.id)) { score-=1; }
+    if(lastDiet==="否"){ if(c.type==="diet_n"){ score+=1; why.push(tt("昨日饮食未遵循,先从少吃一样开始","yesterday's diet missed — start by cutting one thing")); } if(c.type==="diet_y") score-=1; }
+    return {...c,score,why};
+  }).sort((a,b)=>b.score-a.score||cands.indexOf(a)-cands.indexOf(b));
+  // top 3 with 3 distinct types (diet_y/diet_n count as one family)
+  const fam=t=>t.startsWith("diet")?"diet":t; const picks=[]; const fams=new Set();
+  for(const c of scored){ if(fams.has(fam(c.type))) continue; picks.push(c); fams.add(fam(c.type)); if(picks.length===3) break; }
+  for(const c of scored){ if(picks.length===3) break; if(!picks.includes(c)) picks.push(c); }
+  m.picksLog[S.day]=picks.map(p=>p.id); save();
+  return picks.map(p=>({...p,text:pickText(code,p),why:p.why.length?p.why.slice(0,2).join(" · "):tt("常规","routine")}));
+}
+function pickText(code,p){
+  const c=CT(code); const [t,i]=p.id.split(":");
+  if(t==="diet_y") return `${tt("宜","Favor")}: ${c.diet.y[+i]}`;
+  if(t==="diet_n") return `${tt("忌","Avoid")}: ${c.diet.n[+i]}`;
+  if(t==="sleep") return c.sleep; if(t==="move") return c.move;
+  if(t==="recipe") return `${tt("食疗","Recipe")}: ${c.recipe.name}`;
+  if(t==="acu"){ const a=c.acu[+i]; return `${a.n} — ${a.how}`; }
+  return "";
+}
+
 /* ---------- plan ---------- */
 function buildPlan(m){ const a=assess(m); m.plan={code:a.primary.code, provisional:!m.formal, goals:[...m.goals]}; save(); }
 
@@ -388,7 +442,7 @@ function S01(){
     html+=`<div class="card guide"><h3>${tt("2 分钟了解你的体质","Know your constitution in 2 minutes")}</h3><p class="small muted" style="margin:0 0 10px">${tt("10 个小问题,马上拿到初步判断和一份初版调养方案。可以随时中断。","10 quick questions for a preliminary type and a first wellness plan. Stop any time.")}</p><div class="row"><button class="btn" data-act="startChat">${tt("对话方式","Chat")}</button><button class="btn sec" data-act="startForm">${tt("问卷方式","Questionnaire")}</button></div></div>`;
   } else if(m.plan){
     const c=CT(m.plan.code);
-    html+=`<div class="card">${m.plan.provisional?`<span class="ribbon">${tt("初版 · 基于快速初探","First version · from quick screener")}</span>`:''}<h3>${tt("今日方案摘要","Today's plan")} · ${esc(sn(SC(m.plan.code)))}</h3><ul class="list small"><li>${tt("宜","Favor")}: ${esc(c.diet.y[0])}; ${tt("忌","Avoid")}: ${esc(c.diet.n[0])}</li><li>${esc(c.sleep)}</li><li>${tt("穴位","Acupoint")}: ${esc(c.acu[0].n)} — ${esc(c.acu[0].how)}</li></ul><button class="btn ghost sm" data-act="goPlan">${tt("查看完整方案 ›","Full plan ›")}</button></div>`;
+    html+=`<div class="card">${m.plan.provisional?`<span class="ribbon">${tt("初版 · 基于快速初探","First version · from quick screener")}</span>`:''}<h3>${tt("今日方案摘要","Today's plan")} · ${esc(sn(SC(m.plan.code)))}</h3><ul class="list small">${dailyPicks(m).map(p=>`<li>${esc(p.text)} <span class="pill ok" style="font-size:.65em;vertical-align:middle">${esc(p.why)}</span></li>`).join("")}</ul><button class="btn ghost sm" data-act="goPlan">${tt("查看完整方案 ›","Full plan ›")}</button></div>`;
   } else {
     html+=`<div class="card guide"><h3>${tt("初步体质","Preliminary type")}: ${esc(sn(a.primary))}</h3><p class="small muted" style="margin:0 0 10px">${tt("选 1–2 个目标,生成你的初版方案。","Pick 1–2 goals to generate your first plan.")}</p><button class="btn" data-act="goals">${tt("选择目标","Choose goals")}</button></div>`;
   }
