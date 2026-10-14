@@ -10,9 +10,16 @@ TCM AI Health Manager — clickable prototype of the patient-side mobile client.
 
 ## 快速开始
 
-### 方式一:直接打开(最简单)
+### 方式零:在线直接看(最简单)
 
-双击 `index.html`,用 Chrome / Edge / Safari 打开即可。无需安装任何东西。
+**https://shenrao682.github.io/tcm-health-manager-demo/** — 任何浏览器打开即可,手机也行,无需安装。
+
+### 方式一:本机打开 `index.html`
+
+必须用**浏览器**打开,而不是代码查看器:在 Finder 里右键 `index.html` → **打开方式 → Google Chrome**(或 Safari / Edge),或把文件拖进浏览器窗口。
+
+> 在 GitHub 网页上点 `index.html`、或在编辑器 / IDE 的文件面板里点开,看到的都是源代码,不是运行中的 demo。
+> 如果双击默认用编辑器打开,可右键 → 显示简介 → "打开方式"改为 Chrome → "全部更改"。
 
 ### 方式二:本地服务器(推荐,避免个别浏览器对 `file://` 的限制)
 
