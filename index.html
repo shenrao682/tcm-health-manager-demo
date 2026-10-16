@@ -17,6 +17,7 @@
   /* page backdrop: 宣纸底 + 祥云纹 + 淡墨晕(单一浅色主题) */
   --bg-art:radial-gradient(ellipse 70% 55% at 15% 0%,rgba(47,111,94,.10),transparent 60%),radial-gradient(ellipse 60% 50% at 100% 100%,rgba(183,137,58,.12),transparent 60%),var(--cloud); --frame:#c9b98a; --frame-shadow:0 0 0 1px rgba(183,137,58,.25),0 20px 60px rgba(60,45,20,.22);
   --cloud:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%238a7a4e' stroke-opacity='.16' stroke-width='1.2' stroke-linecap='round'><path d='M22 52c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11H34c-7 0-12-5-12-11z'/><path d='M38 50a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M46 49c3-4 9-4 12 0'/><path d='M94 118c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11h-13c-7 0-12-5-12-11z'/><path d='M110 116a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M118 115c3-4 9-4 12 0'/><path d='M104 30c6-8 18-8 24 0'/><path d='M110 36c3-4 9-4 12 0'/><path d='M24 124c6-8 18-8 24 0'/><path d='M30 130c3-4 9-4 12 0'/></g></svg>");
+  --cloud-faint:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%232f6f5e' stroke-opacity='.10' stroke-width='1.2' stroke-linecap='round'><path d='M22 52c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11H34c-7 0-12-5-12-11z'/><path d='M38 50a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M46 49c3-4 9-4 12 0'/><path d='M94 118c0-9 7-14 14-14s11 5 11 11c7 0 12 5 12 11s-5 11-12 11h-13c-7 0-12-5-12-11z'/><path d='M110 116a5 5 0 1 0 10 0a5 5 0 1 0-10 0'/><path d='M118 115c3-4 9-4 12 0'/><path d='M104 30c6-8 18-8 24 0'/><path d='M110 36c3-4 9-4 12 0'/><path d='M24 124c6-8 18-8 24 0'/><path d='M30 130c3-4 9-4 12 0'/></g></svg>");
 }
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);background-image:var(--bg-art);background-attachment:fixed;color:var(--fg);font-family:var(--body);padding-inline:16px;padding-block:24px 40px;min-height:100vh}
@@ -46,6 +47,10 @@ body{margin:0;background-color:var(--bg);background-image:var(--bg-art);backgrou
   .phone[data-elder="1"]{--fs:28px}
   .side{padding:16px;order:2}
   .seal{display:none!important}
+  /* 今日页顶部:淡淡的祥云纹(状态栏、顶栏、节气卡) */
+  .phone[data-tab="today"] .statusbar,.phone[data-tab="today"] .topbar{background-image:var(--cloud-faint);background-size:160px 160px;background-color:var(--app-bg)}
+  .phone[data-tab="today"] .topbar{background-position:0 -44px}
+  .phone[data-tab="today"] .card.soft.term{background-image:var(--cloud-faint);background-size:160px 160px;background-position:40px 10px}
 }
 .phone[data-lang="en"]{--display:"Georgia","Times New Roman",serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 .statusbar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:13px;color:var(--muted);flex:none}
@@ -409,7 +414,7 @@ const ICONS={today:'<svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-
  me:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'};
 const TABS = ()=>[["today",tt("今日","Today")],["constitution",tt("我的体质","My Type")],["plan",tt("调养方案","My Plan")],["me",tt("我的","Me")]];
 function render(){
-  const phone=document.getElementById("phone"); phone.dataset.elder=S.elder?"1":"0"; phone.dataset.lang=S.lang;
+  const phone=document.getElementById("phone"); phone.dataset.elder=S.elder?"1":"0"; phone.dataset.lang=S.lang; phone.dataset.tab=S.stack.length?"":S.tab;
   document.documentElement.lang = EN()?"en":"zh-CN";
   document.getElementById("sbTerm").textContent = `${fmtDate(new Date())} · ${sinceTerm(termAt())}`;
   renderSide();
@@ -465,7 +470,7 @@ function renderTab(tab){ return {today:S01,constitution:S04,plan:S06,me:ME}[tab]
 function S01(){
   const m=M(); const a=assess(m); const todayC=m.checkins[S.day]||{};
   const doneN=["sleep","diet","move","mood"].filter(k=>todayC[k]!=null).length;
-  const T0=termAt(); let html=`<div class="card soft"><div class="k">${esc(sinceTerm(T0))}${T0.next?` · ${tt(`${T0.next.days} 天后进入第 ${T0.next.def.i} 个节气${T0.next.name}`,`${T0.next.name} (${ordinal(T0.next.def.i)} term) in ${T0.next.days} days`)}`:""}</div><div>${m.plan?esc(seasonTip(m.plan.code)):esc(pick(T0.def.tip))}</div></div>`;
+  const T0=termAt(); let html=`<div class="card soft term"><div class="k">${esc(sinceTerm(T0))}${T0.next?` · ${tt(`${T0.next.days} 天后进入第 ${T0.next.def.i} 个节气${T0.next.name}`,`${T0.next.name} (${ordinal(T0.next.def.i)} term) in ${T0.next.days} days`)}`:""}</div><div>${m.plan?esc(seasonTip(m.plan.code)):esc(pick(T0.def.tip))}</div></div>`;
   if(!m.screenerDone){
     html+=`<div class="card guide"><h3>${tt("2 分钟了解你的体质","Know your constitution in 2 minutes")}</h3><p class="small muted" style="margin:0 0 10px">${tt("10 个小问题,马上拿到初步判断和一份初版调养方案。可以随时中断。","10 quick questions for a preliminary type and a first wellness plan. Stop any time.")}</p><div class="row"><button class="btn" data-act="startChat">${tt("对话方式","Chat")}</button><button class="btn sec" data-act="startForm">${tt("问卷方式","Questionnaire")}</button></div></div>`;
   } else if(m.plan){
