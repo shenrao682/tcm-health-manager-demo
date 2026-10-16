@@ -54,6 +54,7 @@ tcm-health-manager-demo/
 │  │                              60 题量表结构化数据:题目、子量表、评分、判定、渐进式评估与早停规则
 │  ├─ solar_terms_24.json         24 节气定义:双语名称、黄经、季节、养生要点;九种体质 × 四季回退提示
 │  ├─ constitution_term_tips.json 24 节气 × 9 体质 = 216 条「今日」节气卡提示(中英)
+│  ├─ plan_content.json           方案内容知识层:112 条条目(食材宜 46 / 忌 25、作息 9、运动 9、食疗方 9、穴位 14),每条带 id、适用体质、季节/目标/禁忌标签、来源;plans 为九种体质的 id 引用
 │  └─ solar_terms_instants_2024_2040.json
 │                                 2024–2040 每个节气的精确交节时刻(UTC + 北京时间),供日期→节气查表
 ├─ docs/
@@ -68,7 +69,7 @@ tcm-health-manager-demo/
 └─ README.md
 ```
 
-`index.html` 内嵌了与 `data/*.json` 等价的题目、量表与节气数据(为了单文件可运行)。正式开发时应改为读取 JSON。
+`index.html` 内嵌了与 `data/*.json` 等价的题目、量表、节气与方案内容数据(为了单文件可运行);`index.html` 里已不含任何方案文案,只有逻辑。正式开发时应改为读取 JSON。方案页与「今日」3 条可执行项的每一条都可点「来源」查看条目 id、来源、标签与审核状态。
 
 **节气**按用户本地时间实时计算:`termAt(date)` 在交节时刻表中找最后一个 ≤ 当前时刻的节气,「今日」页显示当前节气、序号、交节时刻和距下一节气天数;方案、食疗标签、问答推荐问题随之变化。
 
@@ -95,7 +96,7 @@ tcm-health-manager-demo/
 |---|---|
 | `<style>` | 设计 token(浅/深色)、手机框、组件样式;深色模式含祥云纹背景 |
 | `/* i18n */` | `S.lang` 当前语言;`tt(zh,en)` 内联双语;`pick({zh,en})`;`IT()/LK()/CT()/sn()` 按语言取题目、量表选项、方案内容、体质名 |
-| `/* data */` | `ITEMS_ZH/EN` 60 题、`SCALES` 9 个子量表(含 `short` 雷达图短名)、`SCREENER` 14 题初探、`PHRASES` 中英自然语言→题目映射、`CONTENT_ZH/EN` 九种体质的方案内容 |
+| `/* data */` | `ITEMS_ZH/EN` 60 题、`SCALES` 9 个子量表(含 `short` 雷达图短名)、`SCREENER` 10 题初探、`PHRASES` 中英自然语言→题目映射、`PLAN_ITEMS / PLANS / GOAL_RULES`(来自 `data/plan_content.json`)— `CT(code)` 由条目引用拼出页面用的方案视图 |
 | `/* state */` | `S` 全局状态(成员、当前 Tab、导航栈、老年模式),持久化到 localStorage |
 | `/* scoring */` | `scaleState()` 区间计算与早停判定、`assess()` 主/兼夹体质与置信度、`nextItems()` 下一批题目 |
 | `/* nav */` | `go()` 切 Tab、`push()/pop()` 推入页、`openSheet()` 模态浮层 |

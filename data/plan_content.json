@@ -1,0 +1,3078 @@
+{
+ "schema_version": "0.1",
+ "note": "方案内容知识层:食材(宜/忌)、作息、运动、食疗方、穴位,逐条带 id、适用体质、季节标签、目标标签、禁忌标签与来源。plans 为九种体质的内容引用(只存 id)。「今日 3 条可执行项」排序引擎的候选即来自 plans[体质] 引用的 items。草案,source.reviewed=false 表示未经中医顾问核对。",
+ "goal_rules": {
+  "sleep": {
+   "types": [
+    "routine"
+   ],
+   "acupoints": [
+    "SP6",
+    "KI1",
+    "KI3",
+    "CV17"
+   ]
+  },
+  "stress": {
+   "types": [
+    "recipe"
+   ],
+   "acupoints": [
+    "LR3",
+    "CV17"
+   ]
+  },
+  "digest": {
+   "types": [
+    "diet_favor",
+    "recipe"
+   ],
+   "acupoints": [
+    "ST36",
+    "SP9",
+    "ST40"
+   ]
+  },
+  "energy": {
+   "types": [
+    "routine",
+    "diet_favor",
+    "movement"
+   ],
+   "acupoints": [
+    "ST36",
+    "CV6",
+    "CV4"
+   ]
+  },
+  "weight": {
+   "types": [
+    "movement",
+    "diet_avoid"
+   ],
+   "acupoints": [
+    "ST40",
+    "SP9"
+   ]
+  }
+ },
+ "items": {
+  "food.whole-grains": {
+   "id": "food.whole-grains",
+   "type": "diet_favor",
+   "zh": "五谷杂粮",
+   "en": "Whole grains",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.seasonal-fruit-and-vegetables": {
+   "id": "food.seasonal-fruit-and-vegetables",
+   "type": "diet_favor",
+   "zh": "应季蔬果",
+   "en": "Seasonal fruit and vegetables",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.light-low-salt-cooking": {
+   "id": "food.light-low-salt-cooking",
+   "type": "diet_favor",
+   "zh": "清淡少盐",
+   "en": "Light, low-salt cooking",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.overeating": {
+   "id": "food.overeating",
+   "type": "diet_avoid",
+   "zh": "暴饮暴食",
+   "en": "Overeating",
+   "constitutions": [
+    "pinghe",
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.excessive-tonics": {
+   "id": "food.excessive-tonics",
+   "type": "diet_avoid",
+   "zh": "过度进补",
+   "en": "Excessive tonics",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.pinghe": {
+   "id": "routine.pinghe",
+   "type": "routine",
+   "zh": "亥时(21–23点)前入睡,卯时(5–7点)起",
+   "en": "Asleep before 11 pm (Hai hour); up at 5–7 am",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.pinghe": {
+   "id": "movement.pinghe",
+   "type": "movement",
+   "zh": "快走、太极、八段锦,每周 4 次",
+   "en": "Brisk walking, tai chi, Baduanjin — 4× a week",
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.yam-millet-congee": {
+   "id": "recipe.yam-millet-congee",
+   "type": "recipe",
+   "zh": "山药小米粥",
+   "en": "Yam & millet congee",
+   "detail": {
+    "zh": {
+     "fit": "平和质",
+     "ing": [
+      "山药 100g",
+      "小米 60g",
+      "红枣 3 枚"
+     ],
+     "how": [
+      "山药去皮切块",
+      "与小米、红枣同煮 30 分钟",
+      "温热食用"
+     ],
+     "note": "健脾养胃,秋季润燥"
+    },
+    "en": {
+     "fit": "Balanced",
+     "ing": [
+      "Chinese yam 100 g",
+      "Millet 60 g",
+      "Red dates 3"
+     ],
+     "how": [
+      "Peel and cube the yam",
+      "Simmer with millet and dates 30 min",
+      "Serve warm"
+     ],
+     "note": "Strengthens the spleen and stomach; moistens autumn dryness"
+    }
+   },
+   "constitutions": [
+    "pinghe"
+   ],
+   "seasons": [
+    "spring",
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.ST36": {
+   "id": "acupoint.ST36",
+   "type": "acupoint",
+   "code": "ST36",
+   "zh": "足三里",
+   "en": "Zusanli",
+   "detail": {
+    "zh": {
+     "loc": "外膝眼下 3 寸,胫骨外一横指",
+     "how": "拇指按揉 2 分钟,每日早晚"
+    },
+    "en": {
+     "loc": "3 cun below the outer knee hollow, one finger-width lateral to the shin",
+     "how": "Press and knead with the thumb 2 min, morning and evening"
+    }
+   },
+   "constitutions": [
+    "pinghe",
+    "qixu",
+    "tebing"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "digest",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "ST36",
+    "reviewed": false
+   }
+  },
+  "food.chinese-yam": {
+   "id": "food.chinese-yam",
+   "type": "diet_favor",
+   "zh": "山药",
+   "en": "Chinese yam",
+   "constitutions": [
+    "qixu",
+    "tanshi",
+    "tebing"
+   ],
+   "seasons": [
+    "spring",
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.red-dates": {
+   "id": "food.red-dates",
+   "type": "diet_favor",
+   "zh": "红枣",
+   "en": "red dates",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "spring",
+    "winter"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.millet": {
+   "id": "food.millet",
+   "type": "diet_favor",
+   "zh": "小米",
+   "en": "millet",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "spring"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.chicken": {
+   "id": "food.chicken",
+   "type": "diet_favor",
+   "zh": "鸡肉",
+   "en": "Chicken",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.beef": {
+   "id": "food.beef",
+   "type": "diet_favor",
+   "zh": "牛肉",
+   "en": "beef",
+   "constitutions": [
+    "qixu",
+    "yangxu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.pumpkin": {
+   "id": "food.pumpkin",
+   "type": "diet_favor",
+   "zh": "南瓜",
+   "en": "Pumpkin",
+   "constitutions": [
+    "qixu",
+    "yangxu"
+   ],
+   "seasons": [],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.carrot": {
+   "id": "food.carrot",
+   "type": "diet_favor",
+   "zh": "胡萝卜",
+   "en": "carrot",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.raw-cold-fruit": {
+   "id": "food.raw-cold-fruit",
+   "type": "diet_avoid",
+   "zh": "生冷瓜果",
+   "en": "Raw, cold fruit",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.qi-depleting-spicy-food-strong-tea-and-coffee": {
+   "id": "food.qi-depleting-spicy-food-strong-tea-and-coffee",
+   "type": "diet_avoid",
+   "zh": "耗气的辛辣、浓茶咖啡",
+   "en": "Qi-depleting spicy food, strong tea and coffee",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.qixu": {
+   "id": "routine.qixu",
+   "type": "routine",
+   "zh": "保证 7–8 小时,午间小憩 20 分钟",
+   "en": "7–8 hours; a 20-minute midday nap",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.qixu": {
+   "id": "movement.qixu",
+   "type": "movement",
+   "zh": "低强度:散步、八段锦,避免大汗",
+   "en": "Low intensity: walking, Baduanjin; avoid heavy sweating",
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.astragalus-red-date-chicken-soup": {
+   "id": "recipe.astragalus-red-date-chicken-soup",
+   "type": "recipe",
+   "zh": "黄芪红枣鸡汤",
+   "en": "Astragalus, red date & chicken soup",
+   "detail": {
+    "zh": {
+     "fit": "气虚质 · 秋季",
+     "ing": [
+      "鸡腿 1 只",
+      "红枣 5 枚",
+      "山药 150g",
+      "生姜 3 片"
+     ],
+     "how": [
+      "鸡肉焯水",
+      "所有食材入锅加水",
+      "小火炖 1.5 小时,少盐"
+     ],
+     "note": "补中益气;感冒发热期间不宜"
+    },
+    "en": {
+     "fit": "Qi Deficiency · autumn",
+     "ing": [
+      "Chicken leg 1",
+      "Red dates 5",
+      "Chinese yam 150 g",
+      "Ginger 3 slices"
+     ],
+     "how": [
+      "Blanch the chicken",
+      "Add all ingredients and water",
+      "Simmer 1.5 h; season lightly"
+     ],
+     "note": "Tonifies middle qi; avoid during colds or fever"
+    }
+   },
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "digest",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.CV6": {
+   "id": "acupoint.CV6",
+   "type": "acupoint",
+   "code": "CV6",
+   "zh": "气海",
+   "en": "Qihai",
+   "detail": {
+    "zh": {
+     "loc": "脐下 1.5 寸",
+     "how": "掌心顺时针摩 3 分钟"
+    },
+    "en": {
+     "loc": "1.5 cun below the navel",
+     "how": "Rub clockwise with the palm 3 min"
+    }
+   },
+   "constitutions": [
+    "qixu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "CV6",
+    "reviewed": false
+   }
+  },
+  "food.lamb": {
+   "id": "food.lamb",
+   "type": "diet_favor",
+   "zh": "羊肉",
+   "en": "Lamb",
+   "constitutions": [
+    "yangxu",
+    "yinxu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.ginger": {
+   "id": "food.ginger",
+   "type": "diet_favor",
+   "zh": "生姜",
+   "en": "Ginger",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "summer",
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.longan": {
+   "id": "food.longan",
+   "type": "diet_favor",
+   "zh": "桂圆",
+   "en": "longan",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.walnut": {
+   "id": "food.walnut",
+   "type": "diet_favor",
+   "zh": "核桃",
+   "en": "walnut",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.chives": {
+   "id": "food.chives",
+   "type": "diet_favor",
+   "zh": "韭菜",
+   "en": "Chives",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "spring"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.iced-drinks": {
+   "id": "food.iced-drinks",
+   "type": "diet_avoid",
+   "zh": "冷饮",
+   "en": "iced drinks",
+   "group": {
+    "zh": "生冷寒凉",
+    "en": "Raw and cold"
+   },
+   "constitutions": [
+    "yangxu",
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.watermelon": {
+   "id": "food.watermelon",
+   "type": "diet_avoid",
+   "zh": "西瓜",
+   "en": "watermelon",
+   "group": {
+    "zh": "生冷寒凉",
+    "en": "Raw and cold"
+   },
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.crab": {
+   "id": "food.crab",
+   "type": "diet_avoid",
+   "zh": "螃蟹",
+   "en": "crab",
+   "group": {
+    "zh": "生冷寒凉",
+    "en": "Raw and cold"
+   },
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [
+    "allergy_check"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.cold-water-on-an-empty-stomach-in-the-morning": {
+   "id": "food.cold-water-on-an-empty-stomach-in-the-morning",
+   "type": "diet_avoid",
+   "zh": "清晨空腹喝凉水",
+   "en": "Cold water on an empty stomach in the morning",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.yangxu": {
+   "id": "routine.yangxu",
+   "type": "routine",
+   "zh": "早睡,睡前温水泡脚 15 分钟",
+   "en": "Early to bed; soak feet in warm water 15 min beforehand",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.yangxu": {
+   "id": "movement.yangxu",
+   "type": "movement",
+   "zh": "上午阳光下活动;避免夜间剧烈运动",
+   "en": "Be active in morning sunlight; avoid vigorous exercise at night",
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.lamb-soup-with-angelica-ginger": {
+   "id": "recipe.lamb-soup-with-angelica-ginger",
+   "type": "recipe",
+   "zh": "当归生姜羊肉汤",
+   "en": "Lamb soup with angelica & ginger",
+   "detail": {
+    "zh": {
+     "fit": "阳虚质 · 秋冬",
+     "ing": [
+      "羊肉 300g",
+      "生姜 30g",
+      "当归 10g",
+      "葱、盐少许"
+     ],
+     "how": [
+      "羊肉切块焯水",
+      "加生姜、当归,小火炖 2 小时",
+      "出锅前加盐"
+     ],
+     "note": "温中补血,祛寒;阴虚火旺者不宜"
+    },
+    "en": {
+     "fit": "Yang Deficiency · autumn–winter",
+     "ing": [
+      "Lamb 300 g",
+      "Ginger 30 g",
+      "Angelica (dang gui) 10 g",
+      "Scallion, a little salt"
+     ],
+     "how": [
+      "Cube and blanch the lamb",
+      "Add ginger and angelica; simmer 2 h",
+      "Salt before serving"
+     ],
+     "note": "Warms the middle, nourishes blood, dispels cold; not for yin-deficient heat"
+    }
+   },
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.CV4": {
+   "id": "acupoint.CV4",
+   "type": "acupoint",
+   "code": "CV4",
+   "zh": "关元",
+   "en": "Guanyuan",
+   "detail": {
+    "zh": {
+     "loc": "脐下 3 寸",
+     "how": "掌心温热后按压,每日 5 分钟"
+    },
+    "en": {
+     "loc": "3 cun below the navel",
+     "how": "Warm the palm, then press 5 min daily"
+    }
+   },
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "CV4",
+    "reviewed": false
+   }
+  },
+  "acupoint.KI1": {
+   "id": "acupoint.KI1",
+   "type": "acupoint",
+   "code": "KI1",
+   "zh": "涌泉",
+   "en": "Yongquan",
+   "detail": {
+    "zh": {
+     "loc": "足底前 1/3 凹陷处",
+     "how": "睡前搓揉至发热"
+    },
+    "en": {
+     "loc": "Hollow in the front third of the sole",
+     "how": "Rub until warm before bed"
+    }
+   },
+   "constitutions": [
+    "yangxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "KI1",
+    "reviewed": false
+   }
+  },
+  "food.lily-bulb": {
+   "id": "food.lily-bulb",
+   "type": "diet_favor",
+   "zh": "百合",
+   "en": "Lily bulb",
+   "constitutions": [
+    "yinxu",
+    "qiyu"
+   ],
+   "seasons": [
+    "spring",
+    "autumn"
+   ],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.white-fungus": {
+   "id": "food.white-fungus",
+   "type": "diet_favor",
+   "zh": "银耳",
+   "en": "white fungus",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring",
+    "autumn"
+   ],
+   "goals": [
+    "sleep"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.pear": {
+   "id": "food.pear",
+   "type": "diet_favor",
+   "zh": "梨",
+   "en": "pear",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring",
+    "autumn"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.duck": {
+   "id": "food.duck",
+   "type": "diet_favor",
+   "zh": "鸭肉",
+   "en": "Duck",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "summer",
+    "autumn"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.tofu": {
+   "id": "food.tofu",
+   "type": "diet_favor",
+   "zh": "豆腐",
+   "en": "tofu",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.black-sesame": {
+   "id": "food.black-sesame",
+   "type": "diet_favor",
+   "zh": "黑芝麻",
+   "en": "Black sesame",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.mulberry": {
+   "id": "food.mulberry",
+   "type": "diet_favor",
+   "zh": "桑葚",
+   "en": "mulberry",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.chili": {
+   "id": "food.chili",
+   "type": "diet_avoid",
+   "zh": "辣椒",
+   "en": "chili",
+   "group": {
+    "zh": "辛辣燥热",
+    "en": "Spicy and heating"
+   },
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.late-nights": {
+   "id": "food.late-nights",
+   "type": "diet_avoid",
+   "zh": "熬夜",
+   "en": "Late nights",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.strong-tea": {
+   "id": "food.strong-tea",
+   "type": "diet_avoid",
+   "zh": "浓茶",
+   "en": "strong tea",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.yinxu": {
+   "id": "routine.yinxu",
+   "type": "routine",
+   "zh": "子时(23点)前必须入睡,午间闭目养神",
+   "en": "Must be asleep before 11 pm; rest the eyes at midday",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.yinxu": {
+   "id": "movement.yinxu",
+   "type": "movement",
+   "zh": "游泳、瑜伽、太极;避免大汗",
+   "en": "Swimming, yoga, tai chi; avoid heavy sweating",
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.white-fungus-lily-lotus-seed-soup": {
+   "id": "recipe.white-fungus-lily-lotus-seed-soup",
+   "type": "recipe",
+   "zh": "银耳百合莲子羹",
+   "en": "White fungus, lily & lotus seed soup",
+   "detail": {
+    "zh": {
+     "fit": "阴虚质 · 润燥",
+     "ing": [
+      "银耳 1 朵",
+      "百合 20g",
+      "莲子 20g",
+      "冰糖少许"
+     ],
+     "how": [
+      "银耳泡发撕小朵",
+      "所有食材加水炖 1 小时",
+      "冰糖调味"
+     ],
+     "note": "滋阴润肺;脾虚便溏者减量"
+    },
+    "en": {
+     "fit": "Yin Deficiency · dryness",
+     "ing": [
+      "White fungus 1",
+      "Lily bulb 20 g",
+      "Lotus seed 20 g",
+      "A little rock sugar"
+     ],
+     "how": [
+      "Soak and tear the fungus",
+      "Simmer everything 1 h",
+      "Sweeten lightly"
+     ],
+     "note": "Nourishes yin, moistens the lungs; reduce if stools are loose"
+    }
+   },
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "autumn"
+   ],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.SP6": {
+   "id": "acupoint.SP6",
+   "type": "acupoint",
+   "code": "SP6",
+   "zh": "三阴交",
+   "en": "Sanyinjiao",
+   "detail": {
+    "zh": {
+     "loc": "内踝尖上 3 寸,胫骨后缘",
+     "how": "按揉 3 分钟,睡前"
+    },
+    "en": {
+     "loc": "3 cun above the inner ankle, behind the shin bone",
+     "how": "Knead 3 min before bed"
+    }
+   },
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "autumn"
+   ],
+   "goals": [
+    "sleep"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "SP6",
+    "reviewed": false
+   }
+  },
+  "acupoint.KI3": {
+   "id": "acupoint.KI3",
+   "type": "acupoint",
+   "code": "KI3",
+   "zh": "太溪",
+   "en": "Taixi",
+   "detail": {
+    "zh": {
+     "loc": "内踝与跟腱之间凹陷",
+     "how": "按揉 2 分钟"
+    },
+    "en": {
+     "loc": "Hollow between inner ankle and Achilles tendon",
+     "how": "Knead 2 min"
+    }
+   },
+   "constitutions": [
+    "yinxu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "KI3",
+    "reviewed": false
+   }
+  },
+  "food.job-s-tears": {
+   "id": "food.job-s-tears",
+   "type": "diet_favor",
+   "zh": "薏米",
+   "en": "Job's tears",
+   "constitutions": [
+    "tanshi",
+    "shire"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.adzuki-bean": {
+   "id": "food.adzuki-bean",
+   "type": "diet_favor",
+   "zh": "赤小豆",
+   "en": "adzuki bean",
+   "constitutions": [
+    "tanshi",
+    "shire"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.winter-melon": {
+   "id": "food.winter-melon",
+   "type": "diet_favor",
+   "zh": "冬瓜",
+   "en": "winter melon",
+   "constitutions": [
+    "tanshi",
+    "shire"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.daikon": {
+   "id": "food.daikon",
+   "type": "diet_favor",
+   "zh": "白萝卜",
+   "en": "Daikon",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.tangerine-peel-tea": {
+   "id": "food.tangerine-peel-tea",
+   "type": "diet_favor",
+   "zh": "陈皮水",
+   "en": "Tangerine-peel tea",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [
+    "digest",
+    "stress",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.sweets": {
+   "id": "food.sweets",
+   "type": "diet_avoid",
+   "zh": "甜食",
+   "en": "Sweets",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.grease": {
+   "id": "food.grease",
+   "type": "diet_avoid",
+   "zh": "油腻",
+   "en": "grease",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.cream": {
+   "id": "food.cream",
+   "type": "diet_avoid",
+   "zh": "奶油",
+   "en": "cream",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.beer": {
+   "id": "food.beer",
+   "type": "diet_avoid",
+   "zh": "啤酒",
+   "en": "Beer",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [
+    "alcohol"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.tanshi": {
+   "id": "routine.tanshi",
+   "type": "routine",
+   "zh": "不晚于 23 点,避免饭后即睡",
+   "en": "No later than 11 pm; don't sleep right after meals",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.tanshi": {
+   "id": "movement.tanshi",
+   "type": "movement",
+   "zh": "中等强度有氧,出微汗;每周 5 次",
+   "en": "Moderate aerobic exercise to a light sweat; 5× a week",
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.job-s-tears-adzuki-winter-melon-soup": {
+   "id": "recipe.job-s-tears-adzuki-winter-melon-soup",
+   "type": "recipe",
+   "zh": "薏米赤小豆冬瓜汤",
+   "en": "Job's tears, adzuki & winter melon soup",
+   "detail": {
+    "zh": {
+     "fit": "痰湿质",
+     "ing": [
+      "薏米 30g",
+      "赤小豆 30g",
+      "冬瓜 200g",
+      "陈皮 1 小片"
+     ],
+     "how": [
+      "薏米、赤小豆提前泡 2 小时",
+      "煮 40 分钟后加冬瓜",
+      "再煮 10 分钟"
+     ],
+     "note": "利湿健脾;孕期慎用薏米"
+    },
+    "en": {
+     "fit": "Phlegm-Damp",
+     "ing": [
+      "Job's tears 30 g",
+      "Adzuki beans 30 g",
+      "Winter melon 200 g",
+      "Dried tangerine peel, 1 small piece"
+     ],
+     "how": [
+      "Soak grains and beans 2 h",
+      "Cook 40 min, then add melon",
+      "Cook 10 min more"
+     ],
+     "note": "Drains damp, strengthens spleen; use Job's tears cautiously in pregnancy"
+    }
+   },
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "stress",
+    "weight"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.ST40": {
+   "id": "acupoint.ST40",
+   "type": "acupoint",
+   "code": "ST40",
+   "zh": "丰隆",
+   "en": "Fenglong",
+   "detail": {
+    "zh": {
+     "loc": "外踝尖上 8 寸,胫骨前缘外两横指",
+     "how": "用力按揉 3 分钟"
+    },
+    "en": {
+     "loc": "8 cun above the outer ankle, two finger-widths lateral to the shin",
+     "how": "Knead firmly 3 min"
+    }
+   },
+   "constitutions": [
+    "tanshi"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "ST40",
+    "reviewed": false
+   }
+  },
+  "acupoint.SP9": {
+   "id": "acupoint.SP9",
+   "type": "acupoint",
+   "code": "SP9",
+   "zh": "阴陵泉",
+   "en": "Yinlingquan",
+   "detail": {
+    "zh": {
+     "loc": "胫骨内侧髁下缘凹陷",
+     "how": "按揉 2 分钟"
+    },
+    "en": {
+     "loc": "Hollow below the inner knee bone",
+     "how": "Knead 2 min"
+    }
+   },
+   "constitutions": [
+    "tanshi",
+    "shire"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "digest",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "SP9",
+    "reviewed": false
+   }
+  },
+  "food.mung-bean": {
+   "id": "food.mung-bean",
+   "type": "diet_favor",
+   "zh": "绿豆",
+   "en": "Mung bean",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.bitter-melon": {
+   "id": "food.bitter-melon",
+   "type": "diet_favor",
+   "zh": "苦瓜",
+   "en": "bitter melon",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.celery": {
+   "id": "food.celery",
+   "type": "diet_favor",
+   "zh": "芹菜",
+   "en": "celery",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [],
+   "goals": [
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.cucumber": {
+   "id": "food.cucumber",
+   "type": "diet_favor",
+   "zh": "黄瓜",
+   "en": "cucumber",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.lotus-root": {
+   "id": "food.lotus-root",
+   "type": "diet_favor",
+   "zh": "莲藕",
+   "en": "lotus root",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "summer",
+    "autumn"
+   ],
+   "goals": [
+    "digest"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.spicy": {
+   "id": "food.spicy",
+   "type": "diet_avoid",
+   "zh": "辛辣",
+   "en": "Spicy",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.barbecued": {
+   "id": "food.barbecued",
+   "type": "diet_avoid",
+   "zh": "烧烤",
+   "en": "barbecued",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.fried": {
+   "id": "food.fried",
+   "type": "diet_avoid",
+   "zh": "油炸",
+   "en": "fried",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.alcohol-tobacco-sugary-drinks": {
+   "id": "food.alcohol-tobacco-sugary-drinks",
+   "type": "diet_avoid",
+   "zh": "烟酒、甜饮料",
+   "en": "Alcohol, tobacco, sugary drinks",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.shire": {
+   "id": "routine.shire",
+   "type": "routine",
+   "zh": "规律作息,避免熬夜生内热",
+   "en": "Regular hours; late nights breed internal heat",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.shire": {
+   "id": "movement.shire",
+   "type": "movement",
+   "zh": "游泳、慢跑等出汗运动,每周 4–5 次",
+   "en": "Sweaty exercise such as swimming or jogging, 4–5× a week",
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.mung-bean-job-s-tears-soup": {
+   "id": "recipe.mung-bean-job-s-tears-soup",
+   "type": "recipe",
+   "zh": "绿豆薏米汤",
+   "en": "Mung bean & Job's tears soup",
+   "detail": {
+    "zh": {
+     "fit": "湿热质",
+     "ing": [
+      "绿豆 50g",
+      "薏米 30g",
+      "莲子 15g"
+     ],
+     "how": [
+      "绿豆、薏米泡 1 小时",
+      "加水煮 40 分钟",
+      "可微甜,不加冰"
+     ],
+     "note": "清热利湿;脾胃虚寒者少食"
+    },
+    "en": {
+     "fit": "Damp-Heat",
+     "ing": [
+      "Mung beans 50 g",
+      "Job's tears 30 g",
+      "Lotus seed 15 g"
+     ],
+     "how": [
+      "Soak 1 h",
+      "Simmer 40 min",
+      "Lightly sweet; never iced"
+     ],
+     "note": "Clears heat, drains damp; go easy if digestion runs cold"
+    }
+   },
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "spring",
+    "summer",
+    "autumn"
+   ],
+   "goals": [
+    "digest",
+    "sleep",
+    "weight"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.LI11": {
+   "id": "acupoint.LI11",
+   "type": "acupoint",
+   "code": "LI11",
+   "zh": "曲池",
+   "en": "Quchi",
+   "detail": {
+    "zh": {
+     "loc": "屈肘,肘横纹外侧端",
+     "how": "按揉 2 分钟"
+    },
+    "en": {
+     "loc": "Outer end of the elbow crease when bent",
+     "how": "Knead 2 min"
+    }
+   },
+   "constitutions": [
+    "shire"
+   ],
+   "seasons": [
+    "summer"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "LI11",
+    "reviewed": false
+   }
+  },
+  "food.hawthorn": {
+   "id": "food.hawthorn",
+   "type": "diet_favor",
+   "zh": "山楂",
+   "en": "Hawthorn",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.black-fungus": {
+   "id": "food.black-fungus",
+   "type": "diet_favor",
+   "zh": "黑木耳",
+   "en": "black fungus",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.onion": {
+   "id": "food.onion",
+   "type": "diet_favor",
+   "zh": "洋葱",
+   "en": "onion",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "spring"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.rose-tea": {
+   "id": "food.rose-tea",
+   "type": "diet_favor",
+   "zh": "玫瑰花茶",
+   "en": "Rose tea",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.a-little-rice-wine": {
+   "id": "food.a-little-rice-wine",
+   "type": "diet_favor",
+   "zh": "少量黄酒(非孕期)",
+   "en": "A little rice wine (not in pregnancy)",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [
+    "pregnancy",
+    "alcohol"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.cold-and-raw-food": {
+   "id": "food.cold-and-raw-food",
+   "type": "diet_avoid",
+   "zh": "寒凉生冷",
+   "en": "Cold and raw food",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.high-fat-greasy-food": {
+   "id": "food.high-fat-greasy-food",
+   "type": "diet_avoid",
+   "zh": "高脂油腻",
+   "en": "High-fat, greasy food",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.xueyu": {
+   "id": "routine.xueyu",
+   "type": "routine",
+   "zh": "规律入睡;避免久坐久卧",
+   "en": "Regular bedtime; avoid long sitting or lying",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.xueyu": {
+   "id": "movement.xueyu",
+   "type": "movement",
+   "zh": "每天活动量充足,舞蹈、快走、太极",
+   "en": "Plenty of daily movement: dance, brisk walking, tai chi",
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.hawthorn-brown-sugar-drink": {
+   "id": "recipe.hawthorn-brown-sugar-drink",
+   "type": "recipe",
+   "zh": "山楂红糖饮",
+   "en": "Hawthorn & brown sugar drink",
+   "detail": {
+    "zh": {
+     "fit": "血瘀质",
+     "ing": [
+      "干山楂 15g",
+      "红糖 10g",
+      "玫瑰花 5 朵"
+     ],
+     "how": [
+      "山楂洗净",
+      "加水煮 15 分钟",
+      "加红糖、玫瑰花焖 3 分钟"
+     ],
+     "note": "活血化瘀;孕期、经期量多者不宜"
+    },
+    "en": {
+     "fit": "Blood Stasis",
+     "ing": [
+      "Dried hawthorn 15 g",
+      "Brown sugar 10 g",
+      "Rose buds 5"
+     ],
+     "how": [
+      "Rinse the hawthorn",
+      "Simmer 15 min",
+      "Add sugar and roses; steep 3 min"
+     ],
+     "note": "Moves blood; not for pregnancy or heavy periods"
+    }
+   },
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.SP10": {
+   "id": "acupoint.SP10",
+   "type": "acupoint",
+   "code": "SP10",
+   "zh": "血海",
+   "en": "Xuehai",
+   "detail": {
+    "zh": {
+     "loc": "髌骨内上缘上 2 寸",
+     "how": "按揉 3 分钟"
+    },
+    "en": {
+     "loc": "2 cun above the inner upper corner of the kneecap",
+     "how": "Knead 3 min"
+    }
+   },
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "spring",
+    "winter"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "SP10",
+    "reviewed": false
+   }
+  },
+  "acupoint.BL17": {
+   "id": "acupoint.BL17",
+   "type": "acupoint",
+   "code": "BL17",
+   "zh": "膈俞",
+   "en": "Geshu",
+   "detail": {
+    "zh": {
+     "loc": "第 7 胸椎棘突下旁开 1.5 寸",
+     "how": "他人协助按揉或艾灸"
+    },
+    "en": {
+     "loc": "1.5 cun lateral to the 7th thoracic vertebra",
+     "how": "Have someone knead or apply moxa"
+    }
+   },
+   "constitutions": [
+    "xueyu"
+   ],
+   "seasons": [
+    "winter"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "BL17",
+    "reviewed": false
+   }
+  },
+  "food.buddha-s-hand": {
+   "id": "food.buddha-s-hand",
+   "type": "diet_favor",
+   "zh": "佛手",
+   "en": "Buddha's hand",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.rose": {
+   "id": "food.rose",
+   "type": "diet_favor",
+   "zh": "玫瑰花",
+   "en": "rose",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "sleep",
+    "stress"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.tangerine-peel": {
+   "id": "food.tangerine-peel",
+   "type": "diet_favor",
+   "zh": "陈皮",
+   "en": "tangerine peel",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "digest",
+    "stress",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.kumquat": {
+   "id": "food.kumquat",
+   "type": "diet_favor",
+   "zh": "金橘",
+   "en": "Kumquat",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.citrus": {
+   "id": "food.citrus",
+   "type": "diet_favor",
+   "zh": "柑橘",
+   "en": "citrus",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.wheat": {
+   "id": "food.wheat",
+   "type": "diet_favor",
+   "zh": "小麦",
+   "en": "Wheat",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "sleep"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.caffeine-before-bed": {
+   "id": "food.caffeine-before-bed",
+   "type": "diet_avoid",
+   "zh": "睡前咖啡因",
+   "en": "Caffeine before bed",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.qiyu": {
+   "id": "routine.qiyu",
+   "type": "routine",
+   "zh": "睡前 1 小时放下手机,听舒缓音乐",
+   "en": "Put the phone down an hour before bed; calm music",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.qiyu": {
+   "id": "movement.qiyu",
+   "type": "movement",
+   "zh": "户外、集体运动:登山、球类、舞蹈",
+   "en": "Outdoor and group activity: hiking, ball games, dance",
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.rose-buddha-s-hand-tea": {
+   "id": "recipe.rose-buddha-s-hand-tea",
+   "type": "recipe",
+   "zh": "玫瑰佛手茶",
+   "en": "Rose & Buddha's hand tea",
+   "detail": {
+    "zh": {
+     "fit": "气郁质",
+     "ing": [
+      "玫瑰花 5 朵",
+      "佛手片 3 片",
+      "陈皮 1 小片"
+     ],
+     "how": [
+      "沸水冲泡",
+      "焖 5 分钟",
+      "午后饮用"
+     ],
+     "note": "疏肝解郁;孕期慎用玫瑰"
+    },
+    "en": {
+     "fit": "Qi Stagnation",
+     "ing": [
+      "Rose buds 5",
+      "Buddha's hand slices 3",
+      "Dried tangerine peel, 1 small piece"
+     ],
+     "how": [
+      "Steep in boiling water",
+      "Cover 5 min",
+      "Drink in the afternoon"
+     ],
+     "note": "Soothes the liver, relieves stagnation; rose with care in pregnancy"
+    }
+   },
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [],
+   "goals": [
+    "digest",
+    "sleep",
+    "stress",
+    "weight"
+   ],
+   "contraindications": [
+    "pregnancy"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.LR3": {
+   "id": "acupoint.LR3",
+   "type": "acupoint",
+   "code": "LR3",
+   "zh": "太冲",
+   "en": "Taichong",
+   "detail": {
+    "zh": {
+     "loc": "足背第 1、2 跖骨结合部前凹陷",
+     "how": "按揉 2 分钟,有酸胀感"
+    },
+    "en": {
+     "loc": "Hollow on the top of the foot before the 1st–2nd metatarsal junction",
+     "how": "Knead 2 min until it aches slightly"
+    }
+   },
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [
+    "spring"
+   ],
+   "goals": [
+    "stress"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "LR3",
+    "reviewed": false
+   }
+  },
+  "acupoint.CV17": {
+   "id": "acupoint.CV17",
+   "type": "acupoint",
+   "code": "CV17",
+   "zh": "膻中",
+   "en": "Danzhong",
+   "detail": {
+    "zh": {
+     "loc": "两乳头连线中点",
+     "how": "掌心轻揉 2 分钟"
+    },
+    "en": {
+     "loc": "Midpoint between the nipples",
+     "how": "Rub gently with the palm 2 min"
+    }
+   },
+   "constitutions": [
+    "qiyu"
+   ],
+   "seasons": [
+    "spring",
+    "autumn"
+   ],
+   "goals": [
+    "stress",
+    "sleep"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "CV17",
+    "reviewed": false
+   }
+  },
+  "food.light-balanced-meals": {
+   "id": "food.light-balanced-meals",
+   "type": "diet_favor",
+   "zh": "清淡均衡",
+   "en": "Light, balanced meals",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.astragalus": {
+   "id": "food.astragalus",
+   "type": "diet_favor",
+   "zh": "黄芪",
+   "en": "astragalus",
+   "group": {
+    "zh": "益气固表",
+    "en": "Surface-strengthening"
+   },
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.vitamin-c-rich-produce": {
+   "id": "food.vitamin-c-rich-produce",
+   "type": "diet_favor",
+   "zh": "富含维 C 蔬果",
+   "en": "Vitamin-C-rich produce",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.known-allergens": {
+   "id": "food.known-allergens",
+   "type": "diet_avoid",
+   "zh": "已知过敏食物",
+   "en": "Known allergens",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.seafood": {
+   "id": "food.seafood",
+   "type": "diet_avoid",
+   "zh": "海鲜",
+   "en": "Seafood",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [
+    "allergy_check"
+   ],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "food.spicy-triggers": {
+   "id": "food.spicy-triggers",
+   "type": "diet_avoid",
+   "zh": "辛辣(发物)",
+   "en": "spicy triggers",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质饮食宜忌",
+    "reviewed": false
+   }
+  },
+  "routine.tebing": {
+   "id": "routine.tebing",
+   "type": "routine",
+   "zh": "保持卧室清洁,减少尘螨",
+   "en": "Keep the bedroom clean; reduce dust mites",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "sleep",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "起居调摄 · 子午流注",
+    "reviewed": false
+   }
+  },
+  "movement.tebing": {
+   "id": "movement.tebing",
+   "type": "movement",
+   "zh": "规律中等运动增强体质,花粉季减少户外",
+   "en": "Regular moderate exercise; less outdoors in pollen season",
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [
+    "spring",
+    "summer"
+   ],
+   "goals": [
+    "energy",
+    "weight"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医养生学》",
+    "section": "运动养生 · 导引",
+    "reviewed": false
+   }
+  },
+  "recipe.astragalus-yam-congee": {
+   "id": "recipe.astragalus-yam-congee",
+   "type": "recipe",
+   "zh": "黄芪山药粥",
+   "en": "Astragalus & yam congee",
+   "detail": {
+    "zh": {
+     "fit": "特禀质",
+     "ing": [
+      "黄芪 15g",
+      "山药 100g",
+      "大米 60g"
+     ],
+     "how": [
+      "黄芪煎水取汁",
+      "山药、大米入黄芪水煮粥",
+      "温热食"
+     ],
+     "note": "益气固表;感冒期间停用"
+    },
+    "en": {
+     "fit": "Allergic constitution",
+     "ing": [
+      "Astragalus 15 g",
+      "Chinese yam 100 g",
+      "Rice 60 g"
+     ],
+     "how": [
+      "Decoct astragalus; keep the liquid",
+      "Cook yam and rice in it",
+      "Serve warm"
+     ],
+     "note": "Strengthens qi and the surface; stop during colds"
+    }
+   },
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [
+    "spring",
+    "autumn",
+    "winter"
+   ],
+   "goals": [
+    "digest",
+    "energy"
+   ],
+   "contraindications": [],
+   "source": {
+    "ref": "《中医食疗学》",
+    "section": "体质食疗方",
+    "reviewed": false
+   }
+  },
+  "acupoint.LI20": {
+   "id": "acupoint.LI20",
+   "type": "acupoint",
+   "code": "LI20",
+   "zh": "迎香",
+   "en": "Yingxiang",
+   "detail": {
+    "zh": {
+     "loc": "鼻翼外缘中点旁",
+     "how": "食指按揉 1 分钟,早晚"
+    },
+    "en": {
+     "loc": "Beside the midpoint of the nostril wing",
+     "how": "Knead with the index finger 1 min, morning and evening"
+    }
+   },
+   "constitutions": [
+    "tebing"
+   ],
+   "seasons": [
+    "spring",
+    "autumn"
+   ],
+   "goals": [],
+   "contraindications": [],
+   "source": {
+    "ref": "《经络腧穴学》",
+    "section": "LI20",
+    "reviewed": false
+   }
+  }
+ },
+ "plans": {
+  "pinghe": {
+   "summary": {
+    "zh": "阴阳气血调和,精力充沛,适应力强。保持即可,顺应节气微调。",
+    "en": "Yin, yang, qi and blood in balance; good energy and adaptability. Maintain, and make small seasonal adjustments."
+   },
+   "favor": [
+    "food.whole-grains",
+    "food.seasonal-fruit-and-vegetables",
+    "food.light-low-salt-cooking"
+   ],
+   "avoid": [
+    "food.overeating",
+    "food.excessive-tonics"
+   ],
+   "routine": "routine.pinghe",
+   "movement": "movement.pinghe",
+   "recipe": "recipe.yam-millet-congee",
+   "acupoints": [
+    "acupoint.ST36"
+   ]
+  },
+  "qixu": {
+   "summary": {
+    "zh": "元气不足,易疲乏、气短、自汗、易感冒。重在补气健脾,少耗多养。",
+    "en": "Insufficient qi: easy fatigue, shortness of breath, spontaneous sweating, frequent colds. Focus on tonifying qi and the spleen; conserve more than you spend."
+   },
+   "favor": [
+    "food.chinese-yam",
+    "food.red-dates",
+    "food.millet",
+    "food.chicken",
+    "food.beef",
+    "food.pumpkin",
+    "food.carrot"
+   ],
+   "avoid": [
+    "food.raw-cold-fruit",
+    "food.qi-depleting-spicy-food-strong-tea-and-coffee"
+   ],
+   "routine": "routine.qixu",
+   "movement": "movement.qixu",
+   "recipe": "recipe.astragalus-red-date-chicken-soup",
+   "acupoints": [
+    "acupoint.ST36",
+    "acupoint.CV6"
+   ]
+  },
+  "yangxu": {
+   "summary": {
+    "zh": "阳气不足,畏寒怕冷、手足不温、喜热饮。重在温阳散寒,护住腰腹与足部。",
+    "en": "Insufficient yang: aversion to cold, cold limbs, preference for warm drinks. Focus on warming yang and dispelling cold; keep the lower back, abdomen and feet warm."
+   },
+   "favor": [
+    "food.lamb",
+    "food.beef",
+    "food.ginger",
+    "food.longan",
+    "food.walnut",
+    "food.chives",
+    "food.pumpkin"
+   ],
+   "avoid": [
+    "food.iced-drinks",
+    "food.watermelon",
+    "food.crab",
+    "food.cold-water-on-an-empty-stomach-in-the-morning"
+   ],
+   "routine": "routine.yangxu",
+   "movement": "movement.yangxu",
+   "recipe": "recipe.lamb-soup-with-angelica-ginger",
+   "acupoints": [
+    "acupoint.CV4",
+    "acupoint.KI1"
+   ]
+  },
+  "yinxu": {
+   "summary": {
+    "zh": "阴液亏少,口干咽燥、手足心热、易便秘、睡眠浅。重在滋阴润燥,忌熬夜。",
+    "en": "Insufficient yin fluids: dry mouth and throat, hot palms and soles, constipation, light sleep. Focus on nourishing yin and moistening; no late nights."
+   },
+   "favor": [
+    "food.lily-bulb",
+    "food.white-fungus",
+    "food.pear",
+    "food.duck",
+    "food.tofu",
+    "food.black-sesame",
+    "food.mulberry"
+   ],
+   "avoid": [
+    "food.chili",
+    "food.lamb",
+    "food.late-nights",
+    "food.strong-tea"
+   ],
+   "routine": "routine.yinxu",
+   "movement": "movement.yinxu",
+   "recipe": "recipe.white-fungus-lily-lotus-seed-soup",
+   "acupoints": [
+    "acupoint.SP6",
+    "acupoint.KI3"
+   ]
+  },
+  "tanshi": {
+   "summary": {
+    "zh": "痰湿凝聚,体型偏胖、身重不爽、口黏苔腻。重在健脾化湿,管住甜腻。",
+    "en": "Phlegm-damp accumulation: heavier build, heavy body, sticky mouth, greasy tongue coat. Focus on strengthening the spleen and resolving damp; watch sweets and grease."
+   },
+   "favor": [
+    "food.job-s-tears",
+    "food.adzuki-bean",
+    "food.winter-melon",
+    "food.daikon",
+    "food.chinese-yam",
+    "food.tangerine-peel-tea"
+   ],
+   "avoid": [
+    "food.sweets",
+    "food.grease",
+    "food.cream",
+    "food.beer",
+    "food.iced-drinks"
+   ],
+   "routine": "routine.tanshi",
+   "movement": "movement.tanshi",
+   "recipe": "recipe.job-s-tears-adzuki-winter-melon-soup",
+   "acupoints": [
+    "acupoint.ST40",
+    "acupoint.SP9"
+   ]
+  },
+  "shire": {
+   "summary": {
+    "zh": "湿热内蕴,面垢油光、口苦、大便黏滞。重在清热利湿,忌辛辣烟酒。",
+    "en": "Damp-heat inside: oily face, bitter taste, sticky stools. Focus on clearing heat and draining damp; no spicy food, alcohol or smoking."
+   },
+   "favor": [
+    "food.mung-bean",
+    "food.bitter-melon",
+    "food.celery",
+    "food.winter-melon",
+    "food.cucumber",
+    "food.lotus-root",
+    "food.job-s-tears",
+    "food.adzuki-bean"
+   ],
+   "avoid": [
+    "food.spicy",
+    "food.barbecued",
+    "food.fried",
+    "food.alcohol-tobacco-sugary-drinks"
+   ],
+   "routine": "routine.shire",
+   "movement": "movement.shire",
+   "recipe": "recipe.mung-bean-job-s-tears-soup",
+   "acupoints": [
+    "acupoint.LI11",
+    "acupoint.SP9"
+   ]
+  },
+  "xueyu": {
+   "summary": {
+    "zh": "血行不畅,肤色晦暗、易瘀斑、唇暗。重在活血行气,多动少坐。",
+    "en": "Sluggish blood flow: dull complexion, easy bruising, dark lips. Focus on moving blood and qi; sit less, move more."
+   },
+   "favor": [
+    "food.hawthorn",
+    "food.black-fungus",
+    "food.onion",
+    "food.rose-tea",
+    "food.a-little-rice-wine"
+   ],
+   "avoid": [
+    "food.cold-and-raw-food",
+    "food.high-fat-greasy-food"
+   ],
+   "routine": "routine.xueyu",
+   "movement": "movement.xueyu",
+   "recipe": "recipe.hawthorn-brown-sugar-drink",
+   "acupoints": [
+    "acupoint.SP10",
+    "acupoint.BL17"
+   ]
+  },
+  "qiyu": {
+   "summary": {
+    "zh": "气机郁滞,情绪低落、易紧张、胸胁胀满。重在疏肝理气,多与人交流。",
+    "en": "Stagnant qi: low mood, easy tension, fullness in the chest and ribs. Focus on soothing the liver and moving qi; connect with people."
+   },
+   "favor": [
+    "food.buddha-s-hand",
+    "food.rose",
+    "food.tangerine-peel",
+    "food.kumquat",
+    "food.citrus",
+    "food.wheat",
+    "food.lily-bulb"
+   ],
+   "avoid": [
+    "food.overeating",
+    "food.caffeine-before-bed"
+   ],
+   "routine": "routine.qiyu",
+   "movement": "movement.qiyu",
+   "recipe": "recipe.rose-buddha-s-hand-tea",
+   "acupoints": [
+    "acupoint.LR3",
+    "acupoint.CV17"
+   ]
+  },
+  "tebing": {
+   "summary": {
+    "zh": "先天禀赋异常,过敏体质。重在益气固表,避开过敏原。",
+    "en": "Constitutional sensitivity: allergy-prone. Focus on strengthening qi and the body's surface; avoid allergens."
+   },
+   "favor": [
+    "food.light-balanced-meals",
+    "food.astragalus",
+    "food.chinese-yam",
+    "food.vitamin-c-rich-produce"
+   ],
+   "avoid": [
+    "food.known-allergens",
+    "food.seafood",
+    "food.spicy-triggers"
+   ],
+   "routine": "routine.tebing",
+   "movement": "movement.tebing",
+   "recipe": "recipe.astragalus-yam-congee",
+   "acupoints": [
+    "acupoint.LI20",
+    "acupoint.ST36"
+   ]
+  }
+ }
+}
