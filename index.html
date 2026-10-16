@@ -235,10 +235,12 @@ const fmtTime = (d)=> `${String(d.getHours()).padStart(2,'0')}:${String(d.getMin
 const mem=(id,name,initial,sex,minor)=>({id,name,initial,sex,minor:!!minor,answers:{},goals:[],plan:null,checkins:{},screenerDone:false,formal:false,formalShown:false});
 const DEFAULT = ()=>({
   members:[mem("m1",{zh:"我",en:"Me"},{zh:"我",en:"M"},"f"), mem("m2",{zh:"妈妈",en:"Mom"},{zh:"妈",en:"Mo"},"f"), mem("m3",{zh:"小明",en:"Ming"},{zh:"明",en:"Mi"},"m",true)],
-  cur:"m1", tab:"today", stack:[], elder:false, clinicBound:true, day:"d1", lang:"zh"
+  cur:"m1", tab:"today", stack:[], elder:false, clinicBound:true, day:"d1", lang:"zh",
+  reminders:[{id:"wake",time:"07:00",on:true},{id:"acu",time:"10:00",on:false},{id:"nap",time:"12:30",on:false},{id:"move",time:"16:00",on:false},{id:"dinner",time:"18:30",on:false},{id:"sleep",time:"21:00",on:true}]
 });
 try{ S = JSON.parse(localStorage.getItem("tcmdemo")||"null") }catch(e){ S=null }
 if(!S || !S.lang || typeof S.members[0].name==="string") S = DEFAULT();
+if(!S.reminders) S.reminders=DEFAULT().reminders;
 function save(){ try{ localStorage.setItem("tcmdemo",JSON.stringify(S)) }catch(e){} }
 const M = ()=>S.members.find(m=>m.id===S.cur);
 const mn = m => typeof m.name==="string"? m.name : pick(m.name);
@@ -343,6 +345,36 @@ function pickText(it){
   return itName(it);
 }
 
+/* ---------- reminders (子午流注 defaults; content from the constitution's plan items) ---------- */
+const REMINDER_DEFS = {
+  wake:  {hour:{zh:"卯时",en:"Mao hour"}, meridian:{zh:"大肠经",en:"Large Intestine"}, label:{zh:"起床",en:"Wake"},        done:c=>c.sleep!=null,
+          text:(C)=>{ const bf=C.diet.y.find(x=>/粥|米|山药|红枣|南瓜|核桃|芝麻|豆|枸杞|百合|银耳|燕麦|yam|millet|date|pumpkin|walnut|sesame|bean|goji|lily|fungus|oat|grain/i.test(x))||C.diet.y[0]; return tt(`起床,温水一杯;早餐宜 ${bf}`,`Up, a glass of warm water; breakfast: favor ${bf.toLowerCase()}`); }},
+  acu:   {hour:{zh:"巳时",en:"Si hour"},  meridian:{zh:"脾经",en:"Spleen"},            label:{zh:"穴位按压",en:"Acupressure"}, done:c=>!!c.acu,
+          text:(C)=>`${C.acu[0].n} — ${C.acu[0].how}`},
+  nap:   {hour:{zh:"午时",en:"Wu hour"},  meridian:{zh:"心经",en:"Heart"},             label:{zh:"午休",en:"Nap"},          done:()=>false,
+          text:()=>tt("午休 20 分钟,闭目养神","A 20-minute nap; rest the eyes")},
+  move:  {hour:{zh:"申时",en:"Shen hour"},meridian:{zh:"膀胱经",en:"Bladder"},         label:{zh:"活动",en:"Move"},         done:c=>c.move!=null,
+          text:(C)=>C.move},
+  dinner:{hour:{zh:"酉时",en:"You hour"}, meridian:{zh:"肾经",en:"Kidney"},            label:{zh:"晚餐",en:"Dinner"},       done:c=>c.diet!=null,
+          text:(C)=>tt(`晚餐七分饱;宜 ${C.diet.y[1]||C.diet.y[0]},忌 ${C.diet.n[0]}`,`Dinner to 70%: favor ${(C.diet.y[1]||C.diet.y[0]).toLowerCase()}, avoid ${C.diet.n[0].toLowerCase()}`)},
+  sleep: {hour:{zh:"亥时",en:"Hai hour"}, meridian:{zh:"三焦经",en:"Triple Burner"},   label:{zh:"准备入睡",en:"Wind down"}, done:()=>false,
+          text:(C)=>C.sleep},
+};
+const hm = t => { const [h,m]=t.split(":").map(Number); return h*60+m; };
+// next enabled reminder after "now" that is not already done today; wraps to tomorrow
+function nextReminder(m, now){
+  now=now||new Date(); const cur=now.getHours()*60+now.getMinutes();
+  const C=CT(m.plan?m.plan.code:(m.screenerDone?assess(m).primary.code:"pinghe")); const c=m.checkins[S.day]||{};
+  const list=S.reminders.filter(r=>r.on).sort((a,b)=>hm(a.time)-hm(b.time));
+  if(!list.length) return null;
+  const later=list.filter(r=>hm(r.time)>cur && !REMINDER_DEFS[r.id].done(c));
+  const r=later[0]||list[0]; const tomorrow=!later.length;
+  const mins=tomorrow? (24*60-cur)+hm(r.time) : hm(r.time)-cur;
+  const d=REMINDER_DEFS[r.id];
+  return {r,d,tomorrow,mins,text:d.text(C),skipped:list.filter(x=>hm(x.time)>cur && REMINDER_DEFS[x.id].done(c)).length};
+}
+const fmtIn = mins => { const h=Math.floor(mins/60), m=mins%60; return EN()? (h?`${h} h ${m} min`:`${m} min`) : (h?`${h} 小时 ${m} 分`:`${m} 分钟`); };
+
 /* ---------- plan ---------- */
 function buildPlan(m){ const a=assess(m); m.plan={code:a.primary.code, provisional:!m.formal, goals:[...m.goals]}; save(); }
 
@@ -437,7 +469,7 @@ function S01(){
   if(m.formal && !m.formalShown){
     html+=`<div class="card soft"><h3>${tt("你的正式体质报告已生成","Your formal report is ready")}</h3><p class="small" style="margin:0 0 8px">${tt("完整雷达图已解锁","Full radar unlocked")}${m.plan&&m.plan.provisional?tt(",方案可升级为正式版",", and your plan can be upgraded"):""}.</p><button class="btn sm" data-act="seeFormal">${tt("查看报告","View report")}</button></div>`;
   }
-  html+=`<div class="card"><div class="k">${tt("下次提醒","Next reminder")}</div><div>${tt("21:00 · 亥时 · 准备入睡,温水泡脚","9:00 pm · Hai hour · wind down, warm foot soak")}</div></div>`;
+  { const nr=nextReminder(m); html+= nr? `<div class="card"><div class="check"><div class="k" style="margin:0">${tt("下次提醒","Next reminder")} · ${nr.r.time}${nr.tomorrow?tt("(明天)"," (tomorrow)"):""} · ${pick(nr.d.hour)} ${pick(nr.d.meridian)}</div><span class="small muted">${tt("还有","in")} ${fmtIn(nr.mins)}</span></div><div style="margin-top:4px"><b>${pick(nr.d.label)}</b> · ${esc(nr.text)}</div>${nr.skipped?`<div class="small muted" style="margin-top:4px">${tt(`今天已完成 ${nr.skipped} 项提醒对应的打卡,已自动跳过`,`${nr.skipped} reminder${nr.skipped>1?"s":""} skipped — already checked in today`)}</div>`:""}<button class="btn ghost sm" data-act="settings" style="margin-top:8px">${tt("管理提醒 ›","Manage reminders ›")}</button></div>` : `<div class="card"><div class="k">${tt("下次提醒","Next reminder")}</div><div class="small muted">${tt("所有提醒已关闭","All reminders are off")}</div><button class="btn ghost sm" data-act="settings" style="margin-top:8px">${tt("管理提醒 ›","Manage reminders ›")}</button></div>`; }
   return html;
 }
 function seasonTip(code){ const T=termAt(); const tc=(CTT_TIPS[T.code]||{})[code]; if(tc) return pick(tc); const c=CST_TIPS[T.season][code]||CST_TIPS[T.season].pinghe; return `${pick(c)} ${tt(`${T.name}宜${T.def.p.zh}。`,`${T.name}: ${T.def.p.en.toLowerCase()}.`)}`; }
@@ -534,7 +566,7 @@ function tickTimer(){
 }
 function S12(){ return `<h2 class="sec">${tt("家庭成员","Family members")}</h2>${S.members.map(m=>{const a=m.screenerDone?assess(m):null; return `<div class="card" data-act="switch" data-id="${m.id}" style="cursor:pointer;${m.id===S.cur?"border-color:var(--accent)":""}"><div class="check"><div style="display:flex;gap:10px;align-items:center"><span class="avatar">${esc(mi(m))}</span><div><b>${esc(mn(m))}</b>${m.minor?` <span class="pill gd">${tt("监护","Guardian")}</span>`:''}${m.id===S.cur?` <span class="pill ok">${tt("当前","Current")}</span>`:''}<div class="small muted">${a?esc(sn(a.primary))+(m.formal?tt(" · 正式"," · formal"):tt(" · 初步"," · preliminary")):tt("未评估","Not assessed")}</div></div></div>${m.id!=="m1"?`<span class="small muted">${tt("已授权","Authorized")}</span>`:''}</div></div>`}).join("")}<button class="btn sec full" data-act="addMember">＋ ${tt("添加成员","Add member")}</button><p class="small muted" style="margin-top:10px">${tt("成年成员需本人确认授权;未成年成员由监护人创建,数据不进入任何分析。","Adults confirm their own authorization; minors are created by a guardian and their data never enters analytics.")}</p>`; }
 function S13(p){ const sym=p&&p.symptom; const now=new Date(); return `${sym?`<div class="card warn"><div class="k">${tt("症状摘要(将带给医生)","Symptom note (for your doctor)")}</div><div>${esc(sym)}</div><div class="small muted" style="margin-top:4px">${tt("记录时间:今天","Recorded today")} ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}</div></div>`:""}<div class="card"><div class="k">${tt("合作诊所","Partner clinic")}</div><h3>${esc(pick(CLINIC.name))}</h3><div class="kv"><span class="muted">${tt("地址","Address")}</span><span style="text-align:right">${esc(CLINIC.addr)}</span></div><div class="kv"><span class="muted">${tt("电话","Phone")}</span><span>${esc(CLINIC.tel)}</span></div><div class="kv"><span class="muted">${tt("时间","Hours")}</span><span>${esc(pick(CLINIC.hours))}</span></div><div class="row" style="margin-top:10px"><button class="btn" data-act="call">${tt("拨打电话","Call")}</button><button class="btn sec" data-act="copy">${tt("复制号码","Copy number")}</button></div></div><p class="small muted">${tt("演示中拨打与复制仅作提示。","In this demo, call and copy only show a notice.")}</p>`; }
-function S14(){ return `<div class="card"><div class="kv"><span>${tt("语言 / Language","Language / 语言")}</span><span class="seg"><button class="${EN()?"":"on"}" data-act="setZh">中文</button><button class="${EN()?"on":""}" data-act="setEn">English</button></span></div><div class="kv"><span>${tt("老年模式(字号 +25%)","Large text (+25%)")}</span><button class="toggle ${S.elder?"on":""}" data-act="elder" aria-label="${tt("老年模式","Large text")}"></button></div><div class="kv"><span>${tt("提醒时间","Reminders")}</span><span class="muted">07:00 · 21:00</span></div><div class="kv"><span>${tt("健康数据(睡眠、步数)只读","Health data (sleep, steps) read-only")}</span><button class="toggle on" aria-label="${tt("健康数据","Health data")}"></button></div></div><div class="card"><div class="kv" data-act="export" style="cursor:pointer"><span>${tt("导出我的数据(JSON)","Export my data (JSON)")}</span><span class="muted">›</span></div><div class="kv" data-act="del" style="cursor:pointer;color:var(--crit)"><span>${tt("删除账户","Delete account")}</span><span>›</span></div></div><div class="card"><div class="kv"><span>${tt("隐私政策","Privacy policy")}</span><span class="muted">›</span></div><div class="kv"><span>${tt("同意记录","Consent record")}</span><span class="muted small">${tt("2026-10-23 已确认 3 项","3 items confirmed 2026-10-23")}</span></div></div><button class="btn ghost full" data-act="resetDemo">${tt("重置演示数据","Reset demo data")}</button>`; }
+function S14(){ return `<div class="card"><div class="kv"><span>${tt("语言 / Language","Language / 语言")}</span><span class="seg"><button class="${EN()?"":"on"}" data-act="setZh">中文</button><button class="${EN()?"on":""}" data-act="setEn">English</button></span></div><div class="kv"><span>${tt("老年模式(字号 +25%)","Large text (+25%)")}</span><button class="toggle ${S.elder?"on":""}" data-act="elder" aria-label="${tt("老年模式","Large text")}"></button></div></div><div class="card"><div class="k">${tt("提醒 · 默认按子午流注时辰","Reminders · defaults follow the organ clock")}</div>${S.reminders.map(r=>{const d=REMINDER_DEFS[r.id]; return `<div class="kv"><span><b>${pick(d.label)}</b> <span class="small muted">${pick(d.hour)} · ${pick(d.meridian)}</span></span><span style="display:flex;gap:8px;align-items:center"><input type="time" value="${r.time}" data-rem-time="${r.id}" style="font:inherit;font-size:.9em;border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--surface);color:var(--fg)"><button class="toggle ${r.on?"on":""}" data-rem-toggle="${r.id}" aria-label="${pick(d.label)}"></button></span></div>`}).join("")}<div class="small muted" style="margin-top:6px">${tt("提醒为本机通知,不依赖服务端;对应项目当天已打卡时自动跳过。","Local notifications only; a reminder is skipped once its item is checked in for the day.")}</div></div><div class="card"><div class="kv" style="display:none"><div class="kv"><span>${tt("健康数据(睡眠、步数)只读","Health data (sleep, steps) read-only")}</span><button class="toggle on" aria-label="${tt("健康数据","Health data")}"></button></div></div><div class="card"><div class="kv" data-act="export" style="cursor:pointer"><span>${tt("导出我的数据(JSON)","Export my data (JSON)")}</span><span class="muted">›</span></div><div class="kv" data-act="del" style="cursor:pointer;color:var(--crit)"><span>${tt("删除账户","Delete account")}</span><span>›</span></div></div><div class="card"><div class="kv"><span>${tt("隐私政策","Privacy policy")}</span><span class="muted">›</span></div><div class="kv"><span>${tt("同意记录","Consent record")}</span><span class="muted small">${tt("2026-10-23 已确认 3 项","3 items confirmed 2026-10-23")}</span></div></div><button class="btn ghost full" data-act="resetDemo">${tt("重置演示数据","Reset demo data")}</button>`; }
 function HIST(){ const m=M(); return `<div class="card"><div class="check"><div><b>${m.formal?tt("正式报告","Formal report"):tt("初步判断","Preliminary")}</b><div class="small muted">${tt(`今天 · 已答 ${Object.keys(m.answers).length} 题`,`Today · ${Object.keys(m.answers).length} answered`)}</div></div><span class="pill ok">${tt("当前","Current")}</span></div></div><p class="small muted">${tt("历史评估会在重新评估后保留在这里。","Past assessments are kept here after you reassess.")}</p>`; }
 
 /* --- sheets (modal) --- */
@@ -627,6 +659,8 @@ function bind(root){
   root.querySelectorAll("[data-sec]").forEach(el=>el.onclick=()=>{ M().plan.sec=el.dataset.sec; save(); render(); });
   root.querySelectorAll("[data-ck]").forEach(el=>el.onclick=()=>{ const c=M().checkins[S.day]; c[el.dataset.ck]= el.dataset.ck==="mood"? +el.dataset.v : el.dataset.v; if(el.dataset.ck==="sleepQ"){ c.sleep=+document.getElementById("sleepR").value; } save(); render(); });
   const r=root.querySelector("#sleepR"); if(r){ r.oninput=()=>{ document.getElementById("sleepLbl").textContent=r.value; }; }
+  root.querySelectorAll("[data-rem-toggle]").forEach(el=>el.onclick=()=>{ const x=S.reminders.find(q=>q.id===el.dataset.remToggle); x.on=!x.on; save(); render(); });
+  root.querySelectorAll("[data-rem-time]").forEach(el=>el.onchange=()=>{ const x=S.reminders.find(q=>q.id===el.dataset.remTime); if(/^\d{2}:\d{2}$/.test(el.value)) x.time=el.value; save(); render(); });
   root.querySelectorAll("#chatIn,#askIn").forEach(i=>i.onkeydown=(e)=>{ if(e.key==="Enter") act(i.id==="chatIn"?"chatSend":"askSend"); });
 }
 function act(a,d,el){
