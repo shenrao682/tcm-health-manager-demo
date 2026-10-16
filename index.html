@@ -331,7 +331,10 @@ function dailyPicks(m){
     return {it,score,why};
   }).sort((a,b)=>b.score-a.score||cands.indexOf(a.it)-cands.indexOf(b.it));
   const fam=t=>t.startsWith("diet")?"diet":t; const picks=[]; const fams=new Set();
+  // one acupoint every day (the product's differentiator): take the best-scored acupoint first, then fill the other two sections
+  const bestAcu=scored.find(c=>c.it.type==="acupoint"); if(bestAcu){ picks.push(bestAcu); fams.add("acupoint"); }
   for(const c of scored){ if(fams.has(fam(c.it.type))) continue; picks.push(c); fams.add(fam(c.it.type)); if(picks.length===3) break; }
+  picks.sort((x,y)=>y.score-x.score);
   for(const c of scored){ if(picks.length===3) break; if(!picks.includes(c)) picks.push(c); }
   m.picksLog[S.day]=picks.map(p=>p.it.id); save();
   return picks.map(p=>({id:p.it.id,text:pickText(p.it),why:p.why.length?p.why.slice(0,2).join(" · "):tt("常规","routine"),src:SRC_LABEL(p.it)}));
