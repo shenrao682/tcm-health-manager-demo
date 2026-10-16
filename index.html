@@ -221,7 +221,8 @@ const CTT_TIPS = {"lichun":{"pinghe":{"zh":"立春阳气初生,早起拉伸几�
 // current term for a local Date: last instant <= now (user's local time); also next term and days until it
 function termAt(now){ now=now||new Date(); const t=now.getTime(); let cur=null,nxt=null; for(const [code,iso] of TERM_INSTANTS){ const ms=Date.parse(iso); if(ms<=t) cur=[code,ms]; else { nxt=[code,ms]; break; } }
   if(!cur){ cur=TERM_INSTANTS[0].slice(); cur[1]=Date.parse(cur[1]); } const d=TERM_DEFS[cur[0]]; const nd=nxt?TERM_DEFS[nxt[0]]:null; const days=nxt?Math.ceil((nxt[1]-t)/86400000):null;
-  return {code:cur[0],def:d,index:d.i,name:pick(d),season:d.season,start:new Date(cur[1]),next:nd?{code:nxt[0],def:nd,name:pick(nd),days}:null}; }
+  const dayOf=Math.floor((t-cur[1])/86400000)+1; const length=nxt?Math.round((nxt[1]-cur[1])/86400000):15;
+  return {code:cur[0],def:d,index:d.i,name:pick(d),season:d.season,start:new Date(cur[1]),dayOf,length,next:nd?{code:nxt[0],def:nd,name:pick(nd),days}:null}; }
 const TERMNAME = ()=> termAt().name;
 const fmtDate = (d)=> EN()? d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : `${d.getMonth()+1}月${d.getDate()}日`;
 const fmtTime = (d)=> `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
@@ -362,7 +363,7 @@ const TABS = ()=>[["today",tt("今日","Today")],["constitution",tt("我的体�
 function render(){
   const phone=document.getElementById("phone"); phone.dataset.elder=S.elder?"1":"0"; phone.dataset.lang=S.lang;
   document.documentElement.lang = EN()?"en":"zh-CN";
-  document.getElementById("sbTerm").textContent = `${TERMNAME()} · ${fmtDate(new Date())}`;
+  const _T=termAt(); document.getElementById("sbTerm").textContent = `${fmtDate(new Date())} · ${tt(`${_T.name}第 ${_T.dayOf} 天`,`${_T.name}, day ${_T.dayOf}`)}`;
   renderSide();
   const m=M(); const top=S.stack[S.stack.length-1];
   const tb=document.getElementById("topbar");
@@ -416,7 +417,7 @@ function renderTab(tab){ return {today:S01,constitution:S04,plan:S06,me:ME}[tab]
 function S01(){
   const m=M(); const a=assess(m); const todayC=m.checkins[S.day]||{};
   const doneN=["sleep","diet","move","mood"].filter(k=>todayC[k]!=null).length;
-  const T0=termAt(); let html=`<div class="card soft"><div class="k">${esc(T0.name)} · ${tt(`第 ${T0.index} 个节气`,ordinal(T0.index)+" solar term")} · ${tt(`${fmtDate(T0.start)} ${fmtTime(T0.start)} 交节`,`began ${fmtDate(T0.start)} ${fmtTime(T0.start)}`)}${T0.next?` · ${tt(`距${T0.next.name} ${T0.next.days} 天`,`${T0.next.days} d to ${T0.next.name}`)}`:""}</div><div>${m.plan?esc(seasonTip(m.plan.code)):esc(pick(T0.def.tip))}</div></div>`;
+  const T0=termAt(); let html=`<div class="card soft"><div class="k">${tt(`${esc(T0.name)}节气 · 第 ${T0.dayOf} / ${T0.length} 天`,`${esc(T0.name)} period · day ${T0.dayOf} of ${T0.length}`)}</div><div class="small muted" style="margin-bottom:6px">${tt(`第 ${T0.index} 个节气 · ${fmtDate(T0.start)} ${fmtTime(T0.start)} 入节(当地时间)`,`${ordinal(T0.index)} term · began ${fmtDate(T0.start)} ${fmtTime(T0.start)} local time`)}${T0.next?` · ${tt(`${T0.next.days} 天后进入${T0.next.name}`,`${T0.next.name} in ${T0.next.days} days`)}`:""}</div><div>${m.plan?esc(seasonTip(m.plan.code)):esc(pick(T0.def.tip))}</div></div>`;
   if(!m.screenerDone){
     html+=`<div class="card guide"><h3>${tt("2 分钟了解你的体质","Know your constitution in 2 minutes")}</h3><p class="small muted" style="margin:0 0 10px">${tt("10 个小问题,马上拿到初步判断和一份初版调养方案。可以随时中断。","10 quick questions for a preliminary type and a first wellness plan. Stop any time.")}</p><div class="row"><button class="btn" data-act="startChat">${tt("对话方式","Chat")}</button><button class="btn sec" data-act="startForm">${tt("问卷方式","Questionnaire")}</button></div></div>`;
   } else if(m.plan){
