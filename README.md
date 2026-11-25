@@ -60,6 +60,7 @@ tcm-health-manager-demo/
 ├─ docs/
 │  ├─ proposal-client-mvp.html    客户端 MVP 开发方案(网页版)
 │  ├─ data-architecture.html      数据架构与存储策略:两层存储、表结构、同步协议、加密、合规
+│  ├─ 上架合规清单.md / .docx     Apple App Store 与 Google Play 上架合规清单(账户、法务、商店专项、产品功能、内容边界、时间线);compliance-timeline.png 为时间线图
 │  ├─ navigation-map.png          14 页导航组织图
 │  ├─ captions.js                 25 条字幕/旁白文本(中英)
 │  ├─ record-walkthrough.js       录屏脚本(Playwright):`node record-walkthrough.js zh ../index.html out_zh/`
